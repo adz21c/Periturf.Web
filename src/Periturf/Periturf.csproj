@@ -41,9 +41,17 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Auth\OAuth2\Client.cs" />
+    <Compile Include="Auth\OAuth2\GlobalOAuth2Service.cs" />
+    <Compile Include="Auth\OAuth2\IOAuth2Service.cs" />
+    <Compile Include="Auth\OAuth2\OAuth2Flow.cs" />
+    <Compile Include="Auth\OAuth2\Resource.cs" />
+    <Compile Include="Auth\OAuth2\Scope.cs" />
+    <Compile Include="Auth\OAuth2\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Auth\OAuth2\Certificate.pfx" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
