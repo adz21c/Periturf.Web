@@ -14,27 +14,15 @@
  * limitations under the License.
  */
 using System.Collections.Generic;
-using IdentityServer3.Core.Models;
-using IdentityServer3.Core.Services.InMemory;
 
-namespace Periturf.IdentityServer3
+namespace IdentityServer4.Models
 {
-    public class ConfigurationRegistration
+    public static class IdSvrScopeExtensions
     {
-        public ConfigurationRegistration(
-            List<global::IdentityServer3.Core.Models.Client> clients,
-            List<global::IdentityServer3.Core.Models.Scope> scopes,
-            List<InMemoryUser> users)
+        public static void UserClaim(this Scope scope, string name)
         {
-            Clients = clients;
-            Scopes = scopes;
-            Users = users;
+            scope.UserClaims = scope.UserClaims ?? new List<string>();
+            scope.UserClaims.Add(name);
         }
-
-        public List<global::IdentityServer3.Core.Models.Client> Clients { get; }
-
-        public List<global::IdentityServer3.Core.Models.Scope> Scopes { get; }
-
-        public List<InMemoryUser> Users { get; }
     }
 }

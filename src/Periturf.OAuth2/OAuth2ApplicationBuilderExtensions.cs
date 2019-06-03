@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System.Collections.Generic;
-
-namespace Periturf.Auth.OAuth2
+namespace Microsoft.AspNetCore.Builder
 {
-    public class Resource
+    public static class OAuth2ApplicationBuilderExtensions
     {
-        public string Name { get; set; }
-        public bool IsIdentityResource { get; set; }
-        public List<string> Secrets { get; set; }
-        public List<Scope> Scopes { get; set; }
+        public static IApplicationBuilder UsePeriturfOAuth2(this IApplicationBuilder app)
+        {
+            return app.UseIdentityServer();
+        }
     }
 }

@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
 using System.Collections.Generic;
+using IdentityServer4.Models;
 
-namespace Periturf.Auth.OAuth2
+namespace Periturf.OAuth2
 {
-    public class Client
+    class ConfigurationRegistration
     {
-        public string ClientId { get; set; }
-        public OAuth2Flow Flow { get; set; }
-        public List<string> Scopes { get; set; }
-        public List<string> RedirectUrls { get; set; }
-        public TimeSpan TokenLifetime { get; set; }
-        public List<string> Secrets { get; set; }
+        public ConfigurationRegistration(
+            List<Client> clients)
+        {
+            Clients = clients;
+        }
+
+        public List<Client> Clients { get; }
     }
 }

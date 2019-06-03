@@ -19,22 +19,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using IdentityServer3.Core.Models;
-using IdentityServer3.Core.Services;
-using IdentityServer3.Core.Services.InMemory;
+using IdentityServer4.Models;
+using IdentityServer4.Stores;
 
-namespace Periturf.IdentityServer3
+namespace Periturf.OAuth2
 {
-    class ConfigurationStore : IClientStore, IScopeStore, IUserService
+    class ConfigurationStore : IClientStore, IResourceStore
     {
+        // Concurrent friendly configuration registration
         private readonly ConcurrentDictionary<Guid, ConfigurationRegistration> _configurations = new ConcurrentDictionary<Guid, ConfigurationRegistration>();
 
+        // locking
         private readonly TimeSpan _readLockTimeout;
         private readonly TimeSpan _writeLockTimeout;
         private readonly ReaderWriterLockSlim _resourceManager = new ReaderWriterLockSlim();
-        private InMemoryClientStore _clients = new InMemoryClientStore(Enumerable.Empty<global::IdentityServer3.Core.Models.Client>());
-        private InMemoryScopeStore _scopes = new InMemoryScopeStore(Enumerable.Empty<global::IdentityServer3.Core.Models.Scope>());
-        private InMemoryUserService _users = new InMemoryUserService(Enumerable.Empty<InMemoryUser>().ToList());
+
+        // In memory store implementations
+        private InMemoryClientStore _clients = new InMemoryClientStore(Enumerable.Empty<Client>());
+        private InMemoryResourcesStore _resources = new InMemoryResourcesStore(Enumerable.Empty<IdentityResource>(), Enumerable.Empty<ApiResource>());
 
         public ConfigurationStore(TimeSpan? readLock = null, TimeSpan? writeLock = null)
         {
@@ -75,12 +77,8 @@ namespace Periturf.IdentityServer3
             try
             {
                 var newClients = _configurations.Values.SelectMany(x => x.Clients).ToList();
-                var newScopes = _configurations.Values.SelectMany(x => x.Scopes).ToList();
-                var newUsers = _configurations.Values.SelectMany(x => x.Users).ToList();
 
                 _clients = new InMemoryClientStore(newClients);
-                _scopes = new InMemoryScopeStore(newScopes);
-                _users = new InMemoryUserService(newUsers);
             }
             finally
             {
@@ -131,54 +129,29 @@ namespace Periturf.IdentityServer3
 
         #region Passthrough methods
 
-        public Task<global::IdentityServer3.Core.Models.Client> FindClientByIdAsync(string clientId)
+        Task<Client> IClientStore.FindClientByIdAsync(string clientId)
         {
             return ReadLockedAsync(() => _clients.FindClientByIdAsync(clientId));
         }
 
-        public Task<IEnumerable<global::IdentityServer3.Core.Models.Scope>> FindScopesAsync(IEnumerable<string> scopeNames)
+        Task<IEnumerable<IdentityResource>> IResourceStore.FindIdentityResourcesByScopeAsync(IEnumerable<string> scopeNames)
         {
-            return ReadLockedAsync(() => _scopes.FindScopesAsync(scopeNames));
+            return ReadLockedAsync(() => _resources.FindIdentityResourcesByScopeAsync(scopeNames));
         }
 
-        public Task<IEnumerable<global::IdentityServer3.Core.Models.Scope>> GetScopesAsync(bool publicOnly = true)
+        Task<IEnumerable<ApiResource>> IResourceStore.FindApiResourcesByScopeAsync(IEnumerable<string> scopeNames)
         {
-            return ReadLockedAsync(() => _scopes.GetScopesAsync(publicOnly));
+            return ReadLockedAsync(() => _resources.FindApiResourcesByScopeAsync(scopeNames));
         }
 
-        public Task PreAuthenticateAsync(PreAuthenticationContext context)
+        Task<ApiResource> IResourceStore.FindApiResourceAsync(string name)
         {
-            return ReadLockedAsync(() => _users.PreAuthenticateAsync(context));
+            return ReadLockedAsync(() => _resources.FindApiResourceAsync(name));
         }
 
-        public Task AuthenticateLocalAsync(LocalAuthenticationContext context)
+        Task<Resources> IResourceStore.GetAllResourcesAsync()
         {
-            return ReadLockedAsync(() => _users.AuthenticateLocalAsync(context));
-        }
-
-        public Task AuthenticateExternalAsync(ExternalAuthenticationContext context)
-        {
-            return ReadLockedAsync(() => _users.AuthenticateExternalAsync(context));
-        }
-
-        public Task PostAuthenticateAsync(PostAuthenticationContext context)
-        {
-            return ReadLockedAsync(() => _users.PostAuthenticateAsync(context));
-        }
-
-        public Task SignOutAsync(SignOutContext context)
-        {
-            return ReadLockedAsync(() => _users.SignOutAsync(context));
-        }
-
-        public Task GetProfileDataAsync(ProfileDataRequestContext context)
-        {
-            return ReadLockedAsync(() => _users.GetProfileDataAsync(context));
-        }
-
-        public Task IsActiveAsync(IsActiveContext context)
-        {
-            return ReadLockedAsync(() => _users.IsActiveAsync(context));
+            return ReadLockedAsync(() => _resources.GetAllResourcesAsync());
         }
 
         #endregion

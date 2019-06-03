@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
+using IdentityServer4.Stores;
+using Periturf.OAuth2;
 
-namespace Periturf.Auth.OAuth2
+namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class GlobalOAuth2Service
+    static class InternalOAuth2ServiceCollectionExtensions
     {
-        public static void Initialize(IOAuth2Service instance)
+        public static void AddPeriturfOAuth2(this IServiceCollection services, ConfigurationStore configurationStore)
         {
-            if (instance == null)
-                throw new ArgumentNullException(nameof(instance));
-
-            if (instance != null)
-                throw new InvalidOperationException("Global instance already initialized");
-
-            Instance = instance;
+            services.AddIdentityServer()
+                .AddDeveloperSigningCredential()
+                .Services
+                    .AddSingleton<IClientStore, ConfigurationStore>(sp => configurationStore)
+                    .AddSingleton<IResourceStore, ConfigurationStore>(sp => configurationStore);
         }
-
-        public static IOAuth2Service Instance { get; private set; }
     }
 }
