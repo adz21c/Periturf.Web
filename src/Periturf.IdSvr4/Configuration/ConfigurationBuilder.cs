@@ -17,7 +17,7 @@ using IdentityServer4.Models;
 using System;
 using System.Collections.Generic;
 
-namespace Periturf.OAuth2.Configuration
+namespace Periturf.IdSvr4.Configuration
 {
     public class ConfigurationBuilder
     {

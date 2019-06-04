@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.OAuth2;
-using Periturf.OAuth2.Configuration;
+using Periturf.Components;
+using Periturf.IdSvr4.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 
-namespace Periturf.OAuth2
+namespace Periturf.IdSvr4
 {
-    public class OAuth2Services
+    public class IdSvr4Component : IComponent
     {
         internal ConfigurationStore ConfigurationStore { get; } = new ConfigurationStore();
 

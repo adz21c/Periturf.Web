@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Periturf.AspNetCore\Periturf.AspNetCore.csproj" />
     <ProjectReference Include="..\Periturf\Periturf.csproj" />
   </ItemGroup>
 

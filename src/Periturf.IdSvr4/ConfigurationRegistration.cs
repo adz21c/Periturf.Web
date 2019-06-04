@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using IdentityServer4.Stores;
-using Periturf.OAuth2;
+using System.Collections.Generic;
+using IdentityServer4.Models;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Periturf.IdSvr4
 {
-    static class InternalOAuth2ServiceCollectionExtensions
+    class ConfigurationRegistration
     {
-        public static void AddPeriturfOAuth2(this IServiceCollection services, ConfigurationStore configurationStore)
+        public ConfigurationRegistration(
+            List<Client> clients)
         {
-            services.AddIdentityServer()
-                .AddDeveloperSigningCredential()
-                .Services
-                    .AddSingleton<IClientStore, ConfigurationStore>(sp => configurationStore)
-                    .AddSingleton<IResourceStore, ConfigurationStore>(sp => configurationStore);
+            Clients = clients;
         }
+
+        public List<Client> Clients { get; }
     }
 }

@@ -13,13 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Microsoft.AspNetCore.Builder
+namespace Periturf
 {
-    public static class OAuth2ApplicationBuilderExtensions
+    public class EnvironmentSetupConfigurator
     {
-        public static IApplicationBuilder UsePeriturfOAuth2(this IApplicationBuilder app)
-        {
-            return app.UseIdentityServer();
-        }
     }
 }

@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 
-namespace Periturf.OAuth2
+namespace Periturf.IdSvr4
 {
     class ConfigurationStore : IClientStore, IResourceStore
     {

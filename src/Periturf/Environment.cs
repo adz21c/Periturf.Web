@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System.Collections.Generic;
-using IdentityServer4.Models;
+using System;
 
-namespace Periturf.OAuth2
+namespace Periturf
 {
-    class ConfigurationRegistration
+    public class Environment
     {
-        public ConfigurationRegistration(
-            List<Client> clients)
+        public void Setup(Action<EnvironmentSetupConfigurator> config)
         {
-            Clients = clients;
+            var configurator = new EnvironmentSetupConfigurator();
+            config(configurator);
         }
-
-        public List<Client> Clients { get; }
     }
 }
