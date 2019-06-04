@@ -14,15 +14,47 @@
  * limitations under the License.
  */
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Periturf.Components;
 
 namespace Periturf
 {
     public class Environment
     {
-        public void Setup(Action<EnvironmentSetupConfigurator> config)
+        private readonly List<IHost> _hosts = new List<IHost>();
+
+        public void Setup(Action<ISetupConfigurator> config)
         {
-            var configurator = new EnvironmentSetupConfigurator();
+            var configurator = new SetupConfigurator(this);
             config(configurator);
+        }
+
+        public Task StartAsync(CancellationToken ct = default)
+        {
+            return Task.WhenAll(_hosts.Select(x => x.StartAsync(ct)));
+        }
+
+        public Task StopAsync(CancellationToken ct = default)
+        {
+            return Task.WhenAll(_hosts.Select(x => x.StopAsync(ct)));
+        }
+
+        class SetupConfigurator : ISetupConfigurator
+        {
+            private readonly Environment _env;
+
+            public SetupConfigurator(Environment env)
+            {
+                _env = env;
+            }
+
+            public void Host(IHost host)
+            {
+                _env._hosts.Add(host);
+            }
         }
     }
 }

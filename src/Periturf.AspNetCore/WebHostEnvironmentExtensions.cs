@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Periturf.AspNetCore;
 using System;
 
-namespace Periturf.AspNetCore
+namespace Periturf
 {
     public static class WebHostEnvironmentExtensions
     {
-        public static void WebHost(this EnvironmentSetupConfigurator setupConfigurator, Action<IPeriturfWebHostBuilder> config)
+        public static void WebHost(this ISetupConfigurator setupConfigurator, Action<IPeriturfWebHostBuilder> config)
         {
             var builder = new PeriturfWebHostBuilder(Microsoft.AspNetCore.WebHost.CreateDefaultBuilder());
             config(builder);
+            setupConfigurator.Host(new WebHostAdapter(builder.Build()));
         }
     }
 }
