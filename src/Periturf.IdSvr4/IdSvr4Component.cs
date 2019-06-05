@@ -14,26 +14,17 @@
  * limitations under the License.
  */
 using Periturf.Components;
-using Periturf.IdSvr4.Configuration;
 using System;
 
 namespace Periturf.IdSvr4
 {
-    public class IdSvr4Component : IComponent
+    class IdSvr4Component : IComponent
     {
-        internal ConfigurationStore ConfigurationStore { get; } = new ConfigurationStore();
+        public ConfigurationStore ConfigurationStore { get; } = new ConfigurationStore();
 
-        public Guid RegisterConfiguration(Action<ConfigurationBuilder> config)
+        public Guid RegisterConfiguration(ConfigurationRegistration reg)
         {
-            var builder = new ConfigurationBuilder();
-            config(builder);
-            return RegisterConfiguration(builder);
-        }
-
-        public Guid RegisterConfiguration(ConfigurationBuilder config)
-        {
-            var registration = config.Build();
-            return ConfigurationStore.Register(registration);
+            return ConfigurationStore.Register(reg);
         }
 
         public void UnregisterConfiguration(Guid configurationId)

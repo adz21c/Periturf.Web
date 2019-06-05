@@ -13,15 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace Periturf
 {
-    public static class SetupConfiguratorExtensions
+    public class IdSvr4SetupConfigurator
     {
-        public static void SetupIdSvr4(this ISetupConfigurator configurator, Action<IdSvr4SetupConfigurator> config)
+        public void Services(Action<IIdentityServerBuilder> config)
         {
-            configurator.WebHost(c => c.SetupIdSvr4(config));
+            ServicesCallback = config;
         }
+
+        internal Action<IIdentityServerBuilder> ServicesCallback { get; private set; }
     }
 }

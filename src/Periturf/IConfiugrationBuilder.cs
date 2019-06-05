@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
+using Periturf.Components;
 
 namespace Periturf
 {
-    public static class SetupConfiguratorExtensions
+    public interface IConfiugrationBuilder
     {
-        public static void SetupIdSvr4(this ISetupConfigurator configurator, Action<IdSvr4SetupConfigurator> config)
-        {
-            configurator.WebHost(c => c.SetupIdSvr4(config));
-        }
+        T GetComponent<T>() where T : IComponent;
     }
 }

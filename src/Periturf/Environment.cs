@@ -26,6 +26,8 @@ namespace Periturf
     {
         private readonly List<IHost> _hosts = new List<IHost>();
 
+        #region Setup
+
         public void Setup(Action<ISetupConfigurator> config)
         {
             var configurator = new SetupConfigurator(this);
@@ -56,5 +58,32 @@ namespace Periturf
                 _env._hosts.Add(host);
             }
         }
+
+        #endregion
+
+        #region Configure
+
+        public void Configure(Action<IConfiugrationBuilder> config)
+        {
+            var builder = new ConfigurationBuilder(this);
+            config(builder);
+        }
+
+        class ConfigurationBuilder : IConfiugrationBuilder
+        {
+            private Environment _environment;
+
+            public ConfigurationBuilder(Environment environment)
+            {
+                _environment = environment;
+            }
+
+            public T GetComponent<T>() where T : IComponent
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
     }
 }

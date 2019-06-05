@@ -24,9 +24,9 @@ namespace Periturf
 {
     public static class WebHostBuilderExtensions
     {
-        public static void SetupIdSvr4(this IPeriturfWebHostBuilder builder, Action<IdSvr4Configurator> config)
+        public static void SetupIdSvr4(this IPeriturfWebHostBuilder builder, Action<IdSvr4SetupConfigurator> config)
         {
-            var configurator = new IdSvr4Configurator();
+            var configurator = new IdSvr4SetupConfigurator();
             config(configurator);
 
             builder.Configure(app => app.UseIdentityServer());

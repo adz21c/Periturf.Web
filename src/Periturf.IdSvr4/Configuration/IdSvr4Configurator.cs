@@ -13,20 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
+using IdentityServer4.Models;
+using Periturf.IdSvr4;
 using System;
+using System.Collections.Generic;
 
 namespace Periturf
 {
     public class IdSvr4Configurator
     {
-        public void Services(Action<IIdentityServerBuilder> config)
+        private readonly List<Client> _clients = new List<Client>();
+        private readonly List<Resource> _resources = new List<Resource>();
+
+        public void Client(Action<Client> config)
         {
-            ServicesCallback = config;
+            var client = new Client();
+            config(client);
+            Client(client);
         }
 
-        internal Action<IIdentityServerBuilder> ServicesCallback { get; private set; }
+        public void Client(Client client)
+        {
+            _clients.Add(client);
+        }
+
+        public void IdentityResource(Action<IdentityResource> config)
+        {
+            var resource = new IdentityResource();
+            config(resource);
+            Resource(resource);
+        }
+
+        public void ApiResource(Action<ApiResource> config)
+        {
+            var resource = new ApiResource();
+            config(resource);
+            Resource(resource);
+        }
+
+        public void Resource(Resource resource)
+        {
+            _resources.Add(resource);
+        }
+
+        internal ConfigurationRegistration Build()
+        {
+            return new ConfigurationRegistration(_clients);
+        }
     }
 }
