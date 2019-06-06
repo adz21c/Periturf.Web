@@ -29,8 +29,8 @@ namespace Periturf
             var configurator = new IdSvr4Configurator();
             config(configurator);
 
-            var reg = configurator.Build();
-            idSvr4Component.RegisterConfiguration(reg);
+            var configRegistration = configurator.Build();
+            builder.AddComponentConfigurator(new ComponentConfigurator(idSvr4Component, configRegistration));
         }
     }
 }

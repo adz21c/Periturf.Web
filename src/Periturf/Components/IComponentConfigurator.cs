@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.Components;
+using System;
 
-namespace Periturf
+namespace Periturf.Components
 {
-    public interface IConfiugrationBuilder
+    public interface IComponentConfigurator
     {
-        T GetComponent<T>() where T : IComponent;
+        IComponent Component { get; }
 
-        void AddComponentConfigurator(IComponentConfigurator componentConfigurator);
+        void RegisterConfiguration(Guid id);
     }
 }

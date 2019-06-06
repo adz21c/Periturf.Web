@@ -14,13 +14,26 @@
  * limitations under the License.
  */
 using Periturf.Components;
+using System;
 
-namespace Periturf
+namespace Periturf.IdSvr4
 {
-    public interface IConfiugrationBuilder
+    class ComponentConfigurator : IComponentConfigurator
     {
-        T GetComponent<T>() where T : IComponent;
+        private readonly IdSvr4Component _component;
+        private readonly ConfigurationRegistration _config;
 
-        void AddComponentConfigurator(IComponentConfigurator componentConfigurator);
+        public ComponentConfigurator(IdSvr4Component component, ConfigurationRegistration config)
+        {
+            _component = component;
+            _config = config;
+        }
+
+        public IComponent Component => _component;
+
+        public void RegisterConfiguration(Guid id)
+        {
+            _component.RegisterConfiguration(_config);
+        }
     }
 }

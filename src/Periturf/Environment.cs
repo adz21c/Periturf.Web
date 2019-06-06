@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -63,25 +64,79 @@ namespace Periturf
 
         #region Configure
 
-        public void Configure(Action<IConfiugrationBuilder> config)
+        private readonly ConcurrentDictionary<Guid, int> _configurationKeys = new ConcurrentDictionary<Guid, int>();
+
+        public Guid Configure(Action<IConfiugrationBuilder> config)
         {
-            var builder = new ConfigurationBuilder(this);
+            // Get the configuration
+            var builder = new ConfigurationBuilder();
             config(builder);
+
+            // Get an unused unique id
+            var id = Guid.NewGuid();
+            _configurationKeys.AddOrUpdate(id, 0, (old, @new) => throw new InvalidOperationException("Not a unique guid"));
+
+            var configurators = builder.GetConfigurators();
+            var configuredComponents = new List<IComponent>(configurators.Count);
+            try
+            {
+                // Apply the configuration
+                foreach(var configurator in configurators)
+                {
+                    configurator.RegisterConfiguration(id);
+                    configuredComponents.Add(configurator.Component);
+                }
+
+                return id;
+            }
+            catch
+            {
+                // Rollback everything achieved up to now
+                foreach (var component in configuredComponents)
+                    component.UnregisterConfiguration(id);
+
+                _configurationKeys.TryRemove(id, out var dontCare);
+                throw;
+            }
+        }
+
+        public void RemoveConfiguration(Guid id)
+        {
+            var _components = new List<IComponent>();   // TODO: Make this a member
+
+            var exceptions = new List<ComponentConfigurationRemovalFailureDetails>();
+            foreach (var component in _components)
+            {
+                try
+                {
+                    component.UnregisterConfiguration(id);
+                }
+                catch (Exception ex)
+                {
+                    // record and try the next
+                    exceptions.Add(new ComponentConfigurationRemovalFailureDetails(component, ex));
+                }
+            }
+
+            if (exceptions.Any())
+                throw new FailedConfigurationRemovalException(id, exceptions);
         }
 
         class ConfigurationBuilder : IConfiugrationBuilder
         {
-            private Environment _environment;
-
-            public ConfigurationBuilder(Environment environment)
-            {
-                _environment = environment;
-            }
+            private readonly List<IComponentConfigurator> _configurators = new List<IComponentConfigurator>();
 
             public T GetComponent<T>() where T : IComponent
             {
                 throw new NotImplementedException();
             }
+
+            public void AddComponentConfigurator(IComponentConfigurator componentConfigurator)
+            {
+                _configurators.Add(componentConfigurator);
+            }
+
+            public List<IComponentConfigurator> GetConfigurators() => _configurators.ToList();
         }
 
         #endregion

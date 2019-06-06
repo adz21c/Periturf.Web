@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 using Periturf.Components;
+using System;
 
 namespace Periturf
 {
-    public interface IConfiugrationBuilder
+    public class ComponentConfigurationRemovalFailureDetails
     {
-        T GetComponent<T>() where T : IComponent;
+        protected ComponentConfigurationRemovalFailureDetails()
+        { }
 
-        void AddComponentConfigurator(IComponentConfigurator componentConfigurator);
+        public ComponentConfigurationRemovalFailureDetails(IComponent component, Exception exception)
+        {
+            Component = component;
+            Exception = exception;
+        }
+
+        public IComponent Component { get; }
+
+        public Exception Exception { get; }
     }
 }
