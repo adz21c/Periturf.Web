@@ -44,7 +44,7 @@ namespace Periturf
                     .AddIdentityServer()
                     .AddDeveloperSigningCredential();
 
-                configurator.ServicesCallback(identityServiceBuilder);
+                configurator.ServicesCallback?.Invoke(identityServiceBuilder);
             });
 
             builder.AddComponent(component);
