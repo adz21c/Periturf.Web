@@ -40,7 +40,7 @@ namespace Periturf.Tests
                 });
             });
 
-            var response = new FlurlClient("http://localhost:3500/connect/token")
+            var response = await new FlurlClient("http://localhost:3500/connect/token")
                 .Request()
                 .PostStringAsync("client_id=Client&client_secret=secret&grant_type=client_credntials");
 

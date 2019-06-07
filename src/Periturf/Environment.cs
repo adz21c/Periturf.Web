@@ -69,7 +69,7 @@ namespace Periturf
         public Guid Configure(Action<IConfiugrationBuilder> config)
         {
             // Get the configuration
-            var builder = new ConfigurationBuilder();
+            var builder = new ConfigurationBuilder(this);
             config(builder);
 
             // Get an unused unique id
@@ -125,10 +125,16 @@ namespace Periturf
         class ConfigurationBuilder : IConfiugrationBuilder
         {
             private readonly List<IComponentConfigurator> _configurators = new List<IComponentConfigurator>();
+            private readonly Environment _environment;
+
+            public ConfigurationBuilder(Environment environment)
+            {
+                _environment = environment;
+            }
 
             public T GetComponent<T>() where T : IComponent
             {
-                throw new NotImplementedException();
+                return _environment._hosts.SelectMany(x => x.Components).OfType<T>().FirstOrDefault();
             }
 
             public void AddComponentConfigurator(IComponentConfigurator componentConfigurator)

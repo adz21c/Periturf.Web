@@ -9,7 +9,7 @@ namespace Periturf
         {
             var builder = new PeriturfWebHostBuilder(Microsoft.AspNetCore.WebHost.CreateDefaultBuilder());
             config(builder);
-            setupConfigurator.Host(new WebHostAdapter(builder.Build()));
+            setupConfigurator.Host(new WebHostAdapter(builder.Build(), builder.Components));
         }
     }
 }

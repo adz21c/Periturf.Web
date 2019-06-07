@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,6 +21,8 @@ namespace Periturf.Components
 {
     public interface IHost
     {
+        IReadOnlyCollection<IComponent> Components { get; }
+
         Task StartAsync(CancellationToken ct = default);
 
         Task StopAsync(CancellationToken ct = default);
