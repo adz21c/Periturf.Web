@@ -25,15 +25,17 @@ namespace Periturf
 {
     public class Environment
     {
-        private readonly List<IHost> _hosts = new List<IHost>();
-
-        #region Setup
-
-        public void Setup(Action<ISetupConfigurator> config)
+        public static Environment Setup(Action<ISetupConfigurator> config)
         {
-            var configurator = new SetupConfigurator(this);
+            var env = new Environment();
+
+            var configurator = new SetupConfigurator(env);
             config(configurator);
+
+            return env;
         }
+
+        private readonly List<IHost> _hosts = new List<IHost>();
 
         public Task StartAsync(CancellationToken ct = default)
         {
@@ -59,8 +61,6 @@ namespace Periturf
                 _env._hosts.Add(host);
             }
         }
-
-        #endregion
 
         #region Configure
 
