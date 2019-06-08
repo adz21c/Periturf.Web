@@ -23,7 +23,8 @@ namespace Periturf
     public class IdSvr4Configurator
     {
         private readonly List<Client> _clients = new List<Client>();
-        private readonly List<Resource> _resources = new List<Resource>();
+        private readonly List<IdentityResource> _identityResources = new List<IdentityResource>();
+        private readonly List<ApiResource> _apiResources = new List<ApiResource>();
 
         public void Client(Action<Client> config)
         {
@@ -41,24 +42,29 @@ namespace Periturf
         {
             var resource = new IdentityResource();
             config(resource);
-            Resource(resource);
+            IdentityResource(resource);
+        }
+
+        public void IdentityResource(IdentityResource resource)
+        {
+            _identityResources.Add(resource);
         }
 
         public void ApiResource(Action<ApiResource> config)
         {
             var resource = new ApiResource();
             config(resource);
-            Resource(resource);
+            ApiResource(resource);
         }
 
-        public void Resource(Resource resource)
+        public void ApiResource(ApiResource resource)
         {
-            _resources.Add(resource);
+            _apiResources.Add(resource);
         }
 
         internal ConfigurationRegistration Build()
         {
-            return new ConfigurationRegistration(_clients);
+            return new ConfigurationRegistration(_clients, _identityResources, _apiResources);
         }
     }
 }

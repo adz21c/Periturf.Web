@@ -21,11 +21,19 @@ namespace Periturf.IdSvr4
     class ConfigurationRegistration
     {
         public ConfigurationRegistration(
-            List<Client> clients)
+            List<Client> clients,
+            List<IdentityResource> identityResources,
+            List<ApiResource> apiResources)
         {
             Clients = clients;
+            IdentityResources = identityResources;
+            ApiResources = apiResources;
         }
 
         public List<Client> Clients { get; }
+
+        public List<IdentityResource> IdentityResources { get;  }
+
+        public List<ApiResource> ApiResources { get; }
     }
 }

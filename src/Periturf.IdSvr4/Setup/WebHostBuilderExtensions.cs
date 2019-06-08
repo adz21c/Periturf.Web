@@ -31,14 +31,13 @@ namespace Periturf
 
             builder.Configure(app => app.UseIdentityServer());
 
-            var configurationStore = new ConfigurationStore();
             var component = new IdSvr4Component();
 
             builder.ConfigureServices(services =>
             {
                 services
-                    .AddSingleton<IClientStore, ConfigurationStore>(sp => configurationStore)
-                    .AddSingleton<IResourceStore, ConfigurationStore>(sp => configurationStore);
+                    .AddSingleton<IClientStore, ConfigurationStore>(sp => component.ConfigurationStore)
+                    .AddSingleton<IResourceStore, ConfigurationStore>(sp => component.ConfigurationStore);
 
                 var identityServiceBuilder = services
                     .AddIdentityServer()

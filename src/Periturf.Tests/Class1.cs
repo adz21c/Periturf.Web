@@ -1,9 +1,11 @@
 ﻿using Flurl.Http;
+using IdentityModel.Client;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Hosting;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 
 namespace Periturf.Tests
@@ -32,17 +34,23 @@ namespace Periturf.Tests
                     i.Client(cl =>
                     {
                         cl.ClientId = "Client";
-                        cl.ClientName = "HELP";
-                        cl.Secret("secret");
-                        cl.AccessTokenType = AccessTokenType.Jwt;
+                        cl.ClientName = "Client";
+                        cl.Secret("secret".Sha256());
                         cl.AllowedGrantTypes = GrantTypes.ClientCredentials;
+                        cl.Scope("Resource");
                     });
+                    i.ApiResource(new ApiResource("Resource", "Resource Name"));
                 });
             });
 
-            var response = await new FlurlClient("http://localhost:3500/connect/token")
-                .Request()
-                .PostStringAsync("client_id=Client&client_secret=secret&grant_type=client_credntials");
+            var client = new HttpClient();
+            client.BaseAddress = new Uri("http://localhost:3500/connect/token");
+            var token = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+            {
+                ClientId = "Client",
+                ClientSecret = "secret",
+                Scope = "Resource"
+            });
 
             env.RemoveConfiguration(configId);
         }

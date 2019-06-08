@@ -77,8 +77,11 @@ namespace Periturf.IdSvr4
             try
             {
                 var newClients = _configurations.Values.SelectMany(x => x.Clients).ToList();
+                var newIdentityResources = _configurations.Values.SelectMany(x => x.IdentityResources).ToList();
+                var newApiResources = _configurations.Values.SelectMany(x => x.ApiResources).ToList();
 
                 _clients = new InMemoryClientStore(newClients);
+                _resources = new InMemoryResourcesStore(newIdentityResources, newApiResources);
             }
             finally
             {
