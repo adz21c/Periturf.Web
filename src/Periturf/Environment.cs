@@ -36,6 +36,7 @@ namespace Periturf
         }
 
         private readonly List<IHost> _hosts = new List<IHost>();
+        private readonly List<IComponent> _components = new List<IComponent>();
 
         private Environment()
         { }
@@ -62,6 +63,7 @@ namespace Periturf
             public void Host(IHost host)
             {
                 _env._hosts.Add(host);
+                _env._components.AddRange(host.Components);
             }
         }
 
@@ -105,7 +107,7 @@ namespace Periturf
 
         public void RemoveConfiguration(Guid id)
         {
-            var _components = new List<IComponent>();   // TODO: Make this a member
+            
 
             var exceptions = new List<ComponentConfigurationRemovalFailureDetails>();
             foreach (var component in _components)
