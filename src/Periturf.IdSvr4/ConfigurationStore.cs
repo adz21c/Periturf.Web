@@ -44,22 +44,10 @@ namespace Periturf.IdSvr4
             _writeLockTimeout = writeLock ?? TimeSpan.FromSeconds(5);
         }
 
-        public Guid Register(ConfigurationRegistration config)
+        public void Register(Guid id, ConfigurationRegistration config)
         {
-            var tryCount = 3;
-
-            Guid id;
-            do
-            {
-                tryCount -= 1;
-                if (tryCount == 0)
-                    throw new Exception("Failed to add configuration");
-            }
-            while (!_configurations.TryAdd(id = CreateConfigurationId(), config));
-
+            _configurations[id] = config;
             RebuildStores();
-
-            return id;
         }
 
         public void Unregister(Guid id)
@@ -70,7 +58,6 @@ namespace Periturf.IdSvr4
 
         private void RebuildStores()
         {
-
             if (!_resourceManager.TryEnterWriteLock(_writeLockTimeout))
                 throw new TimeoutException("Failed to gain write lock");
 
@@ -87,17 +74,6 @@ namespace Periturf.IdSvr4
             {
                 _resourceManager.ExitWriteLock();
             }
-        }
-
-        private Guid CreateConfigurationId()
-        {
-            Guid id;
-            do
-            {
-                id = Guid.NewGuid();
-            }
-            while (_configurations.ContainsKey(id));
-            return id;
         }
 
         private async Task<T> ReadLockedAsync<T>(Func<Task<T>> readFunc)

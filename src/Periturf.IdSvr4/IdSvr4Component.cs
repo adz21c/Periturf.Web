@@ -22,9 +22,9 @@ namespace Periturf.IdSvr4
     {
         public ConfigurationStore ConfigurationStore { get; } = new ConfigurationStore();
 
-        public Guid RegisterConfiguration(ConfigurationRegistration reg)
+        public void RegisterConfiguration(Guid id, ConfigurationRegistration reg)
         {
-            return ConfigurationStore.Register(reg);
+            ConfigurationStore.Register(id, reg);
         }
 
         public void UnregisterConfiguration(Guid configurationId)

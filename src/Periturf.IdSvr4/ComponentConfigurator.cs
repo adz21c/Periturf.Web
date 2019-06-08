@@ -33,7 +33,7 @@ namespace Periturf.IdSvr4
 
         public void RegisterConfiguration(Guid id)
         {
-            _component.RegisterConfiguration(_config);
+            _component.RegisterConfiguration(id, _config);
         }
     }
 }
