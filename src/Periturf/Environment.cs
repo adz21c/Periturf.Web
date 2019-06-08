@@ -37,6 +37,9 @@ namespace Periturf
 
         private readonly List<IHost> _hosts = new List<IHost>();
 
+        private Environment()
+        { }
+
         public Task StartAsync(CancellationToken ct = default)
         {
             return Task.WhenAll(_hosts.Select(x => x.StartAsync(ct)));
