@@ -1,5 +1,4 @@
-﻿using Flurl.Http;
-using IdentityModel.Client;
+﻿using IdentityModel.Client;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Hosting;
 using NUnit.Framework;
