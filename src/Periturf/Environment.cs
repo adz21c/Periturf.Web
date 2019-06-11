@@ -31,9 +31,16 @@ namespace Periturf
         private Environment()
         { }
 
-        public Task StartAsync(CancellationToken ct = default)
+        public async Task StartAsync(CancellationToken ct = default)
         {
-            return Task.WhenAll(_hosts.Select(x => x.StartAsync(ct)));
+            try
+            {
+                await Task.WhenAll(_hosts.Select(x => x.StartAsync(ct)));
+            }
+            catch
+            {
+                await Task.WhenAll(_hosts.Select(x => x.StopAsync(ct)));
+            }
         }
 
         public Task StopAsync(CancellationToken ct = default)
