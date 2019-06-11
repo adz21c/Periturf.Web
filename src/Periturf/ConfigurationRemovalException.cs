@@ -22,13 +22,13 @@ namespace Periturf
     [Serializable]
     public class ConfigurationRemovalException : Exception
     {
-        public ConfigurationRemovalException(Guid id, List<ComponentConfigurationRemovalFailureDetails> details)
+        public ConfigurationRemovalException(Guid id, List<ComponentExceptionDetails> details)
         {
             Id = id;
             Details = details;
         }
 
-        public ConfigurationRemovalException(string message, Guid id, List<ComponentConfigurationRemovalFailureDetails> details) : base(message)
+        public ConfigurationRemovalException(string message, Guid id, List<ComponentExceptionDetails> details) : base(message)
         {
             Id = id;
             Details = details;
@@ -40,6 +40,6 @@ namespace Periturf
 
         public Guid Id { get; }
 
-        public List<ComponentConfigurationRemovalFailureDetails> Details { get; }
+        public List<ComponentExceptionDetails> Details { get; }
     }
 }
