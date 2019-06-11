@@ -26,7 +26,7 @@ namespace Periturf.Tests
 
             await env.StartAsync();
 
-            var configId = env.Configure(c =>
+            var config = env.Configure(c =>
             {
                 c.ConfigureIdSvr4(i =>
                 {
@@ -51,7 +51,20 @@ namespace Periturf.Tests
                 Scope = "Resource"
             });
 
-            env.RemoveConfiguration(configId);
+            if (token.IsError)
+                throw new Exception("Nope");
+
+            config.Dispose();
+
+            var token2 = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+            {
+                ClientId = "Client",
+                ClientSecret = "secret",
+                Scope = "Resource"
+            });
+
+            if (!token2.IsError)
+                throw new Exception("Nope2");
         }
     }
 }

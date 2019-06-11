@@ -25,16 +25,6 @@ namespace Periturf
 {
     public class Environment
     {
-        public static Environment Setup(Action<ISetupConfigurator> config)
-        {
-            var env = new Environment();
-
-            var configurator = new SetupConfigurator(env);
-            config(configurator);
-
-            return env;
-        }
-
         private readonly List<IHost> _hosts = new List<IHost>();
         private readonly List<IComponent> _components = new List<IComponent>();
 
@@ -49,6 +39,18 @@ namespace Periturf
         public Task StopAsync(CancellationToken ct = default)
         {
             return Task.WhenAll(_hosts.Select(x => x.StopAsync(ct)));
+        }
+
+        #region Setup
+
+        public static Environment Setup(Action<ISetupConfigurator> config)
+        {
+            var env = new Environment();
+
+            var configurator = new SetupConfigurator(env);
+            config(configurator);
+
+            return env;
         }
 
         class SetupConfigurator : ISetupConfigurator
@@ -67,11 +69,13 @@ namespace Periturf
             }
         }
 
+        #endregion
+
         #region Configure
 
         private readonly ConcurrentDictionary<Guid, int> _configurationKeys = new ConcurrentDictionary<Guid, int>();
 
-        public Guid Configure(Action<IConfiugrationBuilder> config)
+        public IDisposable Configure(Action<IConfiugrationBuilder> config)
         {
             // Get the configuration
             var builder = new ConfigurationBuilder(this);
@@ -92,7 +96,7 @@ namespace Periturf
                     configuredComponents.Add(configurator.Component);
                 }
 
-                return id;
+                return new ConfigurationDisposable(id, this);
             }
             catch
             {
@@ -105,10 +109,8 @@ namespace Periturf
             }
         }
 
-        public void RemoveConfiguration(Guid id)
+        private void RemoveConfiguration(Guid id)
         {
-            
-
             var exceptions = new List<ComponentConfigurationRemovalFailureDetails>();
             foreach (var component in _components)
             {
@@ -122,6 +124,8 @@ namespace Periturf
                     exceptions.Add(new ComponentConfigurationRemovalFailureDetails(component, ex));
                 }
             }
+
+            _configurationKeys.TryRemove(id, out var dontCare);
 
             if (exceptions.Any())
                 throw new FailedConfigurationRemovalException(id, exceptions);
@@ -148,6 +152,42 @@ namespace Periturf
             }
 
             public List<IComponentConfigurator> GetConfigurators() => _configurators.ToList();
+        }
+
+        class ConfigurationDisposable : IDisposable
+        {
+            private readonly Environment _environment;
+            private readonly Guid _configId;
+
+            public ConfigurationDisposable(Guid configId, Environment environment)
+            {
+                _configId = configId;
+                _environment = environment;
+            }
+
+            #region IDisposable Support
+            private bool disposedValue = false; // To detect redundant calls
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!disposedValue)
+                {
+                    if (disposing)
+                    {
+                        _environment.RemoveConfiguration(_configId);
+                    }
+
+                    disposedValue = true;
+                }
+            }
+
+            // This code added to correctly implement the disposable pattern.
+            public void Dispose()
+            {
+                // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+                Dispose(true);
+            }
+            #endregion
         }
 
         #endregion
