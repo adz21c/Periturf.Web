@@ -20,21 +20,21 @@ using System.Runtime.Serialization;
 namespace Periturf
 {
     [Serializable]
-    internal class FailedConfigurationRemovalException : Exception
+    public class ConfigurationRemovalException : Exception
     {
-        public FailedConfigurationRemovalException(Guid id, List<ComponentConfigurationRemovalFailureDetails> details)
+        public ConfigurationRemovalException(Guid id, List<ComponentConfigurationRemovalFailureDetails> details)
         {
             Id = id;
             Details = details;
         }
 
-        public FailedConfigurationRemovalException(string message, Guid id, List<ComponentConfigurationRemovalFailureDetails> details) : base(message)
+        public ConfigurationRemovalException(string message, Guid id, List<ComponentConfigurationRemovalFailureDetails> details) : base(message)
         {
             Id = id;
             Details = details;
         }
 
-        protected FailedConfigurationRemovalException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected ConfigurationRemovalException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
 

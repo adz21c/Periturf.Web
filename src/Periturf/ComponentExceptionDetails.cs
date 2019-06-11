@@ -18,12 +18,12 @@ using System;
 
 namespace Periturf
 {
-    public class ComponentConfigurationRemovalFailureDetails
+    public class ComponentExceptionDetails
     {
-        protected ComponentConfigurationRemovalFailureDetails()
+        protected ComponentExceptionDetails()
         { }
 
-        public ComponentConfigurationRemovalFailureDetails(IComponent component, Exception exception)
+        public ComponentExceptionDetails(IComponent component, Exception exception)
         {
             Component = component;
             Exception = exception;
