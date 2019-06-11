@@ -112,7 +112,7 @@ namespace Periturf
 
         private void RemoveConfiguration(Guid id)
         {
-            var exceptions = new List<ComponentConfigurationRemovalFailureDetails>();
+            var exceptions = new List<ComponentExceptionDetails>();
             foreach (var component in _components.Values)
             {
                 try
@@ -122,14 +122,14 @@ namespace Periturf
                 catch (Exception ex)
                 {
                     // record and try the next
-                    exceptions.Add(new ComponentConfigurationRemovalFailureDetails(component, ex));
+                    exceptions.Add(new ComponentExceptionDetails(component, ex));
                 }
             }
 
             _configurationKeys.TryRemove(id, out var dontCare);
 
             if (exceptions.Any())
-                throw new FailedConfigurationRemovalException(id, exceptions);
+                throw new ConfigurationRemovalException(id, exceptions);
         }
 
         class ConfigurationBuilder : IConfiugrationBuilder
