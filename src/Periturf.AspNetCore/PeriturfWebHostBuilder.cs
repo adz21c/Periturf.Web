@@ -16,11 +16,11 @@ namespace Periturf.AspNetCore
             _builder = builder;
         }
 
-        public List<IComponent> Components { get; } = new List<IComponent>();
+        public Dictionary<string, IComponent> Components { get; } = new Dictionary<string, IComponent>();
 
-        public void AddComponent(IComponent component)
+        public void AddComponent(string name, IComponent component)
         {
-            Components.Add(component);
+            Components.Add(name, component);
         }
 
         public IWebHost Build()

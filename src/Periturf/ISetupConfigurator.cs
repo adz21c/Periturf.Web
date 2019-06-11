@@ -19,6 +19,6 @@ namespace Periturf
 {
     public interface ISetupConfigurator
     {
-        void Host(IHost host);
+        void Host(string name, IHost host);
     }
 }

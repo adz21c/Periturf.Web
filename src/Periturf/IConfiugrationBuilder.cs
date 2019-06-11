@@ -19,7 +19,7 @@ namespace Periturf
 {
     public interface IConfiugrationBuilder
     {
-        T GetComponent<T>() where T : IComponent;
+        T GetComponent<T>(string name) where T : IComponent;
 
         void AddComponentConfigurator(IComponentConfigurator componentConfigurator);
     }

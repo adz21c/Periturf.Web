@@ -22,9 +22,9 @@ namespace Periturf
 {
     public static class ConfigurationBuilderExtensions
     {
-        public static void ConfigureIdSvr4(this IConfiugrationBuilder builder, Action<IdSvr4Configurator> config)
+        public static void ConfigureIdSvr4(this IConfiugrationBuilder builder, string name, Action<IdSvr4Configurator> config)
         {
-            var idSvr4Component = builder.GetComponent<IdSvr4Component>();
+            var idSvr4Component = builder.GetComponent<IdSvr4Component>(name);
 
             var configurator = new IdSvr4Configurator();
             config(configurator);

@@ -17,10 +17,10 @@ namespace Periturf.Tests
         {
             var env = Environment.Setup(x =>
             {
-                x.WebHost(w =>
+                x.WebHost("host", w =>
                 {
                     w.UseUrls("http://localhost:3500/");
-                    w.SetupIdSvr4();
+                    w.SetupIdSvr4("component");
                 });
             });
 
@@ -28,7 +28,7 @@ namespace Periturf.Tests
 
             var config = env.Configure(c =>
             {
-                c.ConfigureIdSvr4(i =>
+                c.ConfigureIdSvr4("component", i =>
                 {
                     i.Client(cl =>
                     {

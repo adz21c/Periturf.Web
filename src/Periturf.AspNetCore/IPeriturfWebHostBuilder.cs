@@ -5,6 +5,6 @@ namespace Periturf
 {
     public interface IPeriturfWebHostBuilder : IWebHostBuilder
     {
-        void AddComponent(IComponent component);
+        void AddComponent(string name, IComponent component);
     }
 }

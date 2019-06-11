@@ -21,7 +21,7 @@ namespace Periturf.Components
 {
     public interface IHost
     {
-        IReadOnlyCollection<IComponent> Components { get; }
+        IReadOnlyDictionary<string, IComponent> Components { get; }
 
         Task StartAsync(CancellationToken ct = default);
 

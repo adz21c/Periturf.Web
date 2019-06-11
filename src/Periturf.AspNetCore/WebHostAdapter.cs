@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Periturf.Components;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,13 +12,13 @@ namespace Periturf.AspNetCore
     {
         private readonly IWebHost _host;
 
-        public WebHostAdapter(IWebHost host, IEnumerable<IComponent> components)
+        public WebHostAdapter(IWebHost host, IDictionary<string, IComponent> components)
         {
             _host = host;
-            Components = components.ToList();
+            Components = new ReadOnlyDictionary<string, IComponent>(components);
         }
 
-        public IReadOnlyCollection<IComponent> Components { get; }
+        public IReadOnlyDictionary<string, IComponent> Components { get; }
 
         public Task StartAsync(CancellationToken ct = default)
         {

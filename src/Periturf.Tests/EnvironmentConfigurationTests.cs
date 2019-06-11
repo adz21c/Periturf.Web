@@ -18,6 +18,7 @@ using NUnit.Framework;
 using Periturf.Components;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,11 +37,11 @@ namespace Periturf.Tests
             A.CallTo(() => componentConfigurator.Component).Returns(component);
 
             var host = A.Fake<IHost>();
-            A.CallTo(() => host.Components).Returns(new List<IComponent> { component });
+            A.CallTo(() => host.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { "component", component } }));
 
             var environment = Environment.Setup(x =>
             {
-                x.Host(host);
+                x.Host("host", host);
             });
 
             environment.Configure(x => x.AddComponentConfigurator(componentConfigurator));
@@ -58,11 +59,11 @@ namespace Periturf.Tests
             A.CallTo(() => componentConfigurator.Component).Returns(component);
 
             var host = A.Fake<IHost>();
-            A.CallTo(() => host.Components).Returns(new List<IComponent> { component });
+            A.CallTo(() => host.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { "component", component } }));
 
             var environment = Environment.Setup(x =>
             {
-                x.Host(host);
+                x.Host("host", host);
             });
 
             var config = environment.Configure(x => x.AddComponentConfigurator(componentConfigurator));

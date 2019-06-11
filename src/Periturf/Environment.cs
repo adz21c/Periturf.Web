@@ -25,20 +25,20 @@ namespace Periturf
 {
     public class Environment
     {
-        private readonly List<IHost> _hosts = new List<IHost>();
-        private readonly List<IComponent> _components = new List<IComponent>();
+        private readonly Dictionary<string, IHost> _hosts = new Dictionary<string, IHost>();
+        private readonly Dictionary<string, IComponent> _components = new Dictionary<string, IComponent>();
 
         private Environment()
         { }
 
         public Task StartAsync(CancellationToken ct = default)
         {
-            return Task.WhenAll(_hosts.Select(x => x.StartAsync(ct)));
+            return Task.WhenAll(_hosts.Values.Select(x => x.StartAsync(ct)));
         }
 
         public Task StopAsync(CancellationToken ct = default)
         {
-            return Task.WhenAll(_hosts.Select(x => x.StopAsync(ct)));
+            return Task.WhenAll(_hosts.Values.Select(x => x.StopAsync(ct)));
         }
 
         #region Setup
@@ -62,10 +62,11 @@ namespace Periturf
                 _env = env;
             }
 
-            public void Host(IHost host)
+            public void Host(string name, IHost host)
             {
-                _env._hosts.Add(host);
-                _env._components.AddRange(host.Components);
+                _env._hosts.Add(name, host);
+                foreach(var comp in host.Components)
+                    _env._components.Add(comp.Key, comp.Value);
             }
         }
 
@@ -112,7 +113,7 @@ namespace Periturf
         private void RemoveConfiguration(Guid id)
         {
             var exceptions = new List<ComponentConfigurationRemovalFailureDetails>();
-            foreach (var component in _components)
+            foreach (var component in _components.Values)
             {
                 try
                 {
@@ -141,9 +142,9 @@ namespace Periturf
                 _environment = environment;
             }
 
-            public T GetComponent<T>() where T : IComponent
+            public T GetComponent<T>(string name) where T : IComponent
             {
-                return _environment._hosts.SelectMany(x => x.Components).OfType<T>().FirstOrDefault();
+                return (T)_environment._components[name];
             }
 
             public void AddComponentConfigurator(IComponentConfigurator componentConfigurator)

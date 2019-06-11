@@ -34,7 +34,7 @@ namespace Periturf.Tests
 
             var environment = Environment.Setup(x =>
             {
-                x.Host(host);
+                x.Host("host", host);
             });
 
             Assert.DoesNotThrowAsync(() => environment.StartAsync());
@@ -53,8 +53,8 @@ namespace Periturf.Tests
 
             var environment = Environment.Setup(x =>
             {
-                x.Host(host);
-                x.Host(host2);
+                x.Host("host", host);
+                x.Host("host2", host2);
             });
 
             Assert.DoesNotThrowAsync(() => environment.StartAsync());
@@ -116,7 +116,7 @@ namespace Periturf.Tests
 
             var environment = Environment.Setup(x =>
             {
-                x.Host(host);
+                x.Host("host", host);
             });
 
             Assert.DoesNotThrowAsync(() => environment.StopAsync());
@@ -135,8 +135,8 @@ namespace Periturf.Tests
 
             var environment = Environment.Setup(x =>
             {
-                x.Host(host);
-                x.Host(host2);
+                x.Host("host", host);
+                x.Host("host2", host2);
             });
 
             Assert.DoesNotThrowAsync(() => environment.StopAsync());

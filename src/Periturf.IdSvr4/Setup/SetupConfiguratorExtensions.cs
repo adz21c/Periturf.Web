@@ -19,9 +19,9 @@ namespace Periturf
 {
     public static class SetupConfiguratorExtensions
     {
-        public static void SetupIdSvr4(this ISetupConfigurator configurator, Action<IdSvr4SetupConfigurator> config = null)
+        public static void SetupIdSvr4(this ISetupConfigurator configurator, string name, Action<IdSvr4SetupConfigurator> config = null)
         {
-            configurator.WebHost(c => c.SetupIdSvr4(config));
+            configurator.WebHost(name + ".WebHost", c => c.SetupIdSvr4(name, config));
         }
     }
 }
