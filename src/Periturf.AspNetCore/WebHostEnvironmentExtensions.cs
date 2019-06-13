@@ -5,6 +5,11 @@ namespace Periturf
 {
     public static class WebHostEnvironmentExtensions
     {
+        public static void WebHost(this ISetupConfigurator setupConfigurator, Action<IPeriturfWebHostBuilder> config)
+        {
+            setupConfigurator.WebHost("WebHost", config);
+        }
+
         public static void WebHost(this ISetupConfigurator setupConfigurator, string name, Action<IPeriturfWebHostBuilder> config)
         {
             var builder = new PeriturfWebHostBuilder(Microsoft.AspNetCore.WebHost.CreateDefaultBuilder());
