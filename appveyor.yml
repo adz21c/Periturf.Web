@@ -1,16 +1,28 @@
 ﻿image: Visual Studio 2017
+
+branches:
+  only:
+    - develop
+    - master
+
+skip_tags: true
+
 environment:
   JAVA_HOME: c:/Program Files/Java/jdk1.8.0
-build_script:
+
+build: off
+test: off
+
+before_build:
+  - cmd: choco install gitversion.portable -pre -y
+  - ps: gitversion /l console /output buildserver /updateAssemblyInfo
   cmd: >-
-    choco install gitversion.portable -pre -y
-    
     dotnet tool install --global dotnet-sonarscanner
     
     dotnet restore src
     
-    gitversion /l console /output buildserver /updateAssemblyInfo
-    
+build_script:
+  cmd: >-
     dotnet sonarscanner begin /k:"adz21c_Periturf" /o:"adz21c-github" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="52802d649c768a8651be8b82c80f6b5c9e569fae"
     
     dotnet build src
@@ -18,4 +30,3 @@ build_script:
     dotnet test src /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
     
     dotnet sonarscanner end /d:sonar.login="52802d649c768a8651be8b82c80f6b5c9e569fae"
-test: off
