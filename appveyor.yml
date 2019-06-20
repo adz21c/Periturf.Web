@@ -25,7 +25,7 @@ before_build:
     
 build_script:
   cmd: >-
-    dotnet sonarscanner begin /k:"adz21c_Periturf" /o:"adz21c-github" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="52802d649c768a8651be8b82c80f6b5c9e569fae"
+    dotnet sonarscanner begin /k:"adz21c_Periturf" /o:"adz21c-github" /v:"%GitVersion_FullSemVer%" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="52802d649c768a8651be8b82c80f6b5c9e569fae"
     
     dotnet build src
     
