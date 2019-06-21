@@ -18,20 +18,29 @@ using System.Runtime.Serialization;
 
 namespace Periturf
 {
+    [Serializable]
     public class EnvironmentStartException : Exception
     {
-        public EnvironmentStartException(HostExceptionDetails[] details, EnvironmentStopException stopException = null) : base("Failed to correctly start environment")
+        public EnvironmentStartException(HostExceptionDetails[] details) : base("Failed to correctly start environment")
         {
             Details = details;
-            StopException = stopException;
         }
 
         protected EnvironmentStartException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
+            Details = (HostExceptionDetails[]) info.GetValue("Details", typeof(HostExceptionDetails[]));
         }
 
         public HostExceptionDetails[] Details { get; }
 
-        public EnvironmentStopException StopException { get; }
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null)
+                throw new ArgumentNullException("info");
+
+            info.AddValue("Details", Details, typeof(HostExceptionDetails[]));
+
+            base.GetObjectData(info, context);
+        }
     }
 }

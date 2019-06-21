@@ -15,6 +15,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Periturf
@@ -22,24 +23,38 @@ namespace Periturf
     [Serializable]
     public class ConfigurationRemovalException : Exception
     {
-        public ConfigurationRemovalException(Guid id, List<ComponentExceptionDetails> details)
+        public ConfigurationRemovalException(Guid id, IEnumerable<ComponentExceptionDetails> details)
         {
             Id = id;
-            Details = details;
+            Details = details.ToArray();
         }
 
-        public ConfigurationRemovalException(string message, Guid id, List<ComponentExceptionDetails> details) : base(message)
+        public ConfigurationRemovalException(string message, Guid id, IEnumerable<ComponentExceptionDetails> details) : base(message)
         {
             Id = id;
-            Details = details;
+            Details = details.ToArray();
         }
 
         protected ConfigurationRemovalException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
+            Id = new Guid(info.GetString("Id"));
+            Details = (ComponentExceptionDetails[]) info.GetValue("Details", typeof(ComponentExceptionDetails[]));
         }
 
         public Guid Id { get; }
 
-        public List<ComponentExceptionDetails> Details { get; }
+        public ComponentExceptionDetails[] Details { get; }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null)
+                throw new ArgumentNullException("info");
+
+            info.AddValue("Id", Id);
+
+            info.AddValue("Details", Details, typeof(HostExceptionDetails[]));
+
+            base.GetObjectData(info, context);
+        }
     }
 }

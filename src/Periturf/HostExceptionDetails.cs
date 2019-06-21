@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.Components;
 using System;
 
 namespace Periturf
 {
     public class HostExceptionDetails
     {
-        public HostExceptionDetails(IHost host, Exception exception)
+        public HostExceptionDetails(string hostName, Exception exception)
         {
-            Host = host;
+            HostName = hostName;
             Exception = exception;
         }
 
-        public IHost Host { get; }
+        public string HostName { get; }
 
         public Exception Exception { get; }
     }

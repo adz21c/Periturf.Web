@@ -18,6 +18,7 @@ using System.Runtime.Serialization;
 
 namespace Periturf
 {
+    [Serializable]
     public class EnvironmentStopException : Exception
     {
         public EnvironmentStopException(HostExceptionDetails[] details) : base("Failed to correctly stop environment")
@@ -27,8 +28,19 @@ namespace Periturf
 
         protected EnvironmentStopException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
+            Details = (HostExceptionDetails[])info.GetValue("Details", typeof(HostExceptionDetails[]));
         }
 
         public HostExceptionDetails[] Details { get; }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null)
+                throw new ArgumentNullException("info");
+
+            info.AddValue("Details", Details, typeof(HostExceptionDetails[]));
+
+            base.GetObjectData(info, context);
+        }
     }
 }
