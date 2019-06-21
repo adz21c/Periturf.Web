@@ -91,21 +91,6 @@ namespace Periturf.IdSvr4
             }
         }
 
-        private async Task ReadLockedAsync(Func<Task> readFunc)
-        {
-            if (!_resourceManager.TryEnterReadLock(_readLockTimeout))
-                throw new TimeoutException("Failed to enter read lock");
-
-            try
-            {
-                await readFunc();
-            }
-            finally
-            {
-                _resourceManager.ExitReadLock();
-            }
-        }
-
         #region Passthrough methods
 
         Task<Client> IClientStore.FindClientByIdAsync(string clientId)
