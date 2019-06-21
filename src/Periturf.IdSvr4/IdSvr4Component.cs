@@ -27,9 +27,9 @@ namespace Periturf.IdSvr4
             ConfigurationStore.Register(id, reg);
         }
 
-        public void UnregisterConfiguration(Guid configurationId)
+        public void UnregisterConfiguration(Guid id)
         {
-            ConfigurationStore.Unregister(configurationId);
+            ConfigurationStore.Unregister(id);
         }
     }
 }
