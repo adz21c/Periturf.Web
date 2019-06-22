@@ -21,24 +21,26 @@ namespace Periturf
     [Serializable]
     public class EnvironmentStartException : Exception
     {
-        public EnvironmentStartException(HostExceptionDetails[] details) : base("Failed to correctly start environment")
+        public EnvironmentStartException(HostExceptionDetails[] details = null) : base("Failed to correctly start environment")
         {
-            Details = details;
+            Details = details ?? new HostExceptionDetails[] { };
+        }
+
+        public EnvironmentStartException(string message, HostExceptionDetails[] details = null) : base(message)
+        {
+            Details = details ?? new HostExceptionDetails[] { };
         }
 
         protected EnvironmentStartException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
-            Details = (HostExceptionDetails[]) info.GetValue("Details", typeof(HostExceptionDetails[]));
+            Details = (HostExceptionDetails[]) info.GetValue(nameof(Details), typeof(HostExceptionDetails[]));
         }
 
         public HostExceptionDetails[] Details { get; }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (info == null)
-                throw new ArgumentNullException("info");
-
-            info.AddValue("Details", Details, typeof(HostExceptionDetails[]));
+            info.AddValue(nameof(Details), Details, typeof(HostExceptionDetails[]));
 
             base.GetObjectData(info, context);
         }

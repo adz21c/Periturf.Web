@@ -17,8 +17,12 @@ using System;
 
 namespace Periturf
 {
+    [Serializable]
     public class HostExceptionDetails
     {
+        protected HostExceptionDetails()
+        { }
+
         public HostExceptionDetails(string hostName, Exception exception)
         {
             HostName = hostName;
