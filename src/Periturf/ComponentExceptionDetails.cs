@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.Components;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Periturf
 {
     [Serializable]
     public class ComponentExceptionDetails
     {
+        [ExcludeFromCodeCoverage]
         protected ComponentExceptionDetails()
         { }
 

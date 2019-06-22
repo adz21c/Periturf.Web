@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Periturf
 {
     [Serializable]
     public class HostExceptionDetails
     {
+        [ExcludeFromCodeCoverage]
         protected HostExceptionDetails()
         { }
 
