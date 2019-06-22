@@ -16,19 +16,18 @@
 using FakeItEasy;
 using NUnit.Framework;
 using Periturf.Components;
-using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Periturf.Tests
 {
     [TestFixture]
-    class EnvironmentSetupTests
+    class EnvironmentStartAndStopTests
     {
         [Test]
         public void Given_EnvironmentWithOneHost_When_Start_Then_HostStarts()
         {
+            // Arrange
             var host = A.Fake<IHost>();
             A.CallTo(() => host.StartAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
 
@@ -37,14 +36,17 @@ namespace Periturf.Tests
                 x.Host("host", host);
             });
 
+            // Act
             Assert.DoesNotThrowAsync(() => environment.StartAsync());
 
+            // Assert
             A.CallTo(() => host.StartAsync(A<CancellationToken>._)).MustHaveHappened();
         }
 
         [Test]
         public void Given_EnvironmentWithMultipleHosts_When_Start_Then_HostsStart()
         {
+            // Arrange
             var host = A.Fake<IHost>();
             A.CallTo(() => host.StartAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
 
@@ -57,8 +59,10 @@ namespace Periturf.Tests
                 x.Host("host2", host2);
             });
 
+            // Act
             Assert.DoesNotThrowAsync(() => environment.StartAsync());
 
+            // Assert
             A.CallTo(() => host.StartAsync(A<CancellationToken>._)).MustHaveHappened();
             A.CallTo(() => host2.StartAsync(A<CancellationToken>._)).MustHaveHappened();
         }
@@ -111,6 +115,7 @@ namespace Periturf.Tests
         [Test]
         public void Given_EnvironmentWithOneHost_When_Stop_Then_HostStops()
         {
+            // Arrange
             var host = A.Fake<IHost>();
             A.CallTo(() => host.StopAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
 
@@ -119,14 +124,17 @@ namespace Periturf.Tests
                 x.Host("host", host);
             });
 
+            // Act
             Assert.DoesNotThrowAsync(() => environment.StopAsync());
 
+            // Assert
             A.CallTo(() => host.StopAsync(A<CancellationToken>._)).MustHaveHappened();
         }
 
         [Test]
         public void Given_EnvironmentWithMultipleHosts_When_Stop_Then_HostsStop()
         {
+            // Arrange
             var host = A.Fake<IHost>();
             A.CallTo(() => host.StopAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
 
@@ -139,8 +147,10 @@ namespace Periturf.Tests
                 x.Host("host2", host2);
             });
 
+            // Act
             Assert.DoesNotThrowAsync(() => environment.StopAsync());
 
+            // Assert
             A.CallTo(() => host.StopAsync(A<CancellationToken>._)).MustHaveHappened();
             A.CallTo(() => host2.StopAsync(A<CancellationToken>._)).MustHaveHappened();
         }
