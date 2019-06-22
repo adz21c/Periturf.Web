@@ -18,18 +18,19 @@ using System;
 
 namespace Periturf
 {
+    [Serializable]
     public class ComponentExceptionDetails
     {
         protected ComponentExceptionDetails()
         { }
 
-        public ComponentExceptionDetails(IComponent component, Exception exception)
+        public ComponentExceptionDetails(string componentName, Exception exception)
         {
-            Component = component;
+            ComponentName = componentName;
             Exception = exception;
         }
 
-        public IComponent Component { get; }
+        public string ComponentName { get; }
 
         public Exception Exception { get; }
     }

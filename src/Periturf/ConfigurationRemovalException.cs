@@ -23,22 +23,22 @@ namespace Periturf
     [Serializable]
     public class ConfigurationRemovalException : Exception
     {
-        public ConfigurationRemovalException(Guid id, IEnumerable<ComponentExceptionDetails> details)
+        public ConfigurationRemovalException(Guid id, ComponentExceptionDetails[] details = null) : base("There was a problem while removing configuration from environment")
         {
             Id = id;
-            Details = details.ToArray();
+            Details = details ?? new ComponentExceptionDetails[] { };
         }
 
-        public ConfigurationRemovalException(string message, Guid id, IEnumerable<ComponentExceptionDetails> details) : base(message)
+        public ConfigurationRemovalException(string message, Guid id, ComponentExceptionDetails[] details = null) : base(message)
         {
             Id = id;
-            Details = details.ToArray();
+            Details = details ?? new ComponentExceptionDetails[] { };
         }
 
         protected ConfigurationRemovalException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
-            Id = new Guid(info.GetString("Id"));
-            Details = (ComponentExceptionDetails[]) info.GetValue("Details", typeof(ComponentExceptionDetails[]));
+            Id = new Guid(info.GetString(nameof(Id)));
+            Details = (ComponentExceptionDetails[]) info.GetValue(nameof(Details), typeof(ComponentExceptionDetails[]));
         }
 
         public Guid Id { get; }
@@ -47,12 +47,8 @@ namespace Periturf
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (info == null)
-                throw new ArgumentNullException("info");
-
-            info.AddValue("Id", Id);
-
-            info.AddValue("Details", Details, typeof(HostExceptionDetails[]));
+            info.AddValue(nameof(Id), Id);
+            info.AddValue(nameof(Details), Details, typeof(HostExceptionDetails[]));
 
             base.GetObjectData(info, context);
         }

@@ -113,23 +113,23 @@ namespace Periturf
         private void RemoveConfiguration(Guid id)
         {
             var exceptions = new List<ComponentExceptionDetails>();
-            foreach (var component in _components.Values)
+            foreach (var component in _components)
             {
                 try
                 {
-                    component.UnregisterConfiguration(id);
+                    component.Value.UnregisterConfiguration(id);
                 }
                 catch (Exception ex)
                 {
                     // record and try the next
-                    exceptions.Add(new ComponentExceptionDetails(component, ex));
+                    exceptions.Add(new ComponentExceptionDetails(component.Key, ex));
                 }
             }
 
             _configurationKeys.TryRemove(id, out var dontCare);
 
             if (exceptions.Any())
-                throw new ConfigurationRemovalException(id, exceptions);
+                throw new ConfigurationRemovalException(id, exceptions.ToArray());
         }
 
         class ConfigurationBuilder : IConfiugrationBuilder
