@@ -89,7 +89,7 @@ namespace Periturf.Tests
         }
 
         [Test]
-        public async Task Given_MultipleComponents_When_ConfigureFails_Then_ThrowException()
+        public void Given_MultipleComponents_When_ConfigureFails_Then_ThrowException()
         {
             // Arrange
             var component1 = A.Fake<IComponent>();
