@@ -131,9 +131,23 @@ namespace Periturf
 
             public void Host(string name, IHost host)
             {
+                if (string.IsNullOrWhiteSpace(name))
+                    throw new ArgumentNullException(nameof(name));
+
+                if (host == null)
+                    throw new ArgumentNullException(nameof(host));
+
+                if (_env._hosts.ContainsKey(name))
+                    throw new DuplicateHostNameException(name);
+
                 _env._hosts.Add(name, host);
-                foreach(var comp in host.Components)
+                foreach (var comp in host.Components)
+                {
+                    if (_env._components.ContainsKey(comp.Key))
+                        throw new DuplicateComponentNameException(comp.Key);
+
                     _env._components.Add(comp.Key, comp.Value);
+                }
             }
         }
 
