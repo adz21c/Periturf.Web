@@ -43,8 +43,10 @@ namespace Periturf.Tests
             Assert.IsNotNull(environment);
         }
 
-        [Test]
-        public void Given_HostWithNullName_When_Setup_Then_ThrowException()
+        [TestCase(null, Description = "Null Host Name")]
+        [TestCase("", Description = "Empty Host Name")]
+        [TestCase(" ", Description = "Whitespace Host Name")]
+        public void Given_BadHostName_When_Setup_Then_ThrowException(string hostName)
         {
             // Arrange
             var component = A.Dummy<IComponent>();
@@ -54,43 +56,7 @@ namespace Periturf.Tests
             // Act
             var exception = Assert.Throws<ArgumentNullException>(() => Environment.Setup(x =>
             {
-                x.Host(null, host);
-            }));
-
-            // Assert
-            Assert.AreEqual("name", exception.ParamName);
-        }
-
-        [Test]
-        public void Given_HostWithEmptyName_When_Setup_Then_ThrowException()
-        {
-            // Arrange
-            var component = A.Dummy<IComponent>();
-            var host = A.Dummy<IHost>();
-            A.CallTo(() => host.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { "component", component } }));
-
-            // Act
-            var exception = Assert.Throws<ArgumentNullException>(() => Environment.Setup(x =>
-            {
-                x.Host(string.Empty, host);
-            }));
-
-            // Assert
-            Assert.AreEqual("name", exception.ParamName);
-        }
-
-        [Test]
-        public void Given_HostWithWhitespaceName_When_Setup_Then_ThrowException()
-        {
-            // Arrange
-            var component = A.Dummy<IComponent>();
-            var host = A.Dummy<IHost>();
-            A.CallTo(() => host.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { "component", component } }));
-
-            // Act
-            var exception = Assert.Throws<ArgumentNullException>(() => Environment.Setup(x =>
-            {
-                x.Host(" ", host);
+                x.Host(hostName, host);
             }));
 
             // Assert
