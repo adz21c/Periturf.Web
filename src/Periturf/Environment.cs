@@ -38,7 +38,43 @@ namespace Periturf
 
         public Task StopAsync(CancellationToken ct = default)
         {
-            return Task.WhenAll(_hosts.Values.Select(x => x.StopAsync(ct)));
+            return DoStopAsync(ct);
+        }
+
+        private async Task DoStopAsync(CancellationToken ct = default)
+        {
+            // For symplicity, lets not fail fast :-/
+            Task StopHost(KeyValuePair<string, IHost> host, CancellationToken ict)
+            {
+                try
+                {
+                    return host.Value.StopAsync(ict);
+                }
+                catch (Exception ex)
+                {
+                    return Task.FromException(ex);
+                }
+            }
+
+            var stoppingHosts = _hosts
+                .Select(x => new { Name = x.Key, Task = StopHost(x, ct) })
+                .ToList();
+
+            try
+            {
+                await Task.WhenAll(stoppingHosts.Select(x => x.Task));
+            }
+            catch
+            {
+                var hostDetails = stoppingHosts
+                    .Where(x => x.Task.IsFaulted)
+                    .Select(x => new HostExceptionDetails(
+                        x.Name,
+                        x.Task.Exception.InnerExceptions.First()))
+                    .ToArray();
+
+                throw new EnvironmentStopException(hostDetails);
+            }
         }
 
         #region Setup
