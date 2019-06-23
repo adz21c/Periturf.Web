@@ -20,13 +20,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Periturf.Tests
 {
     [TestFixture]
-    class EnvironmentConfigurationTests
+    class EnvironmentRegisterConfigurationTests
     {
         [Test]
         public async Task Given_MultipleComponents_When_Configure_Then_ComponentsAreConfigured()
@@ -57,7 +56,9 @@ namespace Periturf.Tests
 
             // Assert
             A.CallTo(() => componentConfigurator1.RegisterConfigurationAsync(A<Guid>._)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => component1.UnregisterConfiguration(A<Guid>._)).MustNotHaveHappened();
+            A.CallTo(() => componentConfigurator2.RegisterConfigurationAsync(A<Guid>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => component1.UnregisterConfigurationAsync(A<Guid>._)).MustNotHaveHappened();
+            A.CallTo(() => component2.UnregisterConfigurationAsync(A<Guid>._)).MustNotHaveHappened();
         }
 
         [TestCase(null, Description = "Null Component Name")]

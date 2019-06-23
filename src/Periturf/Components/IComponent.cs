@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 using System;
+using System.Threading.Tasks;
 
 namespace Periturf.Components
 {
     public interface IComponent
     {
-        void UnregisterConfiguration(Guid id);
+        Task UnregisterConfigurationAsync(Guid id);
     }
 }

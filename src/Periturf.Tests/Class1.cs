@@ -54,16 +54,17 @@ namespace Periturf.Tests
             if (token.IsError)
                 throw new Exception("Nope");
 
-            // Temp removed
-            //var token2 = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
-            //{
-            //    ClientId = "Client",
-            //    ClientSecret = "secret",
-            //    Scope = "Resource"
-            //});
+            await env.RemoveConfigurationAsync(configId);
 
-            //if (!token2.IsError)
-            //    throw new Exception("Nope2");
+            var token2 = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+            {
+                ClientId = "Client",
+                ClientSecret = "secret",
+                Scope = "Resource"
+            });
+
+            if (!token2.IsError)
+                throw new Exception("Nope2");
         }
     }
 }

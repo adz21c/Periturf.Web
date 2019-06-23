@@ -200,25 +200,40 @@ namespace Periturf
             }
         }
 
-        //private void RemoveConfiguration(Guid id)
-        //{
-        //    var exceptions = new List<ComponentExceptionDetails>();
-        //    foreach (var component in _components)
-        //    {
-        //        try
-        //        {
-        //            component.Value.UnregisterConfiguration(id);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            // record and try the next
-        //            exceptions.Add(new ComponentExceptionDetails(component.Key, ex));
-        //        }
-        //    }
+        public async Task RemoveConfigurationAsync(Guid configId)
+        {
+            Task RemoveConfiguration(IComponent component)
+            {
+                try
+                {
+                    return component.UnregisterConfigurationAsync(configId);
+                }
+                catch (Exception ex)
+                {
+                    return Task.FromException(ex);
+                }
+            }
 
-        //    if (exceptions.Any())
-        //        throw new ConfigurationRemovalException(id, exceptions.ToArray());
-        //}
+            var configuringComponents = _components
+                .Select(x => new { Name = x.Key, Task = RemoveConfiguration(x.Value) })
+                .ToList();
+
+            try
+            {
+                await Task.WhenAll(configuringComponents.Select(x => x.Task));
+            }
+            catch
+            {
+                var componentDetails = configuringComponents
+                    .Where(x => x.Task.IsFaulted)
+                    .Select(x => new ComponentExceptionDetails(
+                        x.Name,
+                        x.Task.Exception.InnerExceptions.First()))
+                    .ToArray();
+
+                throw new ConfigurationRemovalException(configId, componentDetails);
+            }
+        }
 
         class ConfigurationBuilder : IConfiugrationBuilder
         {

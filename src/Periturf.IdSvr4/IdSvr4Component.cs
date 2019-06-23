@@ -15,6 +15,7 @@
  */
 using Periturf.Components;
 using System;
+using System.Threading.Tasks;
 
 namespace Periturf.IdSvr4
 {
@@ -27,9 +28,10 @@ namespace Periturf.IdSvr4
             ConfigurationStore.Register(id, reg);
         }
 
-        public void UnregisterConfiguration(Guid id)
+        public Task UnregisterConfigurationAsync(Guid id)
         {
             ConfigurationStore.Unregister(id);
+            return Task.CompletedTask;
         }
     }
 }
