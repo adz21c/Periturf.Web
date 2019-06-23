@@ -173,9 +173,10 @@ namespace Periturf
         /// Configures expectation into the environment.
         /// </summary>
         /// <param name="config">The configuration.</param>
+        /// <param name="ct"></param>
         /// <returns>The unique identifier for the expectation configuration.</returns>
         /// <exception cref="ConfigurationApplicationException"></exception>
-        public async Task<Guid> ConfigureAsync(Action<IConfiugrationBuilder> config)
+        public async Task<Guid> ConfigureAsync(Action<IConfiugrationBuilder> config, CancellationToken ct = default)
         {
             var id = Guid.NewGuid();
 
@@ -183,7 +184,7 @@ namespace Periturf
             {
                 try
                 {
-                    return configurator.RegisterConfigurationAsync(id);
+                    return configurator.RegisterConfigurationAsync(id, ct);
                 }
                 catch (Exception ex)
                 {
@@ -224,15 +225,16 @@ namespace Periturf
         /// Removes the specified expectation configuration from the environment.
         /// </summary>
         /// <param name="configId">The configuration identifier.</param>
+        /// <param name="ct">The cancellation token.</param>
         /// <returns></returns>
         /// <exception cref="ConfigurationRemovalException"></exception>
-        public async Task RemoveConfigurationAsync(Guid configId)
+        public async Task RemoveConfigurationAsync(Guid configId, CancellationToken ct = default)
         {
             Task RemoveConfiguration(IComponent component)
             {
                 try
                 {
-                    return component.UnregisterConfigurationAsync(configId);
+                    return component.UnregisterConfigurationAsync(configId, ct);
                 }
                 catch (Exception ex)
                 {

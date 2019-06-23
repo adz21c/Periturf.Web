@@ -58,8 +58,8 @@ namespace Periturf.Tests
             await environment.RemoveConfigurationAsync(configId);
 
             // Assert
-            A.CallTo(() => component1.UnregisterConfigurationAsync(configId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => component2.UnregisterConfigurationAsync(configId)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => component1.UnregisterConfigurationAsync(configId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => component2.UnregisterConfigurationAsync(configId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace Periturf.Tests
             var failingComponent1Exception = new Exception("failingComponent1Exception");
             var failingComponent1 = A.Fake<IComponent>();
             // Throws immediately
-            A.CallTo(() => failingComponent1.UnregisterConfigurationAsync(A<Guid>._)).Throws(failingComponent1Exception);
+            A.CallTo(() => failingComponent1.UnregisterConfigurationAsync(A<Guid>._, A<CancellationToken>._)).Throws(failingComponent1Exception);
             var failingComponentConfigurator1 = A.Fake<IComponentConfigurator>();
 
             var host1 = A.Fake<IHost>();
@@ -89,7 +89,7 @@ namespace Periturf.Tests
             var failingComponent2Exception = new Exception("failingComponent2Exception");
             var failingComponent2 = A.Fake<IComponent>();
             // Throws via task
-            A.CallTo(() => failingComponent2.UnregisterConfigurationAsync(A<Guid>._)).Throws(failingComponent2Exception);
+            A.CallTo(() => failingComponent2.UnregisterConfigurationAsync(A<Guid>._, A<CancellationToken>._)).Throws(failingComponent2Exception);
             var failingComponentConfigurator2 = A.Fake<IComponentConfigurator>();
 
             var host2 = A.Fake<IHost>();
@@ -125,10 +125,10 @@ namespace Periturf.Tests
             Assert.That(exception.Details.Any(x => x.ComponentName == nameof(failingComponent2) && x.Exception == failingComponent2Exception), $"{nameof(failingComponent2)} is missing from the exception details");
 
             // Assert
-            A.CallTo(() => component1.UnregisterConfigurationAsync(configId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => failingComponent1.UnregisterConfigurationAsync(configId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => component2.UnregisterConfigurationAsync(configId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => failingComponent2.UnregisterConfigurationAsync(configId)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => component1.UnregisterConfigurationAsync(configId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => failingComponent1.UnregisterConfigurationAsync(configId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => component2.UnregisterConfigurationAsync(configId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => failingComponent2.UnregisterConfigurationAsync(configId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         }
     }
 }

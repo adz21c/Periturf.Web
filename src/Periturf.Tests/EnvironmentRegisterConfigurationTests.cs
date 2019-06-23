@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Periturf.Tests
@@ -55,10 +56,10 @@ namespace Periturf.Tests
             });
 
             // Assert
-            A.CallTo(() => componentConfigurator1.RegisterConfigurationAsync(A<Guid>._)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => componentConfigurator2.RegisterConfigurationAsync(A<Guid>._)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => component1.UnregisterConfigurationAsync(A<Guid>._)).MustNotHaveHappened();
-            A.CallTo(() => component2.UnregisterConfigurationAsync(A<Guid>._)).MustNotHaveHappened();
+            A.CallTo(() => componentConfigurator1.RegisterConfigurationAsync(A<Guid>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => componentConfigurator2.RegisterConfigurationAsync(A<Guid>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => component1.UnregisterConfigurationAsync(A<Guid>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => component2.UnregisterConfigurationAsync(A<Guid>._, A<CancellationToken>._)).MustNotHaveHappened();
         }
 
         [TestCase(null, Description = "Null Component Name")]
@@ -86,7 +87,7 @@ namespace Periturf.Tests
 
             // Assert
             Assert.AreEqual("componentName", exception.ParamName);
-            A.CallTo(() => componentConfigurator1.RegisterConfigurationAsync(A<Guid>._)).MustNotHaveHappened();
+            A.CallTo(() => componentConfigurator1.RegisterConfigurationAsync(A<Guid>._, A<CancellationToken>._)).MustNotHaveHappened();
         }
 
         [Test]
@@ -100,7 +101,7 @@ namespace Periturf.Tests
             var failingComponentConfigurator1 = A.Fake<IComponentConfigurator>();
             var failingComponent1Exception = new Exception("failingComponent1Exception");
             // Throws immediately
-            A.CallTo(() => failingComponentConfigurator1.RegisterConfigurationAsync(A<Guid>._)).Throws(failingComponent1Exception);
+            A.CallTo(() => failingComponentConfigurator1.RegisterConfigurationAsync(A<Guid>._, A<CancellationToken>._)).Throws(failingComponent1Exception);
 
             var host1 = A.Fake<IHost>();
             A.CallTo(() => host1.Components)
@@ -117,7 +118,7 @@ namespace Periturf.Tests
             var failingComponentConfigurator2 = A.Fake<IComponentConfigurator>();
             var failingComponent2Exception = new Exception("failingComponent2Exception");
             // Throws via task
-            A.CallTo(() => failingComponentConfigurator2.RegisterConfigurationAsync(A<Guid>._)).ThrowsAsync(failingComponent2Exception);
+            A.CallTo(() => failingComponentConfigurator2.RegisterConfigurationAsync(A<Guid>._, A<CancellationToken>._)).ThrowsAsync(failingComponent2Exception);
 
             var host2 = A.Fake<IHost>();
             A.CallTo(() => host2.Components)
@@ -150,10 +151,10 @@ namespace Periturf.Tests
             Assert.That(exception.Details.Any(x => x.ComponentName == nameof(failingComponent2) && x.Exception == failingComponent2Exception), $"{nameof(failingComponent2)} is missing from the exception details");
 
             // Assert
-            A.CallTo(() => componentConfigurator1.RegisterConfigurationAsync(A<Guid>._)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => failingComponentConfigurator1.RegisterConfigurationAsync(A<Guid>._)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => componentConfigurator1.RegisterConfigurationAsync(A<Guid>._)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => failingComponentConfigurator2.RegisterConfigurationAsync(A<Guid>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => componentConfigurator1.RegisterConfigurationAsync(A<Guid>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => failingComponentConfigurator1.RegisterConfigurationAsync(A<Guid>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => componentConfigurator1.RegisterConfigurationAsync(A<Guid>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => failingComponentConfigurator2.RegisterConfigurationAsync(A<Guid>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         }
     }
 }
