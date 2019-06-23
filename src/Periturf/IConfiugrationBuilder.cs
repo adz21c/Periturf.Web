@@ -18,8 +18,17 @@ using System;
 
 namespace Periturf
 {
+    /// <summary>
+    /// Gathers expectation configuration for the environment
+    /// </summary>
     public interface IConfiugrationBuilder
     {
+        /// <summary>
+        /// Adds a component configurator to the environment.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="componentName">Name of the component.</param>
+        /// <param name="config">Configurator for the component's expectation configuration.</param>
         void AddComponentConfigurator<T>(string componentName, Func<T, IComponentConfigurator> config) where T : IComponent;
     }
 }

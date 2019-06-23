@@ -18,26 +18,55 @@ using System.Runtime.Serialization;
 
 namespace Periturf
 {
+    /// <summary>
+    /// Thrown when a component name is used multiple times.
+    /// </summary>
+    /// <seealso cref="System.Exception" />
     [Serializable]
     public class DuplicateComponentNameException : Exception
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DuplicateComponentNameException"/> class.
+        /// </summary>
+        /// <param name="componentName">Name of the component.</param>
         public DuplicateComponentNameException(string componentName) : base($"Duplicate component name: {componentName}")
         {
             ComponentName = componentName;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DuplicateComponentNameException"/> class.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="componentName">Name of the component.</param>
         public DuplicateComponentNameException(string message, string componentName) : base(message)
         {
             ComponentName = componentName;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DuplicateComponentNameException"/> class.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"></see> that holds the serialized object data about the exception being thrown.</param>
+        /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"></see> that contains contextual information about the source or destination.</param>
         protected DuplicateComponentNameException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
             ComponentName = info.GetString(nameof(ComponentName));
         }
 
+        /// <summary>
+        /// Gets the name of the component.
+        /// </summary>
+        /// <value>
+        /// The name of the component.
+        /// </value>
         public string ComponentName { get; }
 
+        /// <summary>
+        /// When overridden in a derived class, sets the <see cref="T:System.Runtime.Serialization.SerializationInfo"></see> with information about the exception.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"></see> that holds the serialized object data about the exception being thrown.</param>
+        /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"></see> that contains contextual information about the source or destination.</param>
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue(nameof(ComponentName), ComponentName);

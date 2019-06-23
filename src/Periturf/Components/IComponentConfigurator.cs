@@ -18,8 +18,16 @@ using System.Threading.Tasks;
 
 namespace Periturf.Components
 {
+    /// <summary>
+    /// Applies configuration to a component.
+    /// </summary>
     public interface IComponentConfigurator
     {
+        /// <summary>
+        /// Registers configuration to a component under the supplied identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier for the configuration.</param>
+        /// <returns></returns>
         Task RegisterConfigurationAsync(Guid id);
     }
 }

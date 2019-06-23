@@ -18,21 +18,44 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Periturf
 {
+    /// <summary>
+    /// Contains details about an error coming from a component.
+    /// </summary>
     [Serializable]
     public class ComponentExceptionDetails
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ComponentExceptionDetails"/> class.
+        /// </summary>
         [ExcludeFromCodeCoverage]
         protected ComponentExceptionDetails()
         { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ComponentExceptionDetails"/> class.
+        /// </summary>
+        /// <param name="componentName">Name of the component.</param>
+        /// <param name="exception">The exception.</param>
         public ComponentExceptionDetails(string componentName, Exception exception)
         {
             ComponentName = componentName;
             Exception = exception;
         }
 
+        /// <summary>
+        /// Gets the name of the component.
+        /// </summary>
+        /// <value>
+        /// The name of the component.
+        /// </value>
         public string ComponentName { get; }
 
+        /// <summary>
+        /// Gets the exception.
+        /// </summary>
+        /// <value>
+        /// The exception.
+        /// </value>
         public Exception Exception { get; }
     }
 }

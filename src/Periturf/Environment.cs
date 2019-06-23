@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -23,6 +22,9 @@ using Periturf.Components;
 
 namespace Periturf
 {
+    /// <summary>
+    /// The environment which manages the assignment and removal of configuration to components.
+    /// </summary>
     public class Environment
     {
         private readonly Dictionary<string, IHost> _hosts = new Dictionary<string, IHost>();
@@ -31,6 +33,12 @@ namespace Periturf
         private Environment()
         { }
 
+        /// <summary>
+        /// Starts all hosts in the environment.
+        /// </summary>
+        /// <param name="ct">The cancellation token.</param>
+        /// <returns></returns>
+        /// <exception cref="EnvironmentStartException"></exception>
         public async Task StartAsync(CancellationToken ct = default)
         {
             // For symplicity, lets not fail fast :-/
@@ -67,12 +75,13 @@ namespace Periturf
             }
         }
 
-        public Task StopAsync(CancellationToken ct = default)
-        {
-            return DoStopAsync(ct);
-        }
-
-        private async Task DoStopAsync(CancellationToken ct = default)
+        /// <summary>
+        /// Stops all hosts in the environment.
+        /// </summary>
+        /// <param name="ct">The cancellation token.</param>
+        /// <returns></returns>
+        /// <exception cref="EnvironmentStopException"></exception>
+        public async Task StopAsync(CancellationToken ct = default)
         {
             // For symplicity, lets not fail fast :-/
             Task StopHost(KeyValuePair<string, IHost> host)
@@ -110,6 +119,11 @@ namespace Periturf
 
         #region Setup
 
+        /// <summary>
+        /// Creates and configures the hosts and components within an environment.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <returns></returns>
         public static Environment Setup(Action<ISetupConfigurator> config)
         {
             var env = new Environment();
@@ -155,6 +169,12 @@ namespace Periturf
 
         #region Configure
 
+        /// <summary>
+        /// Configures expectation into the environment.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <returns>The unique identifier for the expectation configuration.</returns>
+        /// <exception cref="ConfigurationApplicationException"></exception>
         public async Task<Guid> ConfigureAsync(Action<IConfiugrationBuilder> config)
         {
             var id = Guid.NewGuid();
@@ -200,6 +220,12 @@ namespace Periturf
             }
         }
 
+        /// <summary>
+        /// Removes the specified expectation configuration from the environment.
+        /// </summary>
+        /// <param name="configId">The configuration identifier.</param>
+        /// <returns></returns>
+        /// <exception cref="ConfigurationRemovalException"></exception>
         public async Task RemoveConfigurationAsync(Guid configId)
         {
             Task RemoveConfiguration(IComponent component)

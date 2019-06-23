@@ -17,8 +17,16 @@ using Periturf.Components;
 
 namespace Periturf
 {
+    /// <summary>
+    /// Gathers configuration for environment setup.
+    /// </summary>
     public interface ISetupConfigurator
     {
+        /// <summary>
+        /// Adds a host to the environment.
+        /// </summary>
+        /// <param name="name">Unique identifier for the host.</param>
+        /// <param name="host">The host.</param>
         void Host(string name, IHost host);
     }
 }

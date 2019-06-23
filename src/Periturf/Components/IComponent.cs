@@ -18,8 +18,17 @@ using System.Threading.Tasks;
 
 namespace Periturf.Components
 {
+    /// <summary>
+    /// Components run on hosts and are the pieces of the environment that the system under test will interact with.
+    /// Configuration can be registered and unregistered with them.
+    /// </summary>
     public interface IComponent
     {
+        /// <summary>
+        /// Unregisters the configuration associated with the supplied identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier for the configuration.</param>
+        /// <returns></returns>
         Task UnregisterConfigurationAsync(Guid id);
     }
 }
