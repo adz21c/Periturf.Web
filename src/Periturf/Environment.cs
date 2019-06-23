@@ -31,9 +31,40 @@ namespace Periturf
         private Environment()
         { }
 
-        public Task StartAsync(CancellationToken ct = default)
+        public async Task StartAsync(CancellationToken ct = default)
         {
-            return Task.WhenAll(_hosts.Values.Select(x => x.StartAsync(ct)));
+            // For symplicity, lets not fail fast :-/
+            Task StartHost(KeyValuePair<string, IHost> host)
+            {
+                try
+                {
+                    return host.Value.StartAsync(ct);
+                }
+                catch (Exception ex)
+                {
+                    return Task.FromException(ex);
+                }
+            }
+
+            var startingHosts = _hosts
+                .Select(x => new { Name = x.Key, Task = StartHost(x) })
+                .ToList();
+
+            try
+            {
+                await Task.WhenAll(startingHosts.Select(x => x.Task));
+            }
+            catch
+            {
+                var hostDetails = startingHosts
+                    .Where(x => x.Task.IsFaulted)
+                    .Select(x => new HostExceptionDetails(
+                        x.Name,
+                        x.Task.Exception.InnerExceptions.First()))
+                    .ToArray();
+
+                throw new EnvironmentStartException(hostDetails);
+            }
         }
 
         public Task StopAsync(CancellationToken ct = default)
@@ -44,11 +75,11 @@ namespace Periturf
         private async Task DoStopAsync(CancellationToken ct = default)
         {
             // For symplicity, lets not fail fast :-/
-            Task StopHost(KeyValuePair<string, IHost> host, CancellationToken ict)
+            Task StopHost(KeyValuePair<string, IHost> host)
             {
                 try
                 {
-                    return host.Value.StopAsync(ict);
+                    return host.Value.StopAsync(ct);
                 }
                 catch (Exception ex)
                 {
@@ -57,7 +88,7 @@ namespace Periturf
             }
 
             var stoppingHosts = _hosts
-                .Select(x => new { Name = x.Key, Task = StopHost(x, ct) })
+                .Select(x => new { Name = x.Key, Task = StopHost(x) })
                 .ToList();
 
             try
