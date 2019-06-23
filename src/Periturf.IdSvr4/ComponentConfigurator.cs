@@ -15,6 +15,7 @@
  */
 using Periturf.Components;
 using System;
+using System.Threading.Tasks;
 
 namespace Periturf.IdSvr4
 {
@@ -29,11 +30,10 @@ namespace Periturf.IdSvr4
             _config = config;
         }
 
-        public IComponent Component => _component;
-
-        public void RegisterConfiguration(Guid id)
+        public Task RegisterConfigurationAsync(Guid id)
         {
             _component.RegisterConfiguration(id, _config);
+            return Task.CompletedTask;
         }
     }
 }

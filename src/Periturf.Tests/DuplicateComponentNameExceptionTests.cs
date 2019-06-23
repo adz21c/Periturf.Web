@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Periturf.Tests

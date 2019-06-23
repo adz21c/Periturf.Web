@@ -155,67 +155,74 @@ namespace Periturf
 
         #region Configure
 
-        private readonly ConcurrentDictionary<Guid, int> _configurationKeys = new ConcurrentDictionary<Guid, int>();
-
-        public IDisposable Configure(Action<IConfiugrationBuilder> config)
+        public async Task<Guid> ConfigureAsync(Action<IConfiugrationBuilder> config)
         {
-            // Get the configuration
-            var builder = new ConfigurationBuilder(this);
-            config(builder);
-
-            // Get an unused unique id
             var id = Guid.NewGuid();
-            _configurationKeys.AddOrUpdate(id, 0, (old, @new) => throw new InvalidOperationException("Not a unique guid"));
 
-            var configurators = builder.GetConfigurators();
-            var configuredComponents = new List<IComponent>(configurators.Count);
-            try
-            {
-                // Apply the configuration
-                foreach(var configurator in configurators)
-                {
-                    configurator.RegisterConfiguration(id);
-                    configuredComponents.Add(configurator.Component);
-                }
-
-                return new ConfigurationDisposable(id, this);
-            }
-            catch
-            {
-                // Rollback everything achieved up to now
-                foreach (var component in configuredComponents)
-                    component.UnregisterConfiguration(id);
-
-                _configurationKeys.TryRemove(id, out var dontCare);
-                throw;
-            }
-        }
-
-        private void RemoveConfiguration(Guid id)
-        {
-            var exceptions = new List<ComponentExceptionDetails>();
-            foreach (var component in _components)
+            Task ConfigureComponent(IComponentConfigurator configurator)
             {
                 try
                 {
-                    component.Value.UnregisterConfiguration(id);
+                    return configurator.RegisterConfigurationAsync(id);
                 }
                 catch (Exception ex)
                 {
-                    // record and try the next
-                    exceptions.Add(new ComponentExceptionDetails(component.Key, ex));
+                    return Task.FromException(ex);
                 }
             }
 
-            _configurationKeys.TryRemove(id, out var dontCare);
+            // Gather configuration
+            var builder = new ConfigurationBuilder(this);
+            config(builder);
+            var configurators = builder.GetConfigurators();
 
-            if (exceptions.Any())
-                throw new ConfigurationRemovalException(id, exceptions.ToArray());
+            // Apply configuration
+            var configuringComponents = configurators
+                .Select(x => new { Name = x.Key, Task = ConfigureComponent(x.Value) })
+                .ToList();
+
+            try
+            {
+                await Task.WhenAll(configuringComponents.Select(x => x.Task));
+
+                return id;
+            }
+            catch
+            {
+                var componentDetails = configuringComponents
+                    .Where(x => x.Task.IsFaulted)
+                    .Select(x => new ComponentExceptionDetails(
+                        x.Name,
+                        x.Task.Exception.InnerExceptions.First()))
+                    .ToArray();
+
+                throw new ConfigurationApplicationException(componentDetails);
+            }
         }
+
+        //private void RemoveConfiguration(Guid id)
+        //{
+        //    var exceptions = new List<ComponentExceptionDetails>();
+        //    foreach (var component in _components)
+        //    {
+        //        try
+        //        {
+        //            component.Value.UnregisterConfiguration(id);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            // record and try the next
+        //            exceptions.Add(new ComponentExceptionDetails(component.Key, ex));
+        //        }
+        //    }
+
+        //    if (exceptions.Any())
+        //        throw new ConfigurationRemovalException(id, exceptions.ToArray());
+        //}
 
         class ConfigurationBuilder : IConfiugrationBuilder
         {
-            private readonly List<IComponentConfigurator> _configurators = new List<IComponentConfigurator>();
+            private readonly Dictionary<string, IComponentConfigurator> _configurators = new Dictionary<string, IComponentConfigurator>();
             private readonly Environment _environment;
 
             public ConfigurationBuilder(Environment environment)
@@ -223,53 +230,15 @@ namespace Periturf
                 _environment = environment;
             }
 
-            public T GetComponent<T>(string name) where T : IComponent
+            public void AddComponentConfigurator<T>(string componentName, Func<T, IComponentConfigurator> config)
+                where T : IComponent
             {
-                return (T)_environment._components[name];
+                var component = (T)_environment._components[componentName];
+                var componentConfigurator = config(component);
+                _configurators.Add(componentName, componentConfigurator);
             }
 
-            public void AddComponentConfigurator(IComponentConfigurator componentConfigurator)
-            {
-                _configurators.Add(componentConfigurator);
-            }
-
-            public List<IComponentConfigurator> GetConfigurators() => _configurators.ToList();
-        }
-
-        sealed class ConfigurationDisposable : IDisposable
-        {
-            private readonly Environment _environment;
-            private readonly Guid _configId;
-
-            public ConfigurationDisposable(Guid configId, Environment environment)
-            {
-                _configId = configId;
-                _environment = environment;
-            }
-
-            #region IDisposable Support
-            private bool disposedValue = false; // To detect redundant calls
-
-            private void Dispose(bool disposing)
-            {
-                if (!disposedValue)
-                {
-                    if (disposing)
-                    {
-                        _environment.RemoveConfiguration(_configId);
-                    }
-
-                    disposedValue = true;
-                }
-            }
-
-            // This code added to correctly implement the disposable pattern.
-            public void Dispose()
-            {
-                // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-                Dispose(true);
-            }
-            #endregion
+            public Dictionary<string, IComponentConfigurator> GetConfigurators() => _configurators;
         }
 
         #endregion

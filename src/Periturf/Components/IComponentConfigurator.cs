@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 using System;
+using System.Threading.Tasks;
 
 namespace Periturf.Components
 {
     public interface IComponentConfigurator
     {
-        IComponent Component { get; }
-
-        void RegisterConfiguration(Guid id);
+        Task RegisterConfigurationAsync(Guid id);
     }
 }

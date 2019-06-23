@@ -29,48 +29,110 @@ namespace Periturf.Tests
     class EnvironmentConfigurationTests
     {
         [Test]
-        public void Given_Environment_When_ComponentConfiguredAdded_Then_ComponentIsConfigured()
+        public async Task Given_MultipleComponents_When_Configure_Then_ComponentsAreConfigured()
         {
-            var component = A.Fake<IComponent>();
-            
-            var componentConfigurator = A.Fake<IComponentConfigurator>();
-            A.CallTo(() => componentConfigurator.Component).Returns(component);
+            // Arrange
+            var component1 = A.Fake<IComponent>();
+            var componentConfigurator1 = A.Fake<IComponentConfigurator>();
+            var host1 = A.Fake<IHost>();
+            A.CallTo(() => host1.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { nameof(component1), component1 } }));
 
-            var host = A.Fake<IHost>();
-            A.CallTo(() => host.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { "component", component } }));
+            var component2 = A.Fake<IComponent>();
+            var componentConfigurator2 = A.Fake<IComponentConfigurator>();
+            var host2 = A.Fake<IHost>();
+            A.CallTo(() => host2.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { nameof(component2), component2 } }));
 
             var environment = Environment.Setup(x =>
             {
-                x.Host("host", host);
+                x.Host(nameof(host1), host1);
+                x.Host(nameof(host2), host2);
             });
 
-            environment.Configure(x => x.AddComponentConfigurator(componentConfigurator));
+            // Act
+            await environment.ConfigureAsync(x =>
+            {
+                x.AddComponentConfigurator<IComponent>(nameof(component1), cmp => componentConfigurator1);
+                x.AddComponentConfigurator<IComponent>(nameof(component2), cmp => componentConfigurator2);
+            });
 
-            A.CallTo(() => componentConfigurator.RegisterConfiguration(A<Guid>._)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => component.UnregisterConfiguration(A<Guid>._)).MustNotHaveHappened();
+            // Assert
+            A.CallTo(() => componentConfigurator1.RegisterConfigurationAsync(A<Guid>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => component1.UnregisterConfiguration(A<Guid>._)).MustNotHaveHappened();
         }
 
+        //[Test]
+        //public void Given_MultipleHostsWithTheSameName_When_Setup_Then_ThrowException()
+        //{
+        //}
+
+        //[Test]
+        //public void Given_MultipleComponentsWithTheSameName_When_Setup_Then_ThrowException()
+        //{
+        //}
+
         [Test]
-        public void Given_EnvironmentWithConfiguration_When_ConfigurationDisposed_Then_ConfigurationRemoved()
+        public async Task Given_MultipleComponents_When_ConfigureFails_Then_ThrowException()
         {
-            var component = A.Fake<IComponent>();
+            // Arrange
+            var component1 = A.Fake<IComponent>();
+            var componentConfigurator1 = A.Fake<IComponentConfigurator>();
 
-            var componentConfigurator = A.Fake<IComponentConfigurator>();
-            A.CallTo(() => componentConfigurator.Component).Returns(component);
+            var failingComponent1 = A.Fake<IComponent>();
+            var failingComponentConfigurator1 = A.Fake<IComponentConfigurator>();
+            var failingComponent1Exception = new Exception("failingComponent1Exception");
+            A.CallTo(() => failingComponentConfigurator1.RegisterConfigurationAsync(A<Guid>._)).ThrowsAsync(failingComponent1Exception);
 
-            var host = A.Fake<IHost>();
-            A.CallTo(() => host.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { "component", component } }));
+            var host1 = A.Fake<IHost>();
+            A.CallTo(() => host1.Components)
+                .Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent>
+                {
+                    { nameof(component1), component1 },
+                    { nameof(failingComponent1), failingComponent1 }
+                }));
+
+            var component2 = A.Fake<IComponent>();
+            var componentConfigurator2 = A.Fake<IComponentConfigurator>();
+
+            var failingComponent2 = A.Fake<IComponent>();
+            var failingComponentConfigurator2 = A.Fake<IComponentConfigurator>();
+            var failingComponent2Exception = new Exception("failingComponent2Exception");
+            A.CallTo(() => failingComponentConfigurator2.RegisterConfigurationAsync(A<Guid>._)).ThrowsAsync(failingComponent2Exception);
+
+            var host2 = A.Fake<IHost>();
+            A.CallTo(() => host2.Components)
+                .Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent>
+                {
+                    { nameof(component2), component2 },
+                    { nameof(failingComponent2), failingComponent2 }
+                }));
 
             var environment = Environment.Setup(x =>
             {
-                x.Host("host", host);
+                x.Host(nameof(host1), host1);
+                x.Host(nameof(host2), host2);
             });
 
-            var config = environment.Configure(x => x.AddComponentConfigurator(componentConfigurator));
-            config.Dispose();
+            // Act
+            var exception = Assert.ThrowsAsync<ConfigurationApplicationException>(() => environment.ConfigureAsync(x =>
+            {
+                x.AddComponentConfigurator<IComponent>(nameof(component1), cmp => componentConfigurator1);
+                x.AddComponentConfigurator<IComponent>(nameof(failingComponent1), cmp => failingComponentConfigurator1);
+                x.AddComponentConfigurator<IComponent>(nameof(component2), cmp => componentConfigurator2);
+                x.AddComponentConfigurator<IComponent>(nameof(failingComponent2), cmp => failingComponentConfigurator2);
+            }));
 
-            A.CallTo(() => componentConfigurator.RegisterConfiguration(A<Guid>._)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => component.UnregisterConfiguration(A<Guid>._)).MustHaveHappenedOnceExactly();
+            // Assert
+            Assert.IsNotNull(exception.Details);
+            Assert.AreEqual(2, exception.Details.Length);
+
+            Assert.That(exception.Details.Any(x => x.ComponentName == nameof(failingComponent1) && x.Exception == failingComponent1Exception), $"{nameof(failingComponent1)} is missing from the exception details");
+            Assert.That(exception.Details.Any(x => x.ComponentName == nameof(failingComponent2) && x.Exception == failingComponent2Exception), $"{nameof(failingComponent2)} is missing from the exception details");
+
+            // Assert
+            A.CallTo(() => componentConfigurator1.RegisterConfigurationAsync(A<Guid>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => failingComponentConfigurator1.RegisterConfigurationAsync(A<Guid>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => componentConfigurator1.RegisterConfigurationAsync(A<Guid>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => failingComponentConfigurator2.RegisterConfigurationAsync(A<Guid>._)).MustHaveHappenedOnceExactly();
         }
     }
 }

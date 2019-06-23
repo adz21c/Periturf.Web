@@ -15,8 +15,6 @@
  */
 using Periturf.IdSvr4;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Periturf
 {
@@ -24,13 +22,14 @@ namespace Periturf
     {
         public static void ConfigureIdSvr4(this IConfiugrationBuilder builder, string name, Action<IdSvr4Configurator> config)
         {
-            var idSvr4Component = builder.GetComponent<IdSvr4Component>(name);
+            builder.AddComponentConfigurator<IdSvr4Component>(name, component =>
+            {
+                var configurator = new IdSvr4Configurator();
+                config(configurator);
 
-            var configurator = new IdSvr4Configurator();
-            config(configurator);
-
-            var configRegistration = configurator.Build();
-            builder.AddComponentConfigurator(new ComponentConfigurator(idSvr4Component, configRegistration));
+                var configRegistration = configurator.Build();
+                return new ComponentConfigurator(component, configRegistration);
+            });
         }
     }
 }

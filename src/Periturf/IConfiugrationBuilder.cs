@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 using Periturf.Components;
+using System;
 
 namespace Periturf
 {
     public interface IConfiugrationBuilder
     {
-        T GetComponent<T>(string name) where T : IComponent;
-
-        void AddComponentConfigurator(IComponentConfigurator componentConfigurator);
+        void AddComponentConfigurator<T>(string componentName, Func<T, IComponentConfigurator> config) where T : IComponent;
     }
 }
