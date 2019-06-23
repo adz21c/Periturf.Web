@@ -189,53 +189,5 @@ namespace Periturf.Tests
             A.CallTo(() => failingHost.StopAsync(A<CancellationToken>._)).MustHaveHappened();
             A.CallTo(() => failingHost2.StopAsync(A<CancellationToken>._)).MustHaveHappened();
         }
-
-        //[Test]
-        //public void Given_EnvironmentWithMultipleHosts_When_StartFailsAndStopFails_Then_Throw()
-        //{
-        //    var startedHost = A.Fake<IHost>();
-        //    var startedHostException = new Exception();
-        //    A.CallTo(() => startedHost.StartAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
-        //    A.CallTo(() => startedHost.StopAsync(A<CancellationToken>._)).Throws(startedHostException);
-
-        //    var startedHost2 = A.Fake<IHost>();
-        //    A.CallTo(() => startedHost2.StartAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
-        //    A.CallTo(() => startedHost.StopAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
-
-        //    var failingHostException = new Exception();
-        //    var failingHostOtherException = new Exception();
-        //    var failingHost = A.Fake<IHost>();
-        //    A.CallTo(() => failingHost.StartAsync(A<CancellationToken>._)).Throws(failingHostException);
-        //    A.CallTo(() => failingHost.StopAsync(A<CancellationToken>._)).Throws(failingHostOtherException);
-
-        //    var failingHostException2 = new Exception();
-        //    var failingHost2 = A.Fake<IHost>();
-        //    A.CallTo(() => failingHost2.StartAsync(A<CancellationToken>._)).Throws(failingHostException2);
-        //    A.CallTo(() => failingHost2.StopAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
-
-        //    var environment = Environment.Setup(x =>
-        //    {
-        //        x.Host(startedHost);
-        //        x.Host(failingHost);
-        //        x.Host(startedHost2);
-        //        x.Host(failingHost2);
-        //    });
-
-        //    var exception = Assert.ThrowsAsync<EnvironmentStartException>(() => environment.StopAsync());
-
-        //    Assert.NotNull(exception.Details);
-        //    Assert.AreEqual(2, exception.Details.Length);
-        //    Assert.That(exception.Details.Any(x => x.Host == failingHost && x.Exception == failingHostException));
-        //    Assert.That(exception.Details.Any(x => x.Host == failingHost2 && x.Exception == failingHostException2));
-        //    Assert.NotNull(exception.StopException);
-        //    Assert.AreEqual(2, exception.StopException.Details.Length);
-        //    Assert.That(exception.StopException.Details.Any(x => x.Host == startedHost && x.Exception == startedHostException));
-        //    Assert.That(exception.StopException.Details.Any(x => x.Host == failingHost && x.Exception == failingHostOtherException));
-
-        //    A.CallTo(() => startedHost.StopAsync(A<CancellationToken>._)).MustHaveHappened();
-        //    A.CallTo(() => startedHost2.StopAsync(A<CancellationToken>._)).MustHaveHappened();
-        //    A.CallTo(() => failingHost.StopAsync(A<CancellationToken>._)).MustHaveHappened();
-        //    A.CallTo(() => failingHost2.StopAsync(A<CancellationToken>._)).MustHaveHappened();
-        //}
     }
 }
