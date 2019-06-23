@@ -233,6 +233,9 @@ namespace Periturf
             public void AddComponentConfigurator<T>(string componentName, Func<T, IComponentConfigurator> config)
                 where T : IComponent
             {
+                if (string.IsNullOrWhiteSpace(componentName))
+                    throw new ArgumentNullException(nameof(componentName));
+
                 var component = (T)_environment._components[componentName];
                 var componentConfigurator = config(component);
                 _configurators.Add(componentName, componentConfigurator);

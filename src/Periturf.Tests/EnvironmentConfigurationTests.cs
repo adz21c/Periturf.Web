@@ -60,15 +60,33 @@ namespace Periturf.Tests
             A.CallTo(() => component1.UnregisterConfiguration(A<Guid>._)).MustNotHaveHappened();
         }
 
-        //[Test]
-        //public void Given_MultipleHostsWithTheSameName_When_Setup_Then_ThrowException()
-        //{
-        //}
+        [TestCase(null, Description = "Null Component Name")]
+        [TestCase("", Description = "Empty Component Name")]
+        [TestCase(" ", Description = "Whitespace Component Name")]
+        public void Given_BadComponentName_When_Configure_Then_ThrowException(string componentName)
+        {
 
-        //[Test]
-        //public void Given_MultipleComponentsWithTheSameName_When_Setup_Then_ThrowException()
-        //{
-        //}
+            // Arrange
+            var component1 = A.Fake<IComponent>();
+            var componentConfigurator1 = A.Fake<IComponentConfigurator>();
+            var host1 = A.Fake<IHost>();
+            A.CallTo(() => host1.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { nameof(component1), component1 } }));
+
+            var environment = Environment.Setup(x =>
+            {
+                x.Host(nameof(host1), host1);
+            });
+
+            // Act
+            var exception = Assert.ThrowsAsync<ArgumentNullException>(() => environment.ConfigureAsync(x =>
+            {
+                x.AddComponentConfigurator<IComponent>(componentName, cmp => componentConfigurator1);
+            }));
+
+            // Assert
+            Assert.AreEqual("componentName", exception.ParamName);
+            A.CallTo(() => componentConfigurator1.RegisterConfigurationAsync(A<Guid>._)).MustNotHaveHappened();
+        }
 
         [Test]
         public async Task Given_MultipleComponents_When_ConfigureFails_Then_ThrowException()
