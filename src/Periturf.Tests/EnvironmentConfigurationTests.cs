@@ -98,7 +98,8 @@ namespace Periturf.Tests
             var failingComponent1 = A.Fake<IComponent>();
             var failingComponentConfigurator1 = A.Fake<IComponentConfigurator>();
             var failingComponent1Exception = new Exception("failingComponent1Exception");
-            A.CallTo(() => failingComponentConfigurator1.RegisterConfigurationAsync(A<Guid>._)).ThrowsAsync(failingComponent1Exception);
+            // Throws immediately
+            A.CallTo(() => failingComponentConfigurator1.RegisterConfigurationAsync(A<Guid>._)).Throws(failingComponent1Exception);
 
             var host1 = A.Fake<IHost>();
             A.CallTo(() => host1.Components)
@@ -114,6 +115,7 @@ namespace Periturf.Tests
             var failingComponent2 = A.Fake<IComponent>();
             var failingComponentConfigurator2 = A.Fake<IComponentConfigurator>();
             var failingComponent2Exception = new Exception("failingComponent2Exception");
+            // Throws via task
             A.CallTo(() => failingComponentConfigurator2.RegisterConfigurationAsync(A<Guid>._)).ThrowsAsync(failingComponent2Exception);
 
             var host2 = A.Fake<IHost>();

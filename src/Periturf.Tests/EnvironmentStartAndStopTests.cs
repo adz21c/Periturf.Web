@@ -80,11 +80,13 @@ namespace Periturf.Tests
 
             var failingHostException = new Exception();
             var failingHost = A.Fake<IHost>();
+            // Throws immediately
             A.CallTo(() => failingHost.StartAsync(A<CancellationToken>._)).Throws(failingHostException);
 
             var failingHostException2 = new Exception();
             var failingHost2 = A.Fake<IHost>();
-            A.CallTo(() => failingHost2.StartAsync(A<CancellationToken>._)).Throws(failingHostException2);
+            // Throws via task
+            A.CallTo(() => failingHost2.StartAsync(A<CancellationToken>._)).ThrowsAsync(failingHostException2);
 
             var environment = Environment.Setup(x =>
             {
@@ -162,11 +164,13 @@ namespace Periturf.Tests
 
             var failingHostException = new Exception();
             var failingHost = A.Fake<IHost>();
+            // Throws immediately
             A.CallTo(() => failingHost.StopAsync(A<CancellationToken>._)).Throws(failingHostException);
 
             var failingHostException2 = new Exception();
             var failingHost2 = A.Fake<IHost>();
-            A.CallTo(() => failingHost2.StopAsync(A<CancellationToken>._)).Throws(failingHostException2);
+            // Throws via a task
+            A.CallTo(() => failingHost2.StopAsync(A<CancellationToken>._)).ThrowsAsync(failingHostException2);
 
             var environment = Environment.Setup(x =>
             {
