@@ -3,6 +3,15 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/adz21c/Periturf</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/adz21c/Periturf</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>test testing</PackageTags>
+    <Company />
+    <Authors>Adam Burton</Authors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,4 +22,11 @@
     <ProjectReference Include="..\Periturf\Periturf.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+  
 </Project>

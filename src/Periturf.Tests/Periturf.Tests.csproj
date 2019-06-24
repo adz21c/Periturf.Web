@@ -26,4 +26,8 @@
     <ProjectReference Include="..\Periturf\Periturf.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="AspNetCore\" />
+  </ItemGroup>
+
 </Project>
