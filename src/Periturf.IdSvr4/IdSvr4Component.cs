@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Periturf.IdSvr4
 {
-    class IdSvr4Component : IComponent
+    internal class IdSvr4Component : IComponent
     {
         public ConfigurationStore ConfigurationStore { get; } = new ConfigurationStore();
 
