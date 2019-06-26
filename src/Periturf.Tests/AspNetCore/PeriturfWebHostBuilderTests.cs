@@ -107,6 +107,27 @@ namespace Periturf.Tests.AspNetCore
             Assert.DoesNotThrowAsync(() => env.StopAsync());
         }
 
+        [TestCase(null, Description = "Null Component Name")]
+        [TestCase("", Description = "Empty Component Name")]
+        [TestCase(" ", Description = "Whitespace Component Name")]
+        public void Given_BadComponentName_When_AddComponent_Then_ThrowException(string componentName)
+        {
+            // Arrange
+            var configurator = A.Dummy<ISetupConfigurator>();
+            var component1 = A.Dummy<IComponent>();
+            const string hostName1 = "HostName1";
+
+            // Act
+            var exception = Assert.Throws<ArgumentNullException>(() => configurator.WebHost(hostName1, c =>
+            {
+                c.UseStartup<StartupDummy>();
+                c.AddComponent(componentName, component1);
+            }));
+
+            // Assert
+            Assert.AreEqual("componentName", exception.ParamName);
+        }
+
         private class StartupDummy
         {
 #pragma warning disable S1186 // Methods should not be empty
