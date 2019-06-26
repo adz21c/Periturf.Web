@@ -17,6 +17,7 @@ using FakeItEasy;
 using Microsoft.AspNetCore.Hosting;
 using NUnit.Framework;
 using Periturf.Components;
+using System;
 using System.Collections.Generic;
 
 namespace Periturf.Tests.AspNetCore
@@ -49,6 +50,61 @@ namespace Periturf.Tests.AspNetCore
                     x.Components.GetValueOrDefault(nameof(component1)) == component1 &&
                     x.Components.GetValueOrDefault(nameof(component2)) == component2,
                     x => x.Write("ComponentDictionary")))).MustHaveHappened();
+        }
+
+        [Test]
+        public void Given_WebHost_When_StartAndStop_Then_TheWebHostStartsAndStops()
+        {
+            // Arrange
+            var configurator = A.Dummy<ISetupConfigurator>();
+            var component1 = A.Dummy<IComponent>();
+            var component2 = A.Dummy<IComponent>();
+            const string hostName = "HostName";
+
+            var env = Environment.Setup(s =>
+            {
+                s.WebHost(hostName, c =>
+                {
+                    c.UseStartup<StartupDummy>();
+                    c.AddComponent(nameof(component1), component1);
+                    c.AddComponent(nameof(component2), component2);
+                });
+            });
+
+            // Act
+            Assert.DoesNotThrowAsync(() => env.StartAsync());
+            Assert.DoesNotThrowAsync(() => env.StopAsync());
+        }
+
+        [Test]
+        public void Given_MultipleWebHosts_When_StartAndStop_Then_TheWebHostsStartsAndStops()
+        {
+            // Arrange
+            var component1 = A.Dummy<IComponent>();
+            var component2 = A.Dummy<IComponent>();
+            const string hostName1 = "HostName1";
+            const string hostName2 = "HostName2";
+
+            var env = Environment.Setup(s =>
+            {
+                s.WebHost(hostName1, c =>
+                {
+                    c.UseStartup<StartupDummy>();
+                    c.UseUrls("http://localhost:3500");
+                    c.AddComponent(nameof(component1), component1);
+                });
+
+                s.WebHost(hostName2, c =>
+                {
+                    c.UseStartup<StartupDummy>();
+                    c.UseUrls("http://localhost:3501");
+                    c.AddComponent(nameof(component2), component2);
+                });
+            });
+
+            // Act
+            Assert.DoesNotThrowAsync(() => env.StartAsync());
+            Assert.DoesNotThrowAsync(() => env.StopAsync());
         }
 
         private class StartupDummy
