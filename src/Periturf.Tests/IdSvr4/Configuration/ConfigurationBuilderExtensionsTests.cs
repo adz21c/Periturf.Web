@@ -18,6 +18,7 @@ using NUnit.Framework;
 using Periturf.Components;
 using Periturf.IdSvr4;
 using System;
+using System.Linq;
 
 namespace Periturf.Tests.IdSvr4.Configuration
 {
@@ -41,6 +42,41 @@ namespace Periturf.Tests.IdSvr4.Configuration
             // Assert
             A.CallTo(() => builder.AddComponentConfigurator(componentName, A<Func<IdSvr4Component, IComponentConfigurator>>._)).MustHaveHappenedOnceExactly();
             A.CallTo(() => config.Invoke(A<IdSvr4Configurator>._)).MustHaveHappenedOnceExactly();
+        }
+
+
+        [Test]
+        public void Given_IdSvr4Configurator_When_ConfigureOptions_Then_InformationAdded()
+        {
+            // Arrange
+            var configurator = new IdSvr4Configurator();
+            const string clientId1 = "clientId1";
+            const string idResource1 = "idResource1";
+            const string apiResource1 = "apiResource1";
+
+            // Act
+            configurator.Client(c =>
+            {
+                c.ClientId = clientId1;
+            });
+            configurator.IdentityResource(i =>
+            {
+                i.Name = idResource1;
+            });
+            configurator.ApiResource(a =>
+            {
+                a.Name = apiResource1;
+            });
+
+            var registration = configurator.Build();
+
+            // Assert
+            Assert.AreEqual(1, registration.Clients.Count);
+            Assert.NotNull(registration.Clients.SingleOrDefault(x => x.ClientId == clientId1));
+            Assert.AreEqual(1, registration.IdentityResources.Count);
+            Assert.NotNull(registration.IdentityResources.SingleOrDefault(x => x.Name == idResource1));
+            Assert.AreEqual(1, registration.ApiResources.Count);
+            Assert.NotNull(registration.ApiResources.SingleOrDefault(x => x.Name == apiResource1));
         }
     }
 }
