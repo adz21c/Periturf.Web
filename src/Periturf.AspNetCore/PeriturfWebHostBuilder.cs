@@ -50,26 +50,31 @@ namespace Periturf.AspNetCore
             return _builder.Build();
         }
 
+        [ExcludeFromCodeCoverage]   // Passthrough code
         public IWebHostBuilder ConfigureAppConfiguration(Action<WebHostBuilderContext, IConfigurationBuilder> configureDelegate)
         {
             return _builder.ConfigureAppConfiguration(configureDelegate);
         }
 
+        [ExcludeFromCodeCoverage]   // Passthrough code
         public IWebHostBuilder ConfigureServices(Action<IServiceCollection> configureServices)
         {
             return _builder.ConfigureServices(configureServices);
         }
 
+        [ExcludeFromCodeCoverage]   // Passthrough code
         public IWebHostBuilder ConfigureServices(Action<WebHostBuilderContext, IServiceCollection> configureServices)
         {
             return _builder.ConfigureServices(configureServices);
         }
 
+        [ExcludeFromCodeCoverage]   // Passthrough code
         public string GetSetting(string key)
         {
             return _builder.GetSetting(key);
         }
 
+        [ExcludeFromCodeCoverage]   // Passthrough code
         public IWebHostBuilder UseSetting(string key, string value)
         {
             return _builder.UseSetting(key, value);
