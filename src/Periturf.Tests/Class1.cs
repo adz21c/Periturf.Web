@@ -9,10 +9,10 @@ using System.Text;
 
 namespace Periturf.Tests
 {
-    [TestFixture]
+    //[TestFixture]
     class Class1
     {
-        [Test]
+        //[Test]
         public async System.Threading.Tasks.Task SomethingAsync()
         {
             var env = Environment.Setup(x =>
