@@ -128,6 +128,24 @@ namespace Periturf.Tests.AspNetCore
             Assert.AreEqual("componentName", exception.ParamName);
         }
 
+        [Test]
+        public void Given_NullComponent_When_AddComponent_Then_ThrowException()
+        {
+            // Arrange
+            var configurator = A.Dummy<ISetupConfigurator>();
+            const string hostName1 = "HostName1";
+
+            // Act
+            var exception = Assert.Throws<ArgumentNullException>(() => configurator.WebHost(hostName1, c =>
+            {
+                c.UseStartup<StartupDummy>();
+                c.AddComponent("ComponentName", null);
+            }));
+
+            // Assert
+            Assert.AreEqual("component", exception.ParamName);
+        }
+
         private class StartupDummy
         {
 #pragma warning disable S1186 // Methods should not be empty
