@@ -10,7 +10,7 @@ skip_tags: true
 environment:
   JAVA_HOME: c:/Program Files/Java/jdk1.8.0
   sonar_login:
-    secure: 55o+cj8Gxbhzx5I95wHQVyuVEjpp9LyP2Vp05aHPFKSIeCixBhYfKbVf0J2fBoIs
+    secure: 6qD93a8X/HlviVML1h7oaD5Z57iWiGc6BLkgizomSUHAgcNeC6eQoY8sprEtlHtN
 
 build: off
 test: off
