@@ -9,6 +9,8 @@ skip_tags: true
 
 environment:
   JAVA_HOME: c:/Program Files/Java/jdk1.8.0
+  sonar_login:
+    secure: 55o+cj8Gxbhzx5I95wHQVyuVEjpp9LyP2Vp05aHPFKSIeCixBhYfKbVf0J2fBoIs
 
 build: off
 test: off
@@ -25,10 +27,10 @@ before_build:
     
 build_script:
   cmd: >-
-    dotnet sonarscanner begin /k:"adz21c_Periturf" /o:"adz21c-github" /v:"%GitVersion_FullSemVer%" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="52802d649c768a8651be8b82c80f6b5c9e569fae"
+    dotnet sonarscanner begin /k:"adz21c_Periturf" /o:"adz21c-github" /v:"%GitVersion_FullSemVer%" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="%sonar_login%"
     
     dotnet build src
     
     dotnet test src /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
     
-    dotnet sonarscanner end /d:sonar.login="52802d649c768a8651be8b82c80f6b5c9e569fae"
+    dotnet sonarscanner end /d:sonar.login="%sonar_login%"
