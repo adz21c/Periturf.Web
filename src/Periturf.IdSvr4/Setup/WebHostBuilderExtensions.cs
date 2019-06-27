@@ -19,11 +19,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Periturf.IdSvr4;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Periturf
 {
     public static class WebHostBuilderExtensions
     {
+        [ExcludeFromCodeCoverage]
         public static void SetupIdSvr4(this IPeriturfWebHostBuilder builder, Action<IdSvr4SetupConfigurator> config = null)
         {
             builder.SetupIdSvr4("IdSvr4", config);
