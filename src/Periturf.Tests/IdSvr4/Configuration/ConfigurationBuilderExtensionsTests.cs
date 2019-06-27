@@ -61,7 +61,10 @@ namespace Periturf.Tests.IdSvr4.Configuration
                 c.ClientId = clientId1;
                 c.RedirectUri("http://localhost/Redirect");
                 c.Scope("Scope");
-                c.Secret("Secret");
+                c.Secret(s =>
+                {
+                    s.Value = "Secret";
+                });
             });
             configurator.IdentityResource(i =>
             {
