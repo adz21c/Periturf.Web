@@ -40,4 +40,4 @@ build_script:
     
     dotnet sonarscanner end /d:sonar.login="%sonar_login%"
     
-    codecov -f "%coverlet_output%"
+    codecov -f "%coverlet_output%" -t "%CODECOV_TOKEN%"
