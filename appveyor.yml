@@ -1,4 +1,4 @@
-﻿image: Visual Studio 2017
+image: Visual Studio 2017
 
 branches:
   only:
@@ -9,12 +9,15 @@ skip_tags: true
 
 environment:
   JAVA_HOME: c:/Program Files/Java/jdk1.8.0
+  
   sonar_login:
     secure: 6qD93a8X/HlviVML1h7oaD5Z57iWiGc6BLkgizomSUHAgcNeC6eQoY8sprEtlHtN
-  coverlet_output: %APPVEYOR_BUILD_FOLDER%/build/Coverlet.Coverage.OpenCover.xml
+  
+  coverlet_output: "%APPVEYOR_BUILD_FOLDER%/build/Coverlet.Coverage.OpenCover.xml"
+  
   CODECOV_TOKEN:
     secure: qpg2oUby8/m76bjOwVR+hoiGl5/k2CzSDtXnXoog0eZvvgC8k34Yj+IAUedg0yOM
-
+  
 build: off
 test: off
 
