@@ -75,7 +75,7 @@ namespace Periturf.Tests.IdSvr4.Configuration
                 c.Scope(scope);
                 c.Scope(scope2);
                 c.Secret(s => { s.Value = secret; });
-                c.Secret(s => { s.Value = secret2; });
+                c.Secret(secret2);
             });
             configurator.Client(c => c.ClientId = clientId2);
             configurator.IdentityResource(i =>
@@ -93,7 +93,7 @@ namespace Periturf.Tests.IdSvr4.Configuration
                 a.Scope(s => { s.Name = scope; });
                 a.Scope(s => { s.Name = scope2; });
                 a.Secret(s => { s.Value = secret; });
-                a.Secret(s => { s.Value = secret2; });
+                a.Secret(secret2);
             });
             configurator.ApiResource(a => a.Name = apiResource2Name);
 
