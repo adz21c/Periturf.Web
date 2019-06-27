@@ -43,8 +43,8 @@ namespace Periturf
             builder.ConfigureServices(services =>
             {
                 services
-                    .AddSingleton<IClientStore, ConfigurationStore>(sp => component.ConfigurationStore)
-                    .AddSingleton<IResourceStore, ConfigurationStore>(sp => component.ConfigurationStore);
+                    .AddSingleton<IClientStore, IdSvr4Component>(sp => component)
+                    .AddSingleton<IResourceStore, IdSvr4Component>(sp => component);
 
                 var identityServiceBuilder = services
                     .AddIdentityServer()
