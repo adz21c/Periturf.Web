@@ -56,7 +56,6 @@ namespace Periturf.Tests.AspNetCore
         public void Given_WebHost_When_StartAndStop_Then_TheWebHostStartsAndStops()
         {
             // Arrange
-            var configurator = A.Dummy<ISetupConfigurator>();
             var component1 = A.Dummy<IComponent>();
             var component2 = A.Dummy<IComponent>();
             const string hostName = "HostName";

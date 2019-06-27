@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 using FakeItEasy;
+using IdentityServer4.Models;
 using NUnit.Framework;
 using Periturf.Components;
 using Periturf.IdSvr4;
@@ -58,14 +59,24 @@ namespace Periturf.Tests.IdSvr4.Configuration
             configurator.Client(c =>
             {
                 c.ClientId = clientId1;
+                c.RedirectUri("http://localhost/Redirect");
+                c.Scope("Scope");
+                c.Secret("Secret");
             });
             configurator.IdentityResource(i =>
             {
                 i.Name = idResource1;
+                i.UserClaim("Claim");
             });
             configurator.ApiResource(a =>
             {
                 a.Name = apiResource1;
+                a.UserClaim("Claim");
+                a.Scope(s =>
+                {
+                    s.Name = "Scope";
+                });
+                a.Secret("Secret");
             });
 
             var registration = configurator.Build();
