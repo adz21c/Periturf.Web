@@ -52,48 +52,115 @@ namespace Periturf.Tests.IdSvr4.Configuration
             // Arrange
             var configurator = new IdSvr4Configurator();
             const string clientId1 = "clientId1";
-            const string idResource1 = "idResource1";
-            const string apiResource1 = "apiResource1";
+            const string clientId2 = "clientId2";
+            const string redirectUri = "http://localhost/Redirect";
+            const string redirectUri2 = "http://localhost/Redirect2";
+            const string scope = "Scope";
+            const string scope2 = "Scope2";
+            const string secret = "Secret";
+            const string secret2 = "Secret2";
+            const string idResource1Name = "idResource1";
+            const string idResource2Name = "idResource2";
+            const string apiResource1Name = "apiResource1";
+            const string apiResource2Name = "apiResource2";
+            const string claim = "Claim";
+            const string claim2 = "Claim2";
 
             // Act
             configurator.Client(c =>
             {
                 c.ClientId = clientId1;
-                c.RedirectUri("http://localhost/Redirect");
-                c.Scope("Scope");
-                c.Secret(s =>
-                {
-                    s.Value = "Secret";
-                });
+                c.RedirectUri(redirectUri);
+                c.RedirectUri(redirectUri2);
+                c.Scope(scope);
+                c.Scope(scope2);
+                c.Secret(s => { s.Value = secret; });
+                c.Secret(s => { s.Value = secret2; });
             });
+            configurator.Client(c => c.ClientId = clientId2);
             configurator.IdentityResource(i =>
             {
-                i.Name = idResource1;
-                i.UserClaim("Claim");
+                i.Name = idResource1Name;
+                i.UserClaim(claim);
+                i.UserClaim(claim2);
             });
+            configurator.IdentityResource(i => i.Name = idResource2Name);
             configurator.ApiResource(a =>
             {
-                a.Name = apiResource1;
-                a.UserClaim("Claim");
-                a.Scope(s =>
-                {
-                    s.Name = "Scope";
-                });
-                a.Secret(s =>
-                {
-                    s.Value = "Secret";
-                });
+                a.Name = apiResource1Name;
+                a.UserClaim(claim);
+                a.UserClaim(claim2);
+                a.Scope(s => { s.Name = scope; });
+                a.Scope(s => { s.Name = scope2; });
+                a.Secret(s => { s.Value = secret; });
+                a.Secret(s => { s.Value = secret2; });
             });
+            configurator.ApiResource(a => a.Name = apiResource2Name);
 
             var registration = configurator.Build();
 
             // Assert
-            Assert.AreEqual(1, registration.Clients.Count);
-            Assert.NotNull(registration.Clients.SingleOrDefault(x => x.ClientId == clientId1));
-            Assert.AreEqual(1, registration.IdentityResources.Count);
-            Assert.NotNull(registration.IdentityResources.SingleOrDefault(x => x.Name == idResource1));
-            Assert.AreEqual(1, registration.ApiResources.Count);
-            Assert.NotNull(registration.ApiResources.SingleOrDefault(x => x.Name == apiResource1));
+            Assert.AreEqual(2, registration.Clients.Count);
+            
+            // Client1
+            var client1 = registration.Clients.SingleOrDefault(x => x.ClientId == clientId1);
+            Assert.NotNull(client1);
+
+            Assert.IsNotEmpty(client1.RedirectUris);
+            Assert.AreEqual(2, client1.RedirectUris.Count);
+            Assert.That(client1.RedirectUris.Contains(redirectUri));
+            Assert.That(client1.RedirectUris.Contains(redirectUri2));
+
+            Assert.IsNotEmpty(client1.AllowedScopes);
+            Assert.AreEqual(2, client1.AllowedScopes.Count);
+            Assert.That(client1.AllowedScopes.Contains(scope));
+            Assert.That(client1.AllowedScopes.Contains(scope2));
+
+            Assert.IsNotEmpty(client1.ClientSecrets);
+            Assert.AreEqual(2, client1.ClientSecrets.Count);
+            Assert.That(client1.ClientSecrets.Any(x => x.Value == secret));
+            Assert.That(client1.ClientSecrets.Any(x => x.Value == secret2));
+            
+            // Client 2
+            Assert.NotNull(registration.Clients.SingleOrDefault(x => x.ClientId == clientId2));
+
+            Assert.AreEqual(2, registration.IdentityResources.Count);
+
+            // Id Resource 1
+            var idResource1 = registration.IdentityResources.SingleOrDefault(x => x.Name == idResource1Name);
+            Assert.NotNull(idResource1);
+
+            Assert.IsNotEmpty(idResource1.UserClaims);
+            Assert.AreEqual(2, idResource1.UserClaims.Count);
+            Assert.That(idResource1.UserClaims.Contains(claim));
+            Assert.That(idResource1.UserClaims.Contains(claim2));
+
+            // Id Resource 2
+            Assert.NotNull(registration.IdentityResources.SingleOrDefault(x => x.Name == idResource2Name));
+
+            Assert.AreEqual(2, registration.ApiResources.Count);
+
+            // API Resource 1
+            var apiResource1 = registration.ApiResources.SingleOrDefault(x => x.Name == apiResource1Name);
+            Assert.NotNull(apiResource1);
+
+            Assert.IsNotEmpty(apiResource1.ApiSecrets);
+            Assert.AreEqual(2, apiResource1.ApiSecrets.Count);
+            Assert.That(apiResource1.ApiSecrets.Any(x => x.Value == secret));
+            Assert.That(apiResource1.ApiSecrets.Any(x => x.Value == secret2));
+
+            Assert.IsNotEmpty(apiResource1.Scopes);
+            Assert.AreEqual(2, apiResource1.Scopes.Count);
+            Assert.That(apiResource1.Scopes.Any(x => x.Name == scope));
+            Assert.That(apiResource1.Scopes.Any(x => x.Name == scope2));
+
+            Assert.IsNotEmpty(apiResource1.UserClaims);
+            Assert.AreEqual(2, apiResource1.UserClaims.Count);
+            Assert.That(apiResource1.UserClaims.Contains(claim));
+            Assert.That(apiResource1.UserClaims.Contains(claim2));
+
+            // API Resource 2
+            Assert.NotNull(registration.ApiResources.SingleOrDefault(x => x.Name == apiResource2Name));
         }
     }
 }
