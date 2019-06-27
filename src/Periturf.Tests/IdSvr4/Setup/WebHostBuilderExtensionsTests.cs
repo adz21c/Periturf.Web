@@ -31,6 +31,7 @@ namespace Periturf.Tests.IdSvr4.Setup
             var builder = A.Fake<IPeriturfWebHostBuilder>();
 
             var config = A.Fake<Action<IdSvr4SetupConfigurator>>();
+            A.CallTo(() => config(A<IdSvr4SetupConfigurator>._)).Invokes(c => c.GetArgument<IdSvr4SetupConfigurator>(0).Services(s => { }));
 
             const string componentName = "IdSvr4Test";
 
