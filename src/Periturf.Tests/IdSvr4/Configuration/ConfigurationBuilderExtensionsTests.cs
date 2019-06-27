@@ -76,7 +76,10 @@ namespace Periturf.Tests.IdSvr4.Configuration
                 {
                     s.Name = "Scope";
                 });
-                a.Secret("Secret");
+                a.Secret(s =>
+                {
+                    s.Value = "Secret";
+                });
             });
 
             var registration = configurator.Build();
