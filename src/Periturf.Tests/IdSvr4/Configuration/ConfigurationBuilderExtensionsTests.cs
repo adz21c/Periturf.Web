@@ -90,7 +90,12 @@ namespace Periturf.Tests.IdSvr4.Configuration
                 a.Name = apiResource1Name;
                 a.UserClaim(claim);
                 a.UserClaim(claim2);
-                a.Scope(s => { s.Name = scope; });
+                a.Scope(s =>
+                {
+                    s.Name = scope;
+                    s.UserClaim(claim);
+                    s.UserClaim(claim2);
+                });
                 a.Scope(s => { s.Name = scope2; });
                 a.Secret(s => { s.Value = secret; });
                 a.Secret(secret2);
@@ -158,6 +163,12 @@ namespace Periturf.Tests.IdSvr4.Configuration
             Assert.AreEqual(2, apiResource1.UserClaims.Count);
             Assert.That(apiResource1.UserClaims.Contains(claim));
             Assert.That(apiResource1.UserClaims.Contains(claim2));
+
+            // API Resource 1 Scope
+            var apiResource1Scope = apiResource1.Scopes.Single(x => x.Name == scope);
+            Assert.AreEqual(2, apiResource1Scope.UserClaims.Count);
+            Assert.That(apiResource1Scope.UserClaims.Contains(claim));
+            Assert.That(apiResource1Scope.UserClaims.Contains(claim2));
 
             // API Resource 2
             Assert.NotNull(registration.ApiResources.SingleOrDefault(x => x.Name == apiResource2Name));
