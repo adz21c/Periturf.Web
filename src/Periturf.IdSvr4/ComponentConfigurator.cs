@@ -33,8 +33,7 @@ namespace Periturf.IdSvr4
 
         public Task RegisterConfigurationAsync(Guid id, CancellationToken ct = default)
         {
-            _component.RegisterConfiguration(id, _config);
-            return Task.CompletedTask;
+            return _component.RegisterConfigurationAsync(id, _config);
         }
     }
 }

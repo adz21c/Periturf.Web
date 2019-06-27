@@ -31,7 +31,7 @@ namespace Periturf.Tests.IdSvr4
                 new List<ApiResource>());
 
             var component = new IdSvr4Component();
-            await component.RegisterConfiguration(Guid.NewGuid(), config);
+            await component.RegisterConfigurationAsync(Guid.NewGuid(), config);
 
             var clientStore = (IClientStore)component;
             var resourceStore = (IResourceStore)component;
@@ -60,7 +60,7 @@ namespace Periturf.Tests.IdSvr4
 
             var component = new IdSvr4Component();
             var configId = Guid.NewGuid();
-            await component.RegisterConfiguration(configId, config);
+            await component.RegisterConfigurationAsync(configId, config);
 
             var clientStore = (IClientStore)component;
             var resourceStore = (IResourceStore)component;

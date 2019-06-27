@@ -45,7 +45,7 @@ namespace Periturf.IdSvr4
             _writeLockTimeout = writeLock ?? TimeSpan.FromSeconds(5);
         }
 
-        public Task RegisterConfiguration(Guid id, ConfigurationRegistration config)
+        public Task RegisterConfigurationAsync(Guid id, ConfigurationRegistration config)
         {
             _configurations[id] = config;
             RebuildStores();
