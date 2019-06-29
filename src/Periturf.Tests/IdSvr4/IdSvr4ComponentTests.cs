@@ -70,6 +70,11 @@ namespace Periturf.Tests.IdSvr4
             Assert.IsEmpty(await resourceStore.FindApiResourcesByScopeAsync(new[] { fakeApiScope }));
             Assert.IsNotEmpty(await resourceStore.FindIdentityResourcesByScopeAsync(new[] { idResource }));
             Assert.IsEmpty(await resourceStore.FindIdentityResourcesByScopeAsync(new[] { fakeIdResource }));
+
+            var resources = await resourceStore.GetAllResourcesAsync();
+            Assert.IsNotNull(resources);
+            Assert.IsNotEmpty(resources.IdentityResources);
+            Assert.IsNotEmpty(resources.ApiResources);
         }
 
         [Test]
