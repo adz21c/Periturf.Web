@@ -31,19 +31,11 @@ namespace Periturf.IdSvr4
         private readonly ConcurrentDictionary<Guid, ConfigurationRegistration> _configurations = new ConcurrentDictionary<Guid, ConfigurationRegistration>();
 
         // locking
-        private readonly TimeSpan _readLockTimeout;
-        private readonly TimeSpan _writeLockTimeout;
         private readonly ReaderWriterLockSlim _resourceManager = new ReaderWriterLockSlim();
 
         // In memory store implementations
         private InMemoryClientStore _clients = new InMemoryClientStore(Enumerable.Empty<Client>());
         private InMemoryResourcesStore _resources = new InMemoryResourcesStore(Enumerable.Empty<IdentityResource>(), Enumerable.Empty<ApiResource>());
-
-        public IdSvr4Component(TimeSpan? readLock = null, TimeSpan? writeLock = null)
-        {
-            _readLockTimeout = readLock ?? TimeSpan.FromSeconds(5);
-            _writeLockTimeout = writeLock ?? TimeSpan.FromSeconds(5);
-        }
 
         public Task RegisterConfigurationAsync(Guid id, ConfigurationRegistration config)
         {
@@ -61,9 +53,7 @@ namespace Periturf.IdSvr4
 
         private void RebuildStores()
         {
-            if (!_resourceManager.TryEnterWriteLock(_writeLockTimeout))
-                throw new TimeoutException("Failed to gain write lock");
-
+            _resourceManager.EnterWriteLock();
             try
             {
                 var newClients = _configurations.Values.SelectMany(x => x.Clients).ToList();
@@ -81,9 +71,7 @@ namespace Periturf.IdSvr4
 
         private async Task<T> ReadLockedAsync<T>(Func<Task<T>> readFunc)
         {
-            if (!_resourceManager.TryEnterReadLock(_readLockTimeout))
-                throw new TimeoutException("Failed to enter read lock");
-
+            _resourceManager.EnterReadLock();
             try
             {
                 return await readFunc();
