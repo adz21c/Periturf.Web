@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Periturf.AspNetCore", "Peri
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Periturf.Tests", "Periturf.Tests\Periturf.Tests.csproj", "{B160C033-ADFD-4DB3-AB7B-206713A939D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Periturf.Tests.Integration", "Periturf.Tests.Integration\Periturf.Tests.Integration.csproj", "{EA7DDFDF-1726-456A-9C93-15E3E9CB3359}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{B160C033-ADFD-4DB3-AB7B-206713A939D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B160C033-ADFD-4DB3-AB7B-206713A939D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B160C033-ADFD-4DB3-AB7B-206713A939D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA7DDFDF-1726-456A-9C93-15E3E9CB3359}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA7DDFDF-1726-456A-9C93-15E3E9CB3359}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA7DDFDF-1726-456A-9C93-15E3E9CB3359}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA7DDFDF-1726-456A-9C93-15E3E9CB3359}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
