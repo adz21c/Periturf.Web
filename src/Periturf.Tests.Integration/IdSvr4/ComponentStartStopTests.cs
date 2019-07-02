@@ -31,6 +31,7 @@ namespace Periturf.Tests.Integration.IdSvr4
         [Test]
         public async Task Given_IdSvr4_When_StartAndStop_Then_RespondAndDontRespond()
         {
+            // Arrange
             var env = Environment.Setup(e =>
             {
                 e.WebHost(h =>
@@ -40,6 +41,7 @@ namespace Periturf.Tests.Integration.IdSvr4
                 });
             });
 
+            // Assu,e
             var client = new HttpClient();
             var beforeStartResponse = await client.RequestTokenAsync(new IdentityModel.Client.TokenRequest
             {
@@ -48,11 +50,13 @@ namespace Periturf.Tests.Integration.IdSvr4
                 ClientId = "Client1",
                 ClientSecret = "Secret"
             });
-            Assert.IsTrue(beforeStartResponse.IsError);
-            Assert.NotNull(beforeStartResponse.Exception);
+            Assume.That(beforeStartResponse.IsError);
+            Assume.That(beforeStartResponse.Exception != null);
 
+            // Act
             await env.StartAsync();
 
+            // Assert
             var afterStartResponse = await client.RequestTokenAsync(new IdentityModel.Client.TokenRequest
             {
                 Address = WebHostUrl + "/connect/token",
@@ -60,13 +64,14 @@ namespace Periturf.Tests.Integration.IdSvr4
                 ClientId = "Client1",
                 ClientSecret = "Secret"
             });
-
             Assert.IsTrue(afterStartResponse.IsError);
             Assert.AreEqual(HttpStatusCode.BadRequest, afterStartResponse.HttpStatusCode);
             Assert.AreEqual("invalid_client", afterStartResponse.Error);
 
+            // Act
             await env.StopAsync();
 
+            // Assert
             var afterStopResponse = await client.RequestTokenAsync(new IdentityModel.Client.TokenRequest
             {
                 Address = WebHostUrl + "/connect/token",
