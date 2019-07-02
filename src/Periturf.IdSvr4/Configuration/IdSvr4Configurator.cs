@@ -20,12 +20,19 @@ using System.Collections.Generic;
 
 namespace Periturf
 {
+    /// <summary>
+    /// Gathers IdentityServer4 component test configuration
+    /// </summary>
     public class IdSvr4Configurator
     {
         private readonly List<Client> _clients = new List<Client>();
         private readonly List<IdentityResource> _identityResources = new List<IdentityResource>();
         private readonly List<ApiResource> _apiResources = new List<ApiResource>();
 
+        /// <summary>
+        /// Configures a client.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
         public void Client(Action<Client> config)
         {
             var client = new Client();
@@ -33,11 +40,19 @@ namespace Periturf
             Client(client);
         }
 
+        /// <summary>
+        /// Configures a client.
+        /// </summary>
+        /// <param name="client">The client.</param>
         public void Client(Client client)
         {
             _clients.Add(client);
         }
 
+        /// <summary>
+        /// Configures an Identity resource.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
         public void IdentityResource(Action<IdentityResource> config)
         {
             var resource = new IdentityResource();
@@ -45,11 +60,19 @@ namespace Periturf
             IdentityResource(resource);
         }
 
+        /// <summary>
+        /// Configures an Identity resource.
+        /// </summary>
+        /// <param name="resource">The resource.</param>
         public void IdentityResource(IdentityResource resource)
         {
             _identityResources.Add(resource);
         }
 
+        /// <summary>
+        /// Configures an API resource.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
         public void ApiResource(Action<ApiResource> config)
         {
             var resource = new ApiResource();
@@ -57,6 +80,10 @@ namespace Periturf
             ApiResource(resource);
         }
 
+        /// <summary>
+        /// Configures an API resource.
+        /// </summary>
+        /// <param name="resource">The resource.</param>
         public void ApiResource(ApiResource resource)
         {
             _apiResources.Add(resource);

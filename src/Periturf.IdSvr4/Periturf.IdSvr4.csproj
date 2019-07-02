@@ -15,10 +15,12 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <CodeAnalysisRuleSet>Periturf.IdSvr4.ruleset</CodeAnalysisRuleSet>
+    <WarningsAsErrors>NU1605;CS1591</WarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <CodeAnalysisRuleSet>Periturf.IdSvr4.ruleset</CodeAnalysisRuleSet>
+    <WarningsAsErrors>NU1605;CS1591</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

@@ -13,15 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace Periturf
 {
+    /// <summary>
+    /// Gathers IdentityServer4 component setup configuration.
+    /// </summary>
     public class IdSvr4SetupConfigurator
     {
+        /// <summary>
+        /// Applies configuration to the <see cref="IIdentityServerBuilder"/>.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
         public void Services(Action<IIdentityServerBuilder> config)
         {
             ServicesCallback = config;

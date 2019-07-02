@@ -15,11 +15,32 @@
  */
 using Periturf.IdSvr4;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Periturf
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class ConfigurationBuilderExtensions
     {
+        /// <summary>
+        /// Defines test configuration for an IdentityServer4 component.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        /// <param name="config">The configuration.</param>
+        [ExcludeFromCodeCoverage]
+        public static void ConfigureIdSvr4(this IConfiugrationBuilder builder, Action<IdSvr4Configurator> config)
+        {
+            builder.ConfigureIdSvr4("IdSvr4", config);
+        }
+
+        /// <summary>
+        /// Defines test configuration for an IdentityServer4 component.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        /// <param name="name">The component name.</param>
+        /// <param name="config">The configuration.</param>
         public static void ConfigureIdSvr4(this IConfiugrationBuilder builder, string name, Action<IdSvr4Configurator> config)
         {
             builder.AddComponentConfigurator<IdSvr4Component>(name, component =>
