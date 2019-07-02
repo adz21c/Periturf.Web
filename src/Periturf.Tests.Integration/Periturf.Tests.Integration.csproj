@@ -9,9 +9,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="IdentityModel" Version="3.10.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
     <PackageReference Include="nunit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Periturf.AspNetCore\Periturf.AspNetCore.csproj" />
+    <ProjectReference Include="..\Periturf.IdSvr4\Periturf.IdSvr4.csproj" />
+    <ProjectReference Include="..\Periturf\Periturf.csproj" />
   </ItemGroup>
 
 </Project>
