@@ -54,7 +54,7 @@ artifacts:
 deploy:
 - provider: NuGet
   api_key:
-    secure: AzTk1zgttoN4xtc0SCQAh/isJV3B9rCCHYzCcEFADpuMrwcKjOV29DMg7PC95t1d
+    secure: /Na130g9e0VsGKaVeajGH8FpeoVeMR94UrZR9QTlHldLGLpxY0vHwsbtOi0ZsH+/
   skip_symbols: true
   artifact: NuGetPackage
   on:
