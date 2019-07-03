@@ -6,3 +6,7 @@
 [![codecov](https://codecov.io/gh/adz21c/Periturf/branch/develop/graph/badge.svg)](https://codecov.io/gh/adz21c/Periturf)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=adz21c_Periturf&metric=alert_status)](https://sonarcloud.io/dashboard?id=adz21c_Periturf)
+
+[![Nuget (stable)](https://img.shields.io/nuget/v/periturf.svg)](https://www.nuget.org/packages/Periturf/)
+
+[![Nuget (development)](https://img.shields.io/nuget/vpre/periturf.svg)](https://www.nuget.org/packages/Periturf/)
