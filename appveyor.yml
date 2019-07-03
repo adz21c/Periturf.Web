@@ -48,7 +48,7 @@ build_script:
     dotnet pack src --no-restore --include-symbols -c Release -p:PackageVersion=%GitVersion_NuGetVersionV2%
 
 artifacts:
-- path: '**\*.nupkg'
+- path: '**\bin\Release\*.nupkg'
   name: NuGetPackage
 
 deploy:
