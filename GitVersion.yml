@@ -1,5 +1,10 @@
 mode: ContinuousDeployment
 next-version: 0.1.0
-branches: {}
+branches:
+  develop:
+    mode: ContinuousDeployment
+    tag: develop
+  feature:
+    regex: features|feature|bug|bugs|topic|topics[/-]
 ignore:
   sha: []

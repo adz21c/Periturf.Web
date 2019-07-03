@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 using Periturf.Components;
+using System;
 
 namespace Periturf
 {
+    /// <summary>
+    /// Gathers expectation configuration for the environment
+    /// </summary>
     public interface IConfiugrationBuilder
     {
-        T GetComponent<T>(string name) where T : IComponent;
-
-        void AddComponentConfigurator(IComponentConfigurator componentConfigurator);
+        /// <summary>
+        /// Adds a component configurator to the environment.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="componentName">Name of the component.</param>
+        /// <param name="config">Configurator for the component's expectation configuration.</param>
+        void AddComponentConfigurator<T>(string componentName, Func<T, IComponentConfigurator> config) where T : IComponent;
     }
 }

@@ -14,13 +14,22 @@
  * limitations under the License.
  */
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Periturf.Components
 {
+    /// <summary>
+    /// Applies configuration to a component.
+    /// </summary>
     public interface IComponentConfigurator
     {
-        IComponent Component { get; }
-
-        void RegisterConfiguration(Guid id);
+        /// <summary>
+        /// Registers configuration to a component under the supplied identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier for the configuration.</param>
+        /// <param name="ct">The cancellation token.</param>
+        /// <returns></returns>
+        Task RegisterConfigurationAsync(Guid id, CancellationToken ct = default);
     }
 }

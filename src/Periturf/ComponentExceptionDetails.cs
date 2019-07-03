@@ -13,24 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.Components;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Periturf
 {
+    /// <summary>
+    /// Contains details about an error coming from a component.
+    /// </summary>
+    [Serializable]
     public class ComponentExceptionDetails
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ComponentExceptionDetails"/> class.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
         protected ComponentExceptionDetails()
         { }
 
-        public ComponentExceptionDetails(IComponent component, Exception exception)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ComponentExceptionDetails"/> class.
+        /// </summary>
+        /// <param name="componentName">Name of the component.</param>
+        /// <param name="exception">The exception.</param>
+        public ComponentExceptionDetails(string componentName, Exception exception)
         {
-            Component = component;
+            ComponentName = componentName;
             Exception = exception;
         }
 
-        public IComponent Component { get; }
+        /// <summary>
+        /// Gets the name of the component.
+        /// </summary>
+        /// <value>
+        /// The name of the component.
+        /// </value>
+        public string ComponentName { get; }
 
+        /// <summary>
+        /// Gets the exception.
+        /// </summary>
+        /// <value>
+        /// The exception.
+        /// </value>
         public Exception Exception { get; }
     }
 }

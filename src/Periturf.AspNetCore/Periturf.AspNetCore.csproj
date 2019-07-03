@@ -3,6 +3,24 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/adz21c/Periturf</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/adz21c/Periturf</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>test;testing;aspnetcore</PackageTags>
+    <Authors>adz21c</Authors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <CodeAnalysisRuleSet>Periturf.AspNetCore.ruleset</CodeAnalysisRuleSet>
+    <WarningsAsErrors>NU1605;CS1591</WarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <CodeAnalysisRuleSet>Periturf.AspNetCore.ruleset</CodeAnalysisRuleSet>
+    <WarningsAsErrors>NU1605;CS1591</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,5 +30,5 @@
   <ItemGroup>
     <ProjectReference Include="..\Periturf\Periturf.csproj" />
   </ItemGroup>
-
+  
 </Project>

@@ -18,25 +18,48 @@ using System.Collections.Generic;
 
 namespace IdentityServer4.Models
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class IdSvrClientExtensions
     {
+        /// <summary>
+        /// Add a redirect URI to the client
+        /// </summary>
+        /// <param name="client">The client.</param>
+        /// <param name="uri">The URI.</param>
         public static void RedirectUri(this Client client, string uri)
         {
             client.RedirectUris = client.RedirectUris ?? new List<string>();
             client.RedirectUris.Add(uri);
         }
 
+        /// <summary>
+        /// Adds an allowed scope to the client
+        /// </summary>
+        /// <param name="client">The client.</param>
+        /// <param name="name">The name.</param>
         public static void Scope(this Client client, string name)
         {
             client.AllowedScopes = client.AllowedScopes ?? new List<string>();
             client.AllowedScopes.Add(name);
         }
 
+        /// <summary>
+        /// Adds a secret to the client's secrets.
+        /// </summary>
+        /// <param name="client">The client.</param>
+        /// <param name="secret">The secret.</param>
         public static void Secret(this Client client, string secret)
         {
             client.Secret(new Secret(secret));
         }
 
+        /// <summary>
+        /// Adds a secret to the client's secrets.
+        /// </summary>
+        /// <param name="client">The client.</param>
+        /// <param name="config">The configuration.</param>
         public static void Secret(this Client client, Action<Secret> config)
         {
             var secret = new Secret();
@@ -44,6 +67,11 @@ namespace IdentityServer4.Models
             client.Secret(secret);
         }
 
+        /// <summary>
+        /// Adds a secret to the client's secrets.
+        /// </summary>
+        /// <param name="client">The client.</param>
+        /// <param name="secret">The secret.</param>
         public static void Secret(this Client client, Secret secret)
         {
             client.ClientSecrets = client.ClientSecrets ?? new List<Secret>();

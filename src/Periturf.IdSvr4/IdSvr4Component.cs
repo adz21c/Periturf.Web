@@ -13,23 +13,102 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+using IdentityServer4.Models;
+using IdentityServer4.Stores;
 using Periturf.Components;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Periturf.IdSvr4
 {
-    class IdSvr4Component : IComponent
+    internal class IdSvr4Component : IComponent, IClientStore, IResourceStore
     {
-        public ConfigurationStore ConfigurationStore { get; } = new ConfigurationStore();
+        // Concurrent friendly configuration registration
+        private readonly ConcurrentDictionary<Guid, ConfigurationRegistration> _configurations = new ConcurrentDictionary<Guid, ConfigurationRegistration>();
 
-        public void RegisterConfiguration(Guid id, ConfigurationRegistration reg)
+        // locking
+        private readonly ReaderWriterLockSlim _resourceManager = new ReaderWriterLockSlim();
+
+        // In memory store implementations
+        private InMemoryClientStore _clients = new InMemoryClientStore(Enumerable.Empty<Client>());
+        private InMemoryResourcesStore _resources = new InMemoryResourcesStore(Enumerable.Empty<IdentityResource>(), Enumerable.Empty<ApiResource>());
+
+        public Task RegisterConfigurationAsync(Guid id, ConfigurationRegistration config)
         {
-            ConfigurationStore.Register(id, reg);
+            _configurations[id] = config;
+            RebuildStores();
+            return Task.CompletedTask;
         }
 
-        public void UnregisterConfiguration(Guid configurationId)
+        public Task UnregisterConfigurationAsync(Guid id, CancellationToken ct = default)
         {
-            ConfigurationStore.Unregister(configurationId);
+            if (_configurations.TryRemove(id, out _))
+                RebuildStores();
+            return Task.CompletedTask;
         }
+
+        private void RebuildStores()
+        {
+            _resourceManager.EnterWriteLock();
+            try
+            {
+                var newClients = _configurations.Values.SelectMany(x => x.Clients).ToList();
+                var newIdentityResources = _configurations.Values.SelectMany(x => x.IdentityResources).ToList();
+                var newApiResources = _configurations.Values.SelectMany(x => x.ApiResources).ToList();
+
+                _clients = new InMemoryClientStore(newClients);
+                _resources = new InMemoryResourcesStore(newIdentityResources, newApiResources);
+            }
+            finally
+            {
+                _resourceManager.ExitWriteLock();
+            }
+        }
+
+        private async Task<T> ReadLockedAsync<T>(Func<Task<T>> readFunc)
+        {
+            _resourceManager.EnterReadLock();
+            try
+            {
+                return await readFunc();
+            }
+            finally
+            {
+                _resourceManager.ExitReadLock();
+            }
+        }
+
+        #region Passthrough methods
+
+        Task<Client> IClientStore.FindClientByIdAsync(string clientId)
+        {
+            return ReadLockedAsync(() => _clients.FindClientByIdAsync(clientId));
+        }
+
+        Task<IEnumerable<IdentityResource>> IResourceStore.FindIdentityResourcesByScopeAsync(IEnumerable<string> scopeNames)
+        {
+            return ReadLockedAsync(() => _resources.FindIdentityResourcesByScopeAsync(scopeNames));
+        }
+
+        Task<IEnumerable<ApiResource>> IResourceStore.FindApiResourcesByScopeAsync(IEnumerable<string> scopeNames)
+        {
+            return ReadLockedAsync(() => _resources.FindApiResourcesByScopeAsync(scopeNames));
+        }
+
+        Task<ApiResource> IResourceStore.FindApiResourceAsync(string name)
+        {
+            return ReadLockedAsync(() => _resources.FindApiResourceAsync(name));
+        }
+
+        Task<Resources> IResourceStore.GetAllResourcesAsync()
+        {
+            return ReadLockedAsync(() => _resources.GetAllResourcesAsync());
+        }
+
+        #endregion
     }
 }

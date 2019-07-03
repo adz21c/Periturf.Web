@@ -17,9 +17,8 @@ using FakeItEasy;
 using NUnit.Framework;
 using Periturf.Components;
 using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Periturf.Tests
 {
@@ -27,208 +26,124 @@ namespace Periturf.Tests
     class EnvironmentSetupTests
     {
         [Test]
-        public void Given_EnvironmentWithOneHost_When_Start_Then_HostStarts()
+        public void Given_SingleHost_When_Setup_Then_EnvironmentCreated()
         {
-            var host = A.Fake<IHost>();
-            A.CallTo(() => host.StartAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
+            // Arrange
+            var component = A.Dummy<IComponent>();
+            var host = A.Dummy<IHost>();
+            A.CallTo(() => host.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { "component", component } }));
 
+            // Act
             var environment = Environment.Setup(x =>
             {
-                x.Host("host", host);
+                x.Host(nameof(host), host);
             });
 
-            Assert.DoesNotThrowAsync(() => environment.StartAsync());
+            // Assert
+            Assert.IsNotNull(environment);
+        }
 
-            A.CallTo(() => host.StartAsync(A<CancellationToken>._)).MustHaveHappened();
+        [TestCase(null, Description = "Null Host Name")]
+        [TestCase("", Description = "Empty Host Name")]
+        [TestCase(" ", Description = "Whitespace Host Name")]
+        public void Given_BadHostName_When_Setup_Then_ThrowException(string hostName)
+        {
+            // Arrange
+            var component = A.Dummy<IComponent>();
+            var host = A.Dummy<IHost>();
+            A.CallTo(() => host.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { "component", component } }));
+
+            // Act
+            var exception = Assert.Throws<ArgumentNullException>(() => Environment.Setup(x =>
+            {
+                x.Host(hostName, host);
+            }));
+
+            // Assert
+            Assert.AreEqual("name", exception.ParamName);
         }
 
         [Test]
-        public void Given_EnvironmentWithMultipleHosts_When_Start_Then_HostsStart()
+        public void Given_NullHost_When_Setup_Then_ThrowException()
         {
-            var host = A.Fake<IHost>();
-            A.CallTo(() => host.StartAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
-
-            var host2 = A.Fake<IHost>();
-            A.CallTo(() => host2.StartAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
-
-            var environment = Environment.Setup(x =>
+            // Act
+            var exception = Assert.Throws<ArgumentNullException>(() => Environment.Setup(x =>
             {
-                x.Host("host", host);
-                x.Host("host2", host2);
-            });
+                x.Host("Host", null);
+            }));
 
-            Assert.DoesNotThrowAsync(() => environment.StartAsync());
-
-            A.CallTo(() => host.StartAsync(A<CancellationToken>._)).MustHaveHappened();
-            A.CallTo(() => host2.StartAsync(A<CancellationToken>._)).MustHaveHappened();
-        }
-
-        //[Test]
-        //public void Given_EnvironmentWithMultipleHosts_When_StartFails_Then_StoppedAndThrow()
-        //{
-        //    var startedHost = A.Fake<IHost>();
-        //    A.CallTo(() => startedHost.StartAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
-
-        //    var startedHost2 = A.Fake<IHost>();
-        //    A.CallTo(() => startedHost2.StartAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
-
-        //    var failingHostException = new Exception();
-        //    var failingHost = A.Fake<IHost>();
-        //    A.CallTo(() => failingHost.StartAsync(A<CancellationToken>._)).Throws(failingHostException);
-
-        //    var failingHostException2 = new Exception();
-        //    var failingHost2 = A.Fake<IHost>();
-        //    A.CallTo(() => failingHost2.StartAsync(A<CancellationToken>._)).Throws(failingHostException2);
-
-        //    var environment = Environment.Setup(x =>
-        //    {
-        //        x.Host(startedHost);
-        //        x.Host(failingHost);
-        //        x.Host(startedHost2);
-        //        x.Host(failingHost2);
-        //    });
-
-        //    var exception = Assert.ThrowsAsync<EnvironmentStartException>(() => environment.StartAsync());
-
-        //    Assert.NotNull(exception.Details);
-        //    Assert.AreEqual(2, exception.Details.Length);
-        //    Assert.That(exception.Details.Any(x => x.Host == failingHost && x.Exception == failingHostException));
-        //    Assert.That(exception.Details.Any(x => x.Host == failingHost2 && x.Exception == failingHostException2));
-
-        //    A.CallTo(() => startedHost.StartAsync(A<CancellationToken>._)).MustHaveHappenedOnceOrLess().Then(
-        //        A.CallTo(() => startedHost.StopAsync(A<CancellationToken>._)).MustHaveHappened());
-
-        //    A.CallTo(() => startedHost2.StartAsync(A<CancellationToken>._)).MustHaveHappenedOnceOrLess().Then(
-        //        A.CallTo(() => startedHost2.StopAsync(A<CancellationToken>._)).MustHaveHappened());
-
-        //    A.CallTo(() => failingHost.StartAsync(A<CancellationToken>._)).MustHaveHappenedOnceOrLess().Then(
-        //        A.CallTo(() => failingHost.StopAsync(A<CancellationToken>._)).MustHaveHappened());
-
-        //    A.CallTo(() => failingHost2.StartAsync(A<CancellationToken>._)).MustHaveHappenedOnceOrLess().Then(
-        //        A.CallTo(() => failingHost2.StopAsync(A<CancellationToken>._)).MustHaveHappened());
-        //}
-
-        [Test]
-        public void Given_EnvironmentWithOneHost_When_Stop_Then_HostStops()
-        {
-            var host = A.Fake<IHost>();
-            A.CallTo(() => host.StopAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
-
-            var environment = Environment.Setup(x =>
-            {
-                x.Host("host", host);
-            });
-
-            Assert.DoesNotThrowAsync(() => environment.StopAsync());
-
-            A.CallTo(() => host.StopAsync(A<CancellationToken>._)).MustHaveHappened();
+            // Assert
+            Assert.AreEqual("host", exception.ParamName);
         }
 
         [Test]
-        public void Given_EnvironmentWithMultipleHosts_When_Stop_Then_HostsStop()
+        public void Given_MultipleHosts_When_Setup_Then_EnvironmentCreated()
         {
-            var host = A.Fake<IHost>();
-            A.CallTo(() => host.StopAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
+            // Arrange
+            var component = A.Dummy<IComponent>();
+            var host = A.Dummy<IHost>();
+            A.CallTo(() => host.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { nameof(component), component } }));
 
-            var host2 = A.Fake<IHost>();
-            A.CallTo(() => host2.StopAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
+            var component2 = A.Dummy<IComponent>();
+            var host2 = A.Dummy<IHost>();
+            A.CallTo(() => host2.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { nameof(component2), component2 } }));
 
+            // Act
             var environment = Environment.Setup(x =>
             {
-                x.Host("host", host);
-                x.Host("host2", host2);
+                x.Host(nameof(host), host);
+                x.Host(nameof(host2), host2);
             });
 
-            Assert.DoesNotThrowAsync(() => environment.StopAsync());
-
-            A.CallTo(() => host.StopAsync(A<CancellationToken>._)).MustHaveHappened();
-            A.CallTo(() => host2.StopAsync(A<CancellationToken>._)).MustHaveHappened();
+            // Assert
+            Assert.IsNotNull(environment);
         }
 
-        //[Test]
-        //public void Given_EnvironmentWithMultipleHosts_When_StopFails_Then_Throw()
-        //{
-        //    var startedHost = A.Fake<IHost>();
-        //    A.CallTo(() => startedHost.StopAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
+        [Test]
+        public void Given_MultipleHostsWithTheSameName_When_Setup_Then_ThrowException()
+        {
+            // Arrange
+            var component = A.Dummy<IComponent>();
+            var host = A.Dummy<IHost>();
+            A.CallTo(() => host.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { nameof(component), component } }));
 
-        //    var startedHost2 = A.Fake<IHost>();
-        //    A.CallTo(() => startedHost2.StopAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
+            var component2 = A.Dummy<IComponent>();
+            var host2 = A.Dummy<IHost>();
+            A.CallTo(() => host2.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { nameof(component2), component2 } }));
 
-        //    var failingHostException = new Exception();
-        //    var failingHost = A.Fake<IHost>();
-        //    A.CallTo(() => failingHost.StopAsync(A<CancellationToken>._)).Throws(failingHostException);
+            // Act
+            var exception = Assert.Throws<DuplicateHostNameException>(() => Environment.Setup(x =>
+            {
+                x.Host(nameof(host), host);
+                x.Host(nameof(host), host2);
+            }));
 
-        //    var failingHostException2 = new Exception();
-        //    var failingHost2 = A.Fake<IHost>();
-        //    A.CallTo(() => failingHost2.StopAsync(A<CancellationToken>._)).Throws(failingHostException2);
+            // Assert
+            Assert.AreEqual(nameof(host), exception.HostName);
+        }
 
-        //    var environment = Environment.Setup(x =>
-        //    {
-        //        x.Host(startedHost);
-        //        x.Host(failingHost);
-        //        x.Host(startedHost2);
-        //        x.Host(failingHost2);
-        //    });
 
-        //    var exception = Assert.ThrowsAsync<EnvironmentStopException>(() => environment.StopAsync());
+        [Test]
+        public void Given_MultipleComponentsWithTheSameName_When_Setup_Then_ThrowException()
+        {
+            // Arrange
+            var component = A.Dummy<IComponent>();
+            var host = A.Dummy<IHost>();
+            A.CallTo(() => host.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { nameof(component), component } }));
 
-        //    Assert.NotNull(exception.Details);
-        //    Assert.AreEqual(2, exception.Details.Length);
-        //    Assert.That(exception.Details.Any(x => x.Host == failingHost && x.Exception == failingHostException));
-        //    Assert.That(exception.Details.Any(x => x.Host == failingHost2 && x.Exception == failingHostException2));
+            var component2 = A.Dummy<IComponent>();
+            var host2 = A.Dummy<IHost>();
+            A.CallTo(() => host2.Components).Returns(new ReadOnlyDictionary<string, IComponent>(new Dictionary<string, IComponent> { { nameof(component), component2 } }));
 
-        //    A.CallTo(() => startedHost.StopAsync(A<CancellationToken>._)).MustHaveHappened();
-        //    A.CallTo(() => startedHost2.StopAsync(A<CancellationToken>._)).MustHaveHappened();
-        //    A.CallTo(() => failingHost.StopAsync(A<CancellationToken>._)).MustHaveHappened();
-        //    A.CallTo(() => failingHost2.StopAsync(A<CancellationToken>._)).MustHaveHappened();
-        //}
+            // Act
+            var exception = Assert.Throws<DuplicateComponentNameException>(() => Environment.Setup(x =>
+            {
+                x.Host(nameof(host), host);
+                x.Host(nameof(host2), host2);
+            }));
 
-        //[Test]
-        //public void Given_EnvironmentWithMultipleHosts_When_StartFailsAndStopFails_Then_Throw()
-        //{
-        //    var startedHost = A.Fake<IHost>();
-        //    var startedHostException = new Exception();
-        //    A.CallTo(() => startedHost.StartAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
-        //    A.CallTo(() => startedHost.StopAsync(A<CancellationToken>._)).Throws(startedHostException);
-
-        //    var startedHost2 = A.Fake<IHost>();
-        //    A.CallTo(() => startedHost2.StartAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
-        //    A.CallTo(() => startedHost.StopAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
-
-        //    var failingHostException = new Exception();
-        //    var failingHostOtherException = new Exception();
-        //    var failingHost = A.Fake<IHost>();
-        //    A.CallTo(() => failingHost.StartAsync(A<CancellationToken>._)).Throws(failingHostException);
-        //    A.CallTo(() => failingHost.StopAsync(A<CancellationToken>._)).Throws(failingHostOtherException);
-
-        //    var failingHostException2 = new Exception();
-        //    var failingHost2 = A.Fake<IHost>();
-        //    A.CallTo(() => failingHost2.StartAsync(A<CancellationToken>._)).Throws(failingHostException2);
-        //    A.CallTo(() => failingHost2.StopAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
-
-        //    var environment = Environment.Setup(x =>
-        //    {
-        //        x.Host(startedHost);
-        //        x.Host(failingHost);
-        //        x.Host(startedHost2);
-        //        x.Host(failingHost2);
-        //    });
-
-        //    var exception = Assert.ThrowsAsync<EnvironmentStartException>(() => environment.StopAsync());
-
-        //    Assert.NotNull(exception.Details);
-        //    Assert.AreEqual(2, exception.Details.Length);
-        //    Assert.That(exception.Details.Any(x => x.Host == failingHost && x.Exception == failingHostException));
-        //    Assert.That(exception.Details.Any(x => x.Host == failingHost2 && x.Exception == failingHostException2));
-        //    Assert.NotNull(exception.StopException);
-        //    Assert.AreEqual(2, exception.StopException.Details.Length);
-        //    Assert.That(exception.StopException.Details.Any(x => x.Host == startedHost && x.Exception == startedHostException));
-        //    Assert.That(exception.StopException.Details.Any(x => x.Host == failingHost && x.Exception == failingHostOtherException));
-
-        //    A.CallTo(() => startedHost.StopAsync(A<CancellationToken>._)).MustHaveHappened();
-        //    A.CallTo(() => startedHost2.StopAsync(A<CancellationToken>._)).MustHaveHappened();
-        //    A.CallTo(() => failingHost.StopAsync(A<CancellationToken>._)).MustHaveHappened();
-        //    A.CallTo(() => failingHost2.StopAsync(A<CancellationToken>._)).MustHaveHappened();
-        //}
+            // Assert
+            Assert.AreEqual(nameof(component), exception.ComponentName);
+        }
     }
 }

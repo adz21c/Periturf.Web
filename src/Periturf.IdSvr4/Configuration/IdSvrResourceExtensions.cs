@@ -18,19 +18,37 @@ using System.Collections.Generic;
 
 namespace IdentityServer4.Models
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class IdSvrResourceExtensions
     {
+        /// <summary>
+        /// Adds a user claim to the resource
+        /// </summary>
+        /// <param name="resource">The resource.</param>
+        /// <param name="name">The name.</param>
         public static void UserClaim(this Resource resource, string name)
         {
             resource.UserClaims = resource.UserClaims ?? new List<string>();
             resource.UserClaims.Add(name);
         }
 
+        /// <summary>
+        /// Adds a secret to the API resource
+        /// </summary>
+        /// <param name="resource">The resource.</param>
+        /// <param name="secret">The secret.</param>
         public static void Secret(this ApiResource resource, string secret)
         {
             resource.Secret(new Secret(secret));
         }
 
+        /// <summary>
+        /// Adds a secret to the API resource
+        /// </summary>
+        /// <param name="resource">The resource.</param>
+        /// <param name="config">The configuration.</param>
         public static void Secret(this ApiResource resource, Action<Secret> config)
         {
             var secret = new Secret();
@@ -38,6 +56,11 @@ namespace IdentityServer4.Models
             resource.Secret(secret);
         }
 
+        /// <summary>
+        /// Adds a secret to the API resource
+        /// </summary>
+        /// <param name="resource">The resource.</param>
+        /// <param name="secret">The secret.</param>
         public static void Secret(this ApiResource resource, Secret secret)
         {
             resource.ApiSecrets = resource.ApiSecrets ?? new List<Secret>();
@@ -45,6 +68,11 @@ namespace IdentityServer4.Models
         }
 
 
+        /// <summary>
+        /// Adds a scope to the API resource
+        /// </summary>
+        /// <param name="resource">The resource.</param>
+        /// <param name="config">The configuration.</param>
         public static void Scope(this ApiResource resource, Action<Scope> config)
         {
             var scope = new Scope();
@@ -52,6 +80,11 @@ namespace IdentityServer4.Models
             resource.Scope(scope);
         }
 
+        /// <summary>
+        /// Adds a scope to the API resource
+        /// </summary>
+        /// <param name="resource">The resource.</param>
+        /// <param name="scope">The scope.</param>
         public static void Scope(this ApiResource resource, Scope scope)
         {
             resource.Scopes = resource.Scopes ?? new List<Scope>();

@@ -1,4 +1,4 @@
-﻿image: Visual Studio 2017
+image: Visual Studio 2017
 
 branches:
   only:
@@ -9,7 +9,15 @@ skip_tags: true
 
 environment:
   JAVA_HOME: c:/Program Files/Java/jdk1.8.0
-
+  
+  sonar_login:
+    secure: 6qD93a8X/HlviVML1h7oaD5Z57iWiGc6BLkgizomSUHAgcNeC6eQoY8sprEtlHtN
+  
+  coverlet_output: "%APPVEYOR_BUILD_FOLDER%/build/Coverlet.Coverage.OpenCover.xml"
+  
+  CODECOV_TOKEN:
+    secure: qpg2oUby8/m76bjOwVR+hoiGl5/k2CzSDtXnXoog0eZvvgC8k34Yj+IAUedg0yOM
+  
 build: off
 test: off
 
@@ -19,16 +27,35 @@ before_build:
     
     gitversion /l console /output buildserver /updateAssemblyInfo
     
+    choco install codecov
+    
     dotnet tool install --global dotnet-sonarscanner
     
     dotnet restore src
     
 build_script:
   cmd: >-
-    dotnet sonarscanner begin /k:"adz21c_Periturf" /o:"adz21c-github" /v:"%GitVersion_FullSemVer%" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="52802d649c768a8651be8b82c80f6b5c9e569fae"
+    dotnet sonarscanner begin /k:"adz21c_Periturf" /o:"adz21c-github" /v:"%GitVersion_FullSemVer%" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="%sonar_login%" /d:sonar.branch.name="%APPVEYOR_REPO_BRANCH%"
     
     dotnet build src
     
-    dotnet test src /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+    dotnet test src /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput="%coverlet_output%"
     
-    dotnet sonarscanner end /d:sonar.login="52802d649c768a8651be8b82c80f6b5c9e569fae"
+    dotnet sonarscanner end /d:sonar.login="%sonar_login%"
+    
+    codecov -f "%coverlet_output%" -t "%CODECOV_TOKEN%"
+    
+    dotnet pack src --no-restore --include-symbols -c Release -p:PackageVersion=%GitVersion_NuGetVersionV2%
+
+artifacts:
+- path: '**\bin\Release\*.nupkg'
+  name: NuGetPackage
+
+deploy:
+- provider: NuGet
+  api_key:
+    secure: 7O2m24jX9iGDVqiTgo/BQfilTBo6ZyAJnv2sscOrtIl3sxLFOhXXJhmF1Ra/bmj0
+  skip_symbols: true
+  artifact: NuGetPackage
+  on:
+    branch: /master|develop/

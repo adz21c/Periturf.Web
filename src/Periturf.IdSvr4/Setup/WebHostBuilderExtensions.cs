@@ -19,16 +19,32 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Periturf.IdSvr4;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Periturf
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class WebHostBuilderExtensions
     {
+        /// <summary>
+        /// Adds and configures an IdentityServer4 component to the ASP.NET Core Web Host.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        /// <param name="config">The configuration.</param>
+        [ExcludeFromCodeCoverage]
         public static void SetupIdSvr4(this IPeriturfWebHostBuilder builder, Action<IdSvr4SetupConfigurator> config = null)
         {
             builder.SetupIdSvr4("IdSvr4", config);
         }
 
+        /// <summary>
+        /// Adds and configures an IdentityServer4 component to the ASP.NET Core Web Host.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        /// <param name="name">The host name.</param>
+        /// <param name="config">The configuration.</param>
         public static void SetupIdSvr4(this IPeriturfWebHostBuilder builder, string name, Action<IdSvr4SetupConfigurator> config = null)
         {
             var configurator = new IdSvr4SetupConfigurator();
@@ -41,8 +57,8 @@ namespace Periturf
             builder.ConfigureServices(services =>
             {
                 services
-                    .AddSingleton<IClientStore, ConfigurationStore>(sp => component.ConfigurationStore)
-                    .AddSingleton<IResourceStore, ConfigurationStore>(sp => component.ConfigurationStore);
+                    .AddSingleton<IClientStore, IdSvr4Component>(sp => component)
+                    .AddSingleton<IResourceStore, IdSvr4Component>(sp => component);
 
                 var identityServiceBuilder = services
                     .AddIdentityServer()

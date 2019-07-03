@@ -17,8 +17,16 @@ using System.Collections.Generic;
 
 namespace IdentityServer4.Models
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class IdSvrScopeExtensions
     {
+        /// <summary>
+        /// Adds a user claim to the scope.
+        /// </summary>
+        /// <param name="scope">The scope.</param>
+        /// <param name="name">The name.</param>
         public static void UserClaim(this Scope scope, string name)
         {
             scope.UserClaims = scope.UserClaims ?? new List<string>();

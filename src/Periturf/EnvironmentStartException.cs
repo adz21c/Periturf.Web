@@ -18,27 +18,58 @@ using System.Runtime.Serialization;
 
 namespace Periturf
 {
+    /// <summary>
+    /// Holds details of errors while starting the hosts of an environment.
+    /// </summary>
+    /// <seealso cref="System.Exception" />
     [Serializable]
     public class EnvironmentStartException : Exception
     {
-        public EnvironmentStartException(HostExceptionDetails[] details) : base("Failed to correctly start environment")
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EnvironmentStartException"/> class.
+        /// </summary>
+        /// <param name="details">The details.</param>
+        public EnvironmentStartException(HostExceptionDetails[] details = null) : base("Failed to correctly start environment")
         {
-            Details = details;
+            Details = details ?? new HostExceptionDetails[] { };
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EnvironmentStartException"/> class.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="details">The details.</param>
+        public EnvironmentStartException(string message, HostExceptionDetails[] details = null) : base(message)
+        {
+            Details = details ?? new HostExceptionDetails[] { };
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EnvironmentStartException"/> class.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"></see> that holds the serialized object data about the exception being thrown.</param>
+        /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"></see> that contains contextual information about the source or destination.</param>
         protected EnvironmentStartException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
-            Details = (HostExceptionDetails[]) info.GetValue("Details", typeof(HostExceptionDetails[]));
+            Details = (HostExceptionDetails[]) info.GetValue(nameof(Details), typeof(HostExceptionDetails[]));
         }
 
+        /// <summary>
+        /// Gets the host error details.
+        /// </summary>
+        /// <value>
+        /// The host error details.
+        /// </value>
         public HostExceptionDetails[] Details { get; }
 
+        /// <summary>
+        /// When overridden in a derived class, sets the <see cref="T:System.Runtime.Serialization.SerializationInfo"></see> with information about the exception.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"></see> that holds the serialized object data about the exception being thrown.</param>
+        /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"></see> that contains contextual information about the source or destination.</param>
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (info == null)
-                throw new ArgumentNullException("info");
-
-            info.AddValue("Details", Details, typeof(HostExceptionDetails[]));
+            info.AddValue(nameof(Details), Details, typeof(HostExceptionDetails[]));
 
             base.GetObjectData(info, context);
         }

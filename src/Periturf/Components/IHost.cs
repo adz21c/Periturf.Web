@@ -19,12 +19,31 @@ using System.Threading.Tasks;
 
 namespace Periturf.Components
 {
+    /// <summary>
+    /// Hosts run components and can be stopped and started.
+    /// </summary>
     public interface IHost
     {
+        /// <summary>
+        /// Gets the components for the host.
+        /// </summary>
+        /// <value>
+        /// The components for the host.
+        /// </value>
         IReadOnlyDictionary<string, IComponent> Components { get; }
 
+        /// <summary>
+        /// Starts the host.
+        /// </summary>
+        /// <param name="ct">The cancellation token.</param>
+        /// <returns></returns>
         Task StartAsync(CancellationToken ct = default);
 
+        /// <summary>
+        /// Stops the host.
+        /// </summary>
+        /// <param name="ct">The cancellation token.</param>
+        /// <returns></returns>
         Task StopAsync(CancellationToken ct = default);
     }
 }

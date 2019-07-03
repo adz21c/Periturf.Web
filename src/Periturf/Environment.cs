@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -23,6 +22,9 @@ using Periturf.Components;
 
 namespace Periturf
 {
+    /// <summary>
+    /// The environment which manages the assignment and removal of configuration to components.
+    /// </summary>
     public class Environment
     {
         private readonly Dictionary<string, IHost> _hosts = new Dictionary<string, IHost>();
@@ -31,18 +33,97 @@ namespace Periturf
         private Environment()
         { }
 
-        public Task StartAsync(CancellationToken ct = default)
+        /// <summary>
+        /// Starts all hosts in the environment.
+        /// </summary>
+        /// <param name="ct">The cancellation token.</param>
+        /// <returns></returns>
+        /// <exception cref="EnvironmentStartException"></exception>
+        public async Task StartAsync(CancellationToken ct = default)
         {
-            return Task.WhenAll(_hosts.Values.Select(x => x.StartAsync(ct)));
+            // For symplicity, lets not fail fast :-/
+            Task StartHost(KeyValuePair<string, IHost> host)
+            {
+                try
+                {
+                    return host.Value.StartAsync(ct);
+                }
+                catch (Exception ex)
+                {
+                    return Task.FromException(ex);
+                }
+            }
+
+            var startingHosts = _hosts
+                .Select(x => new { Name = x.Key, Task = StartHost(x) })
+                .ToList();
+
+            try
+            {
+                await Task.WhenAll(startingHosts.Select(x => x.Task));
+            }
+            catch
+            {
+                var hostDetails = startingHosts
+                    .Where(x => x.Task.IsFaulted)
+                    .Select(x => new HostExceptionDetails(
+                        x.Name,
+                        x.Task.Exception.InnerExceptions.First()))
+                    .ToArray();
+
+                throw new EnvironmentStartException(hostDetails);
+            }
         }
 
-        public Task StopAsync(CancellationToken ct = default)
+        /// <summary>
+        /// Stops all hosts in the environment.
+        /// </summary>
+        /// <param name="ct">The cancellation token.</param>
+        /// <returns></returns>
+        /// <exception cref="EnvironmentStopException"></exception>
+        public async Task StopAsync(CancellationToken ct = default)
         {
-            return Task.WhenAll(_hosts.Values.Select(x => x.StopAsync(ct)));
+            // For symplicity, lets not fail fast :-/
+            Task StopHost(KeyValuePair<string, IHost> host)
+            {
+                try
+                {
+                    return host.Value.StopAsync(ct);
+                }
+                catch (Exception ex)
+                {
+                    return Task.FromException(ex);
+                }
+            }
+
+            var stoppingHosts = _hosts
+                .Select(x => new { Name = x.Key, Task = StopHost(x) })
+                .ToList();
+
+            try
+            {
+                await Task.WhenAll(stoppingHosts.Select(x => x.Task));
+            }
+            catch
+            {
+                var hostDetails = stoppingHosts
+                    .Where(x => x.Task.IsFaulted)
+                    .Select(x => new HostExceptionDetails(
+                        x.Name,
+                        x.Task.Exception.InnerExceptions.First()))
+                    .ToArray();
+
+                throw new EnvironmentStopException(hostDetails);
+            }
         }
 
         #region Setup
 
+        /// <summary>
+        /// Creates and configures the hosts and components within an environment.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <returns></returns>
         public static Environment Setup(Action<ISetupConfigurator> config)
         {
             var env = new Environment();
@@ -64,9 +145,23 @@ namespace Periturf
 
             public void Host(string name, IHost host)
             {
+                if (string.IsNullOrWhiteSpace(name))
+                    throw new ArgumentNullException(nameof(name));
+
+                if (host == null)
+                    throw new ArgumentNullException(nameof(host));
+
+                if (_env._hosts.ContainsKey(name))
+                    throw new DuplicateHostNameException(name);
+
                 _env._hosts.Add(name, host);
-                foreach(var comp in host.Components)
+                foreach (var comp in host.Components)
+                {
+                    if (_env._components.ContainsKey(comp.Key))
+                        throw new DuplicateComponentNameException(comp.Key);
+
                     _env._components.Add(comp.Key, comp.Value);
+                }
             }
         }
 
@@ -74,67 +169,103 @@ namespace Periturf
 
         #region Configure
 
-        private readonly ConcurrentDictionary<Guid, int> _configurationKeys = new ConcurrentDictionary<Guid, int>();
-
-        public IDisposable Configure(Action<IConfiugrationBuilder> config)
+        /// <summary>
+        /// Configures expectation into the environment.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <param name="ct"></param>
+        /// <returns>The unique identifier for the expectation configuration.</returns>
+        /// <exception cref="ConfigurationApplicationException"></exception>
+        public async Task<Guid> ConfigureAsync(Action<IConfiugrationBuilder> config, CancellationToken ct = default)
         {
-            // Get the configuration
-            var builder = new ConfigurationBuilder(this);
-            config(builder);
-
-            // Get an unused unique id
             var id = Guid.NewGuid();
-            _configurationKeys.AddOrUpdate(id, 0, (old, @new) => throw new InvalidOperationException("Not a unique guid"));
 
-            var configurators = builder.GetConfigurators();
-            var configuredComponents = new List<IComponent>(configurators.Count);
-            try
-            {
-                // Apply the configuration
-                foreach(var configurator in configurators)
-                {
-                    configurator.RegisterConfiguration(id);
-                    configuredComponents.Add(configurator.Component);
-                }
-
-                return new ConfigurationDisposable(id, this);
-            }
-            catch
-            {
-                // Rollback everything achieved up to now
-                foreach (var component in configuredComponents)
-                    component.UnregisterConfiguration(id);
-
-                _configurationKeys.TryRemove(id, out var dontCare);
-                throw;
-            }
-        }
-
-        private void RemoveConfiguration(Guid id)
-        {
-            var exceptions = new List<ComponentExceptionDetails>();
-            foreach (var component in _components.Values)
+            Task ConfigureComponent(IComponentConfigurator configurator)
             {
                 try
                 {
-                    component.UnregisterConfiguration(id);
+                    return configurator.RegisterConfigurationAsync(id, ct);
                 }
                 catch (Exception ex)
                 {
-                    // record and try the next
-                    exceptions.Add(new ComponentExceptionDetails(component, ex));
+                    return Task.FromException(ex);
                 }
             }
 
-            _configurationKeys.TryRemove(id, out var dontCare);
+            // Gather configuration
+            var builder = new ConfigurationBuilder(this);
+            config(builder);
+            var configurators = builder.GetConfigurators();
 
-            if (exceptions.Any())
-                throw new ConfigurationRemovalException(id, exceptions);
+            // Apply configuration
+            var configuringComponents = configurators
+                .Select(x => new { Name = x.Key, Task = ConfigureComponent(x.Value) })
+                .ToList();
+
+            try
+            {
+                await Task.WhenAll(configuringComponents.Select(x => x.Task));
+
+                return id;
+            }
+            catch
+            {
+                var componentDetails = configuringComponents
+                    .Where(x => x.Task.IsFaulted)
+                    .Select(x => new ComponentExceptionDetails(
+                        x.Name,
+                        x.Task.Exception.InnerExceptions.First()))
+                    .ToArray();
+
+                throw new ConfigurationApplicationException(componentDetails);
+            }
+        }
+
+        /// <summary>
+        /// Removes the specified expectation configuration from the environment.
+        /// </summary>
+        /// <param name="configId">The configuration identifier.</param>
+        /// <param name="ct">The cancellation token.</param>
+        /// <returns></returns>
+        /// <exception cref="ConfigurationRemovalException"></exception>
+        public async Task RemoveConfigurationAsync(Guid configId, CancellationToken ct = default)
+        {
+            Task RemoveConfiguration(IComponent component)
+            {
+                try
+                {
+                    return component.UnregisterConfigurationAsync(configId, ct);
+                }
+                catch (Exception ex)
+                {
+                    return Task.FromException(ex);
+                }
+            }
+
+            var configuringComponents = _components
+                .Select(x => new { Name = x.Key, Task = RemoveConfiguration(x.Value) })
+                .ToList();
+
+            try
+            {
+                await Task.WhenAll(configuringComponents.Select(x => x.Task));
+            }
+            catch
+            {
+                var componentDetails = configuringComponents
+                    .Where(x => x.Task.IsFaulted)
+                    .Select(x => new ComponentExceptionDetails(
+                        x.Name,
+                        x.Task.Exception.InnerExceptions.First()))
+                    .ToArray();
+
+                throw new ConfigurationRemovalException(configId, componentDetails);
+            }
         }
 
         class ConfigurationBuilder : IConfiugrationBuilder
         {
-            private readonly List<IComponentConfigurator> _configurators = new List<IComponentConfigurator>();
+            private readonly Dictionary<string, IComponentConfigurator> _configurators = new Dictionary<string, IComponentConfigurator>();
             private readonly Environment _environment;
 
             public ConfigurationBuilder(Environment environment)
@@ -142,53 +273,18 @@ namespace Periturf
                 _environment = environment;
             }
 
-            public T GetComponent<T>(string name) where T : IComponent
+            public void AddComponentConfigurator<T>(string componentName, Func<T, IComponentConfigurator> config)
+                where T : IComponent
             {
-                return (T)_environment._components[name];
+                if (string.IsNullOrWhiteSpace(componentName))
+                    throw new ArgumentNullException(nameof(componentName));
+
+                var component = (T)_environment._components[componentName];
+                var componentConfigurator = config(component);
+                _configurators.Add(componentName, componentConfigurator);
             }
 
-            public void AddComponentConfigurator(IComponentConfigurator componentConfigurator)
-            {
-                _configurators.Add(componentConfigurator);
-            }
-
-            public List<IComponentConfigurator> GetConfigurators() => _configurators.ToList();
-        }
-
-        class ConfigurationDisposable : IDisposable
-        {
-            private readonly Environment _environment;
-            private readonly Guid _configId;
-
-            public ConfigurationDisposable(Guid configId, Environment environment)
-            {
-                _configId = configId;
-                _environment = environment;
-            }
-
-            #region IDisposable Support
-            private bool disposedValue = false; // To detect redundant calls
-
-            protected virtual void Dispose(bool disposing)
-            {
-                if (!disposedValue)
-                {
-                    if (disposing)
-                    {
-                        _environment.RemoveConfiguration(_configId);
-                    }
-
-                    disposedValue = true;
-                }
-            }
-
-            // This code added to correctly implement the disposable pattern.
-            public void Dispose()
-            {
-                // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-                Dispose(true);
-            }
-            #endregion
+            public Dictionary<string, IComponentConfigurator> GetConfigurators() => _configurators;
         }
 
         #endregion
