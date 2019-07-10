@@ -14,55 +14,53 @@
  * limitations under the License.
  */
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Periturf
+namespace Periturf.Setup
 {
     /// <summary>
-    /// Thrown when there are errors while applying configuration to an environment.
+    /// Thrown when a host name is used multiple times.
     /// </summary>
     /// <seealso cref="System.Exception" />
     [Serializable]
-    public class ConfigurationApplicationException : Exception
+    public class DuplicateHostNameException : Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConfigurationApplicationException"/> class.
+        /// Initializes a new instance of the <see cref="DuplicateHostNameException"/> class.
         /// </summary>
-        /// <param name="details">The component error details.</param>
-        public ConfigurationApplicationException(ComponentExceptionDetails[] details = null) : base("There was a problem while applying configuration to the environment")
+        /// <param name="hostName">Name of the host.</param>
+        public DuplicateHostNameException(string hostName) : base($"Duplicate host name: {hostName}")
         {
-            Details = details ?? new ComponentExceptionDetails[] { };
+            HostName = hostName;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConfigurationApplicationException"/> class.
+        /// Initializes a new instance of the <see cref="DuplicateHostNameException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        /// <param name="details">The component error details.</param>
-        public ConfigurationApplicationException(string message, ComponentExceptionDetails[] details = null) : base(message)
+        /// <param name="hostName">Name of the host.</param>
+        public DuplicateHostNameException(string message, string hostName) : base(message)
         {
-            Details = details ?? new ComponentExceptionDetails[] { };
+            HostName = hostName;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConfigurationApplicationException"/> class.
+        /// Initializes a new instance of the <see cref="DuplicateHostNameException"/> class.
         /// </summary>
         /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"></see> that holds the serialized object data about the exception being thrown.</param>
         /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"></see> that contains contextual information about the source or destination.</param>
-        protected ConfigurationApplicationException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected DuplicateHostNameException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
-            Details = (ComponentExceptionDetails[]) info.GetValue(nameof(Details), typeof(ComponentExceptionDetails[]));
+            HostName = info.GetString(nameof(HostName));
         }
 
         /// <summary>
-        /// Gets the component error details.
+        /// Gets the name of the host.
         /// </summary>
         /// <value>
-        /// The component error details.
+        /// The name of the host.
         /// </value>
-        public ComponentExceptionDetails[] Details { get; }
+        public string HostName { get; }
 
         /// <summary>
         /// When overridden in a derived class, sets the <see cref="T:System.Runtime.Serialization.SerializationInfo"></see> with information about the exception.
@@ -71,7 +69,7 @@ namespace Periturf
         /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"></see> that contains contextual information about the source or destination.</param>
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(nameof(Details), Details, typeof(ComponentExceptionDetails[]));
+            info.AddValue(nameof(HostName), HostName);
 
             base.GetObjectData(info, context);
         }

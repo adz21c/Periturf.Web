@@ -16,7 +16,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Periturf
+namespace Periturf.Setup
 {
     /// <summary>
     /// Thrown when a component name is used multiple times.

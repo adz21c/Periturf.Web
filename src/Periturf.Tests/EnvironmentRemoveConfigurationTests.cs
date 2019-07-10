@@ -16,6 +16,7 @@
 using FakeItEasy;
 using NUnit.Framework;
 using Periturf.Components;
+using Periturf.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

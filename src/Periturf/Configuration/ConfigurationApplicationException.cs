@@ -16,51 +16,51 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Periturf
+namespace Periturf.Configuration
 {
     /// <summary>
-    /// Thrown when a host name is used multiple times.
+    /// Thrown when there are errors while applying configuration to an environment.
     /// </summary>
     /// <seealso cref="System.Exception" />
     [Serializable]
-    public class DuplicateHostNameException : Exception
+    public class ConfigurationApplicationException : Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DuplicateHostNameException"/> class.
+        /// Initializes a new instance of the <see cref="ConfigurationApplicationException"/> class.
         /// </summary>
-        /// <param name="hostName">Name of the host.</param>
-        public DuplicateHostNameException(string hostName) : base($"Duplicate host name: {hostName}")
+        /// <param name="details">The component error details.</param>
+        public ConfigurationApplicationException(ComponentExceptionDetails[] details = null) : base("There was a problem while applying configuration to the environment")
         {
-            HostName = hostName;
+            Details = details ?? new ComponentExceptionDetails[] { };
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DuplicateHostNameException"/> class.
+        /// Initializes a new instance of the <see cref="ConfigurationApplicationException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        /// <param name="hostName">Name of the host.</param>
-        public DuplicateHostNameException(string message, string hostName) : base(message)
+        /// <param name="details">The component error details.</param>
+        public ConfigurationApplicationException(string message, ComponentExceptionDetails[] details = null) : base(message)
         {
-            HostName = hostName;
+            Details = details ?? new ComponentExceptionDetails[] { };
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DuplicateHostNameException"/> class.
+        /// Initializes a new instance of the <see cref="ConfigurationApplicationException"/> class.
         /// </summary>
         /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"></see> that holds the serialized object data about the exception being thrown.</param>
         /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"></see> that contains contextual information about the source or destination.</param>
-        protected DuplicateHostNameException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected ConfigurationApplicationException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
-            HostName = info.GetString(nameof(HostName));
+            Details = (ComponentExceptionDetails[]) info.GetValue(nameof(Details), typeof(ComponentExceptionDetails[]));
         }
 
         /// <summary>
-        /// Gets the name of the host.
+        /// Gets the component error details.
         /// </summary>
         /// <value>
-        /// The name of the host.
+        /// The component error details.
         /// </value>
-        public string HostName { get; }
+        public ComponentExceptionDetails[] Details { get; }
 
         /// <summary>
         /// When overridden in a derived class, sets the <see cref="T:System.Runtime.Serialization.SerializationInfo"></see> with information about the exception.
@@ -69,7 +69,7 @@ namespace Periturf
         /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"></see> that contains contextual information about the source or destination.</param>
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(nameof(HostName), HostName);
+            info.AddValue(nameof(Details), Details, typeof(ComponentExceptionDetails[]));
 
             base.GetObjectData(info, context);
         }

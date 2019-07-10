@@ -16,7 +16,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Periturf
+namespace Periturf.Configuration
 {
     /// <summary>
     /// Thrown when there are errors while removing configuration from an environment.

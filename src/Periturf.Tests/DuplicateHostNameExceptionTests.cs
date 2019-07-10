@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 using NUnit.Framework;
+using Periturf.Setup;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 

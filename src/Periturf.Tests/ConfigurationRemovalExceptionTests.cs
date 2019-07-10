@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 using NUnit.Framework;
+using Periturf.Configuration;
 using System;
 using System.IO;
 using System.Linq;

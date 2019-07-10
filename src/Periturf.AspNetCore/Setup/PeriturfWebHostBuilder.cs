@@ -21,7 +21,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Periturf.Components;
 
-namespace Periturf.AspNetCore
+namespace Periturf.AspNetCore.Setup
 {
     class PeriturfWebHostBuilder : IPeriturfWebHostBuilder
     {

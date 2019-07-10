@@ -20,7 +20,7 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Periturf.AspNetCore
+namespace Periturf.AspNetCore.Setup
 {
     class WebHostAdapter : IHost
     {
