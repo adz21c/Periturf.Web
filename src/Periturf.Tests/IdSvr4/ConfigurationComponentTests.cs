@@ -52,7 +52,7 @@ namespace Periturf.Tests.IdSvr4
                 });
 
 
-            builder.ConfigureIdSvr4(componentName, x =>
+            builder.IdSvr4(componentName, x =>
             {
                 x.Client(c =>
                 {
@@ -60,7 +60,7 @@ namespace Periturf.Tests.IdSvr4
                 });
             });
 
-            builder.ConfigureIdSvr4(componentName, x =>
+            builder.IdSvr4(componentName, x =>
             {
                 x.Client(c =>
                 {

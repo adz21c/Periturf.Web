@@ -34,9 +34,9 @@ namespace Periturf
         /// <param name="builder">The builder.</param>
         /// <param name="config">The configuration.</param>
         [ExcludeFromCodeCoverage]
-        public static void SetupIdSvr4(this IPeriturfWebHostBuilder builder, Action<IdSvr4SetupConfigurator> config = null)
+        public static void IdSvr4(this IPeriturfWebHostBuilder builder, Action<IdSvr4SetupConfigurator> config = null)
         {
-            builder.SetupIdSvr4("IdSvr4", config);
+            builder.IdSvr4("IdSvr4", config);
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Periturf
         /// <param name="builder">The builder.</param>
         /// <param name="name">The host name.</param>
         /// <param name="config">The configuration.</param>
-        public static void SetupIdSvr4(this IPeriturfWebHostBuilder builder, string name, Action<IdSvr4SetupConfigurator> config = null)
+        public static void IdSvr4(this IPeriturfWebHostBuilder builder, string name, Action<IdSvr4SetupConfigurator> config = null)
         {
             var configurator = new IdSvr4SetupConfigurator();
             config?.Invoke(configurator);
