@@ -13,28 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.Components;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Periturf.IdSvr4
+namespace Periturf.Verify.Evaluators.Logical
 {
-    class ComponentConfigurator : IComponentConfigurator
+    class XorConditionSpecification : IConditionSpecification
     {
-        private readonly IdSvr4Component _component;
-        private readonly ConfigurationRegistration _config;
+        private readonly List<IConditionSpecification> _conditions;
 
-        public ComponentConfigurator(IdSvr4Component component, ConfigurationRegistration config)
+        public XorConditionSpecification(List<IConditionSpecification> conditions)
         {
-            _component = component;
-            _config = config;
+            _conditions = conditions;
         }
 
-        public Task RegisterConfigurationAsync(Guid id, CancellationToken ct = default)
+        public async Task<IConditionEvaluator> BuildEvaluatorAsync(Guid verifierId, IConditionErasePlan erasePlan, CancellationToken ct = default)
         {
-            _component.RegisterConfiguration(id, _config);
-            return Task.CompletedTask;
+            var buildTasks = _conditions.Select(x => x.BuildEvaluatorAsync(verifierId, erasePlan, ct)).ToList();
+            await Task.WhenAll(buildTasks);
+            return new XorConditionEvaluator(buildTasks.Select(x => x.Result));
         }
     }
 }

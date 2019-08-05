@@ -13,28 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.Components;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Periturf.IdSvr4
+namespace Periturf.Verify
 {
-    class ComponentConfigurator : IComponentConfigurator
+    /// <summary>
+    /// Removes any changes made to the <see cref="Environment"/> to monitor for the condition.
+    /// </summary>
+    public interface IConditionEraser
     {
-        private readonly IdSvr4Component _component;
-        private readonly ConfigurationRegistration _config;
-
-        public ComponentConfigurator(IdSvr4Component component, ConfigurationRegistration config)
-        {
-            _component = component;
-            _config = config;
-        }
-
-        public Task RegisterConfigurationAsync(Guid id, CancellationToken ct = default)
-        {
-            _component.RegisterConfiguration(id, _config);
-            return Task.CompletedTask;
-        }
+        /// <summary>
+        /// Erases the changes to an <see cref="Environment"/> for the condition.
+        /// </summary>
+        /// <param name="ct">The cancellation token.</param>
+        /// <returns></returns>
+        Task EraseAsync(CancellationToken ct = default);
     }
 }

@@ -14,32 +14,20 @@
  * limitations under the License.
  */
 using Periturf.Verify;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Periturf.Components
+namespace Periturf
 {
     /// <summary>
-    /// Components run on hosts and are the pieces of the environment that the system under test will interact with.
-    /// Configuration can be registered and unregistered with them.
+    /// Provides access to components for building conditions for an environment. Component condition builder extensions
+    /// will ordinarily hang off this.
     /// </summary>
-    public interface IComponent
+    public interface IConditionContext
     {
-        /// <summary>
-        /// Unregisters the configuration associated with the supplied identifier.
-        /// </summary>
-        /// <param name="id">The unique identifier for the configuration.</param>
-        /// <param name="ct">The cancellation token</param>
-        /// <returns></returns>
-        Task UnregisterConfigurationAsync(Guid id, CancellationToken ct = default);
-
-        /// <summary>
-        /// Creates a component specific condition builder.
-        /// </summary>
+        /// <summary>Gets a component's condition builder.</summary>
         /// <typeparam name="TComponentConditionBuilder">The type of the component condition builder.</typeparam>
+        /// <param name="componentName">The name of the component.</param>
         /// <returns></returns>
-        TComponentConditionBuilder CreateConditionBuilder<TComponentConditionBuilder>()
+        TComponentConditionBuilder GetComponentConditionBuilder<TComponentConditionBuilder>(string componentName)
             where TComponentConditionBuilder : IComponentConditionBuilder;
     }
 }

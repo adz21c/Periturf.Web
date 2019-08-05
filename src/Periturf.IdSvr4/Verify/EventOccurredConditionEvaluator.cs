@@ -13,28 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.Components;
+using IdentityServer4.Events;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Periturf.IdSvr4
+namespace Periturf.IdSvr4.Verify
 {
-    class ComponentConfigurator : IComponentConfigurator
+    class EventOccurredConditionEvaluator<TEvent> : IEventOccurredConditionEvaluator where TEvent : Event
     {
-        private readonly IdSvr4Component _component;
-        private readonly ConfigurationRegistration _config;
+        private readonly Func<TEvent, bool> _checker;
+        private bool _occurred = false;
 
-        public ComponentConfigurator(IdSvr4Component component, ConfigurationRegistration config)
+        public EventOccurredConditionEvaluator(Func<TEvent, bool> checker)
         {
-            _component = component;
-            _config = config;
+            _checker = checker;
         }
 
-        public Task RegisterConfigurationAsync(Guid id, CancellationToken ct = default)
+        public Guid Id { get; } = Guid.NewGuid();
+
+        public void CheckEvent(Event @event)
         {
-            _component.RegisterConfiguration(id, _config);
-            return Task.CompletedTask;
+            var upcastEvent = @event as TEvent;
+
+            if (_checker(upcastEvent))
+                _occurred = true;
+        }
+
+        public Task<bool> EvaluateAsync(CancellationToken ct = default)
+        {
+            return Task.FromResult(_occurred);
         }
     }
 }

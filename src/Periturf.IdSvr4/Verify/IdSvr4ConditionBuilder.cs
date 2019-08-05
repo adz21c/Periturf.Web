@@ -13,28 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.Components;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
+using IdentityServer4.Events;
+using Periturf.Verify;
 
-namespace Periturf.IdSvr4
+namespace Periturf.IdSvr4.Verify
 {
-    class ComponentConfigurator : IComponentConfigurator
+    class IdSvr4ConditionBuilder : IIdSvr4ConditionBuilder
     {
-        private readonly IdSvr4Component _component;
-        private readonly ConfigurationRegistration _config;
+        private readonly IEventMonitorSink _eventMonitorSink;
 
-        public ComponentConfigurator(IdSvr4Component component, ConfigurationRegistration config)
+        public IdSvr4ConditionBuilder(IEventMonitorSink eventMonitorSink)
         {
-            _component = component;
-            _config = config;
+            _eventMonitorSink = eventMonitorSink;
         }
 
-        public Task RegisterConfigurationAsync(Guid id, CancellationToken ct = default)
+        public IConditionSpecification EventOccurred<TEvent>(Func<TEvent, bool> condition) where TEvent : Event
         {
-            _component.RegisterConfiguration(id, _config);
-            return Task.CompletedTask;
+            return new EventOccurredConditionSpecification<TEvent>(_eventMonitorSink, condition);
         }
     }
 }

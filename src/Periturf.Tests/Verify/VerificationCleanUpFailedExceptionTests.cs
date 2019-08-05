@@ -14,45 +14,38 @@
  * limitations under the License.
  */
 using NUnit.Framework;
-using Periturf.Setup;
+using Periturf.Verify;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace Periturf.Tests
+namespace Periturf.Tests.Verify
 {
     [TestFixture]
-    class DuplicateHostNameExceptionTests
+    class VerificationCleanUpFailedExceptionTests
     {
         [Test]
-        public void Given_HostName_When_Ctor_Then_ExceptionCreated()
+        public void Given_NoComponentErrors_When_Ctor_Then_ExceptionCreated()
         {
-            // Arrange
-            const string hostName = "HostName";
-
             // Act
-            var sut = new DuplicateHostNameException(hostName);
+            var sut = new VerificationCleanUpFailedException();
 
             // Assert
             Assert.IsNull(sut.InnerException);
-            Assert.AreEqual(hostName, sut.HostName);
-            // Has the default message
             Assert.IsNotNull(sut.Message);
             Assert.IsNotEmpty(sut.Message);
         }
 
         [Test]
-        public void Given_CustomMessageAndHostName_When_Ctor_Then_ExceptionCreated()
+        public void Given_CustomMessage_When_Ctor_Then_ExceptionCreated()
         {
             // Arrange
-            const string hostName = "HostName";
-            const string message = "My Custom Mesage";
+            const string message = "My Custom Error Message";
 
             // Act
-            var sut = new DuplicateHostNameException(message, hostName);
+            var sut = new VerificationCleanUpFailedException(message);
 
             // Assert
             Assert.IsNull(sut.InnerException);
-            Assert.AreEqual(hostName, sut.HostName);
             Assert.AreEqual(message, sut.Message);
         }
 
@@ -60,8 +53,7 @@ namespace Periturf.Tests
         public void Given_AnException_When_SeriaizedAndDeserialized_Then_DataMatchesTheOriginal()
         {
             // Arrange
-            const string hostName = "HostName";
-            var originalException = new DuplicateHostNameException(hostName);
+            var originalException = new VerificationCleanUpFailedException();
 
             var buffer = new byte[4096];
             var ms = new MemoryStream(buffer);
@@ -70,10 +62,9 @@ namespace Periturf.Tests
 
             // Act
             formatter.Serialize(ms, originalException);
-            var deserializedException = (DuplicateHostNameException)formatter.Deserialize(ms2);
+            var deserializedException = (VerificationCleanUpFailedException)formatter.Deserialize(ms2);
 
             // Assert
-            Assert.AreEqual(hostName, deserializedException.HostName);
             Assert.AreEqual(originalException.Message, deserializedException.Message);
         }
     }

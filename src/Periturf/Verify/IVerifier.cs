@@ -1,4 +1,4 @@
-﻿/*
+/*
  *     Copyright 2019 Adam Burton (adz21c@gmail.com)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,28 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.Components;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Periturf.IdSvr4
+namespace Periturf
 {
-    class ComponentConfigurator : IComponentConfigurator
+    /// <summary>
+    /// Evaluates if a condition has happened since creation of the instance.
+    /// </summary>
+    public interface IVerifier
     {
-        private readonly IdSvr4Component _component;
-        private readonly ConfigurationRegistration _config;
+        /// <summary>
+        /// Verifies the condition and throws an exception on failure.
+        /// </summary>
+        /// <param name="ct">The ct.</param>
+        /// <returns></returns>
+        Task VerifyAndThrowAsync(CancellationToken ct = default);
 
-        public ComponentConfigurator(IdSvr4Component component, ConfigurationRegistration config)
-        {
-            _component = component;
-            _config = config;
-        }
-
-        public Task RegisterConfigurationAsync(Guid id, CancellationToken ct = default)
-        {
-            _component.RegisterConfiguration(id, _config);
-            return Task.CompletedTask;
-        }
+        /// <summary>
+        /// Removes associated listeners from components.
+        /// </summary>
+        /// <param name="ct">The ct.</param>
+        /// <returns></returns>
+        Task CleanUpAsync(CancellationToken ct = default);
     }
 }
