@@ -54,7 +54,7 @@ namespace Periturf.Tests.IdSvr4.Verify
             await sink.PersistAsync(@event);
 
             // Assert
-            A.CallTo(() => evaluator.CheckEvent(@event)).MustHaveHappened();
+            A.CallTo(() => evaluator.CheckEventAsync(@event)).MustHaveHappened();
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace Periturf.Tests.IdSvr4.Verify
             await sink.PersistAsync(@event);
 
             // Assert
-            A.CallTo(() => evaluator.CheckEvent(@event)).MustNotHaveHappened();
+            A.CallTo(() => evaluator.CheckEventAsync(@event)).MustNotHaveHappened();
         }
 
         [Test]
@@ -87,7 +87,7 @@ namespace Periturf.Tests.IdSvr4.Verify
             await sink.PersistAsync(@event);
 
             // Assert
-            A.CallTo(() => evaluator.CheckEvent(@event)).MustNotHaveHappened();
+            A.CallTo(() => evaluator.CheckEventAsync(@event)).MustNotHaveHappened();
         }
 
         [Test]
@@ -105,8 +105,8 @@ namespace Periturf.Tests.IdSvr4.Verify
             await sink.PersistAsync(@event);
 
             // Assert
-            A.CallTo(() => evaluator.CheckEvent(@event)).MustNotHaveHappened();
-            A.CallTo(() => evaluator2.CheckEvent(@event)).MustHaveHappened();
+            A.CallTo(() => evaluator.CheckEventAsync(@event)).MustNotHaveHappened();
+            A.CallTo(() => evaluator2.CheckEventAsync(@event)).MustHaveHappened();
         }
     }
 }

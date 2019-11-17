@@ -51,7 +51,8 @@ namespace Periturf.IdSvr4.Verify
             var eventTypeEvaluators = _evaluators.GetOrAdd(eventType, x => new ConcurrentDictionary<Guid, IEventOccurredConditionEvaluator>());
 
             foreach (var evaluator in eventTypeEvaluators.Values)
-                evaluator.CheckEvent(evt);
+                await evaluator.CheckEventAsync(evt);
         }
     }
+
 }

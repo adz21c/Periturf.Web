@@ -1,4 +1,4 @@
-/*
+﻿/*
  *     Copyright 2019 Adam Burton (adz21c@gmail.com)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,22 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
+
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Periturf
+namespace Periturf.Verify
 {
     /// <summary>
-    /// Evaluates if a condition has happened since creation of the instance.
+    /// Specifies a component's expected condition. Constructs an evaluator for the condition.
     /// </summary>
-    public interface IVerifier : IAsyncDisposable
+    public interface IComponentConditionSpecification
     {
         /// <summary>
-        /// Verifies if expectations have been met.
+        /// Gets the component condition description.
         /// </summary>
+        /// <value>
+        /// The description.
+        /// </value>
+        string Description { get; }
+
+        /// <summary>
+        /// Constructs an <see cref="IComponentConditionEvaluator"/>.
+        /// When called multiple times builds a reference count to monitor the condition 
+        /// across multiple streams.
+        /// </summary>
+        /// <param name="timespanFactory">The timespan factory.</param>
         /// <param name="ct">The cancellation token.</param>
         /// <returns></returns>
-        Task<VerificationResult> VerifyAsync(CancellationToken ct = default);
+        Task<IComponentConditionEvaluator> BuildAsync(IConditionInstanceTimeSpanFactory timespanFactory, CancellationToken ct = default);
     }
 }

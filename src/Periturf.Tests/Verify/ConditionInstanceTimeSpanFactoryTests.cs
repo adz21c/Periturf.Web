@@ -13,12 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+using NUnit.Framework;
 using Periturf.Verify;
+using System;
 
 namespace Periturf.Tests.Verify
 {
-    public interface ITestComponentConditionBuilder : IComponentConditionBuilder
+    [TestFixture]
+    class ConditionInstanceTimeSpanFactoryTests
     {
-        IComponentConditionSpecification CreateCondition();
+        [Test]
+        public void Given_Factry_When_Create_Then_TimeDifferenceSinceCtor()
+        {
+            var start = new DateTime(2019, 11, 17, 09, 00, 00);
+            var factory = new ConditionInstanceTimeSpanFactory(start);
+
+            var ts1 = TimeSpan.FromMilliseconds(500);
+            var ts2 = TimeSpan.FromMilliseconds(1000);
+
+            var result1 = factory.Create(start.Add(ts1));
+            var result2 = factory.Create(start.Add(ts2));
+
+            Assert.AreEqual(ts1, result1);
+            Assert.AreEqual(ts2, result2);
+        }
     }
 }

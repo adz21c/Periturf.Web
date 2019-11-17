@@ -13,27 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using IdentityServer4.Events;
-using IdentityServer4.Services;
-using Periturf.Verify;
 using System;
 
-namespace Periturf
+namespace Periturf.Verify
 {
-
     /// <summary>
-    /// Builds IdentityServer4 specific conditions for a component.
+    /// Converts a <see cref="DateTime"/> to a <see cref="TimeSpan"/> relative to the verification construction time.
     /// </summary>
-    /// <seealso cref="Periturf.IComponentConditionBuilder" />
-    public interface IIdSvr4ConditionBuilder : IComponentConditionBuilder
+    public interface IConditionInstanceTimeSpanFactory
     {
         /// <summary>
-        /// Hooks into the IdentityServer4 <see cref="IEventService"/> to identity if an event has occurred.
+        /// Converts a <see cref="DateTime"/> to a <see cref="TimeSpan"/> relative to the verification construction time.
         /// </summary>
-        /// <typeparam name="TEvent">The type of the event.</typeparam>
-        /// <param name="condition">The condition.</param>
+        /// <param name="dateTime">The date time.</param>
         /// <returns></returns>
-        IComponentConditionSpecification EventOccurred<TEvent>(Func<TEvent, bool> condition)
-            where TEvent : Event;
+        TimeSpan Create(DateTime dateTime);
     }
 }

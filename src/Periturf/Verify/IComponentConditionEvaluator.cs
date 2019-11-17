@@ -13,27 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using IdentityServer4.Events;
-using IdentityServer4.Services;
-using Periturf.Verify;
 using System;
+using System.Collections.Generic;
+using System.Threading;
 
-namespace Periturf
+namespace Periturf.Verify
 {
-
     /// <summary>
-    /// Builds IdentityServer4 specific conditions for a component.
+    /// Feeds expectations with instances of a components expected condition.
     /// </summary>
-    /// <seealso cref="Periturf.IComponentConditionBuilder" />
-    public interface IIdSvr4ConditionBuilder : IComponentConditionBuilder
+    public interface IComponentConditionEvaluator : IAsyncDisposable
     {
         /// <summary>
-        /// Hooks into the IdentityServer4 <see cref="IEventService"/> to identity if an event has occurred.
+        /// Gets the instances of the expected component condition, fed asyncronously.
         /// </summary>
-        /// <typeparam name="TEvent">The type of the event.</typeparam>
-        /// <param name="condition">The condition.</param>
         /// <returns></returns>
-        IComponentConditionSpecification EventOccurred<TEvent>(Func<TEvent, bool> condition)
-            where TEvent : Event;
+        IAsyncEnumerable<ConditionInstance> GetInstancesAsync(CancellationToken ect = default);
     }
 }

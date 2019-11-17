@@ -13,33 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.Components;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Periturf
 {
     /// <summary>
-    /// Gathers configuration for environment setup.
+    /// A moment when a component condition matched
     /// </summary>
-    public interface ISetupConfigurator
+    [ExcludeFromCodeCoverage]
+    public class ConditionInstance
     {
         /// <summary>
-        /// Sets the default expectation short circuit state.
+        /// Initializes a new instance of the <see cref="ConditionInstance"/> class.
         /// </summary>
-        /// <param name="shortCircuit">if set to <c>true</c> [short circuit].</param>
-        void DefaultExpectationShortCircuit(bool shortCircuit);
+        /// <param name="when">The when.</param>
+        /// <param name="id">The identifier.</param>
+        public ConditionInstance(TimeSpan when, string id)
+        {
+            When = when;
+            ID = id ?? string.Empty;
+        }
 
         /// <summary>
-        /// Sets the default expectation timeout.
+        /// When the condition instance occurred relative to the time of definition.
         /// </summary>
-        /// <param name="timeout">The timeout.</param>
-        void DefaultExpectationTimeout(TimeSpan timeout);
+        /// <value>
+        /// The when.
+        /// </value>
+        public TimeSpan When { get; }
 
         /// <summary>
-        /// Adds a host to the environment.
+        /// Component specific identifier for the condition instance.
         /// </summary>
-        /// <param name="name">Unique identifier for the host.</param>
-        /// <param name="host">The host.</param>
-        void Host(string name, IHost host);
+        /// <value>
+        /// The identifier.
+        /// </value>
+        public string ID { get; }
     }
 }

@@ -13,36 +13,71 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using IdentityServer4.Events;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using IdentityServer4.Events;
+using Periturf.Verify;
 
 namespace Periturf.IdSvr4.Verify
 {
-    class EventOccurredConditionEvaluator<TEvent> : IEventOccurredConditionEvaluator where TEvent : Event
+    class EventOccurredConditionSpecification<TEvent> : IComponentConditionSpecification
+        where TEvent : Event
     {
-        private readonly Func<TEvent, bool> _checker;
-        private bool _occurred = false;
+        private readonly IEventMonitorSink _eventMonitorSink;
+        private readonly Func<TEvent, bool> _condition;
 
-        public EventOccurredConditionEvaluator(Func<TEvent, bool> checker)
+        private readonly object _feedManagerLock = new object();
+        private ConditionInstanceFeedManager<TEvent>? _feedManager;
+
+        public EventOccurredConditionSpecification(IEventMonitorSink eventMonitorSink, Func<TEvent, bool> condition)
         {
-            _checker = checker;
+            _eventMonitorSink = eventMonitorSink;
+            _condition = condition;
         }
 
-        public Guid Id { get; } = Guid.NewGuid();
+        public string Description => typeof(TEvent).Name;
 
-        public void CheckEvent(Event @event)
+        public Task<IComponentConditionEvaluator> BuildAsync(IConditionInstanceTimeSpanFactory timespanFactory, CancellationToken ct = default)
         {
-            var upcastEvent = (TEvent) @event;
+            if (_feedManager == null)
+            {
+                lock (_feedManagerLock)
+                {
+                    if (_feedManager == null)
+                        _feedManager = new ConditionInstanceFeedManager<TEvent>(_eventMonitorSink, _condition, timespanFactory);
+                }
+            }
 
-            if (_checker(upcastEvent))
-                _occurred = true;
+            return Task.FromResult<IComponentConditionEvaluator>(
+                new LifetimeManager(
+                    _feedManager.CreateFeed(),
+                    _feedManager));
         }
 
-        public Task<bool> EvaluateAsync(CancellationToken ct = default)
+        class LifetimeManager : IComponentConditionEvaluator
         {
-            return Task.FromResult(_occurred);
+            private readonly ConditionInstanceFeeder _feed;
+            private readonly ConditionInstanceFeedManager<TEvent> _feedManager;
+
+            public LifetimeManager(ConditionInstanceFeeder feed, ConditionInstanceFeedManager<TEvent> feedManager)
+            {
+                _feed = feed;
+                _feedManager = feedManager;
+            }
+
+            public ValueTask DisposeAsync()
+            {
+                _feedManager.RemoveFeed(_feed);
+                _feed.Complete();
+                return new ValueTask();
+            }
+
+            public IAsyncEnumerable<ConditionInstance> GetInstancesAsync(CancellationToken ect = default)
+            {
+                return _feed.GetInstancesAsync(ect);
+            }
         }
     }
 }

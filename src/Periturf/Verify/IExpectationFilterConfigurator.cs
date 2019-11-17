@@ -13,33 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.Components;
-using System;
+
+using Periturf.Verify;
 
 namespace Periturf
 {
     /// <summary>
-    /// Gathers configuration for environment setup.
+    /// Builds an expectation filter specification
     /// </summary>
-    public interface ISetupConfigurator
+    public interface IExpectationFilterConfigurator
     {
         /// <summary>
-        /// Sets the default expectation short circuit state.
+        /// Describes the filter.
         /// </summary>
-        /// <param name="shortCircuit">if set to <c>true</c> [short circuit].</param>
-        void DefaultExpectationShortCircuit(bool shortCircuit);
+        /// <param name="description">The description.</param>
+        /// <returns></returns>
+        IExpectationFilterConfigurator Description(string description);
 
         /// <summary>
-        /// Sets the default expectation timeout.
+        /// Adds a filter specification to the expectation.
         /// </summary>
-        /// <param name="timeout">The timeout.</param>
-        void DefaultExpectationTimeout(TimeSpan timeout);
-
-        /// <summary>
-        /// Adds a host to the environment.
-        /// </summary>
-        /// <param name="name">Unique identifier for the host.</param>
-        /// <param name="host">The host.</param>
-        void Host(string name, IHost host);
+        /// <param name="specification">The specification.</param>
+        /// <returns></returns>
+        IExpectationFilterConfigurator AddSpecification(IExpectationFilterSpecification specification);
     }
 }

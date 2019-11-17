@@ -1,4 +1,4 @@
-/*
+﻿/*
  *     Copyright 2019 Adam Burton (adz21c@gmail.com)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
-namespace Periturf
+namespace Periturf.Tests.Verify
 {
-    /// <summary>
-    /// Evaluates if a condition has happened since creation of the instance.
-    /// </summary>
-    public interface IVerifier : IAsyncDisposable
+    static class Helpers
     {
-        /// <summary>
-        /// Verifies if expectations have been met.
-        /// </summary>
-        /// <param name="ct">The cancellation token.</param>
-        /// <returns></returns>
-        Task<VerificationResult> VerifyAsync(CancellationToken ct = default);
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public static async IAsyncEnumerable<T> AsAsyncEnumerable<T>(this IEnumerable<T> enumerable)
+        {
+            foreach (var item in enumerable)
+                yield return item;
+        }
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     }
 }

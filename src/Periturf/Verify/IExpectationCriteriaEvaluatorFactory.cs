@@ -13,27 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using IdentityServer4.Events;
-using IdentityServer4.Services;
-using Periturf.Verify;
-using System;
 
-namespace Periturf
+namespace Periturf.Verify
 {
-
     /// <summary>
-    /// Builds IdentityServer4 specific conditions for a component.
+    /// Checks whether one or more condition instances match a criteria.
     /// </summary>
-    /// <seealso cref="Periturf.IComponentConditionBuilder" />
-    public interface IIdSvr4ConditionBuilder : IComponentConditionBuilder
+    public interface IExpectationCriteriaEvaluatorFactory
     {
         /// <summary>
-        /// Hooks into the IdentityServer4 <see cref="IEventService"/> to identity if an event has occurred.
+        /// Creates a stateful evaluator instance.
         /// </summary>
-        /// <typeparam name="TEvent">The type of the event.</typeparam>
-        /// <param name="condition">The condition.</param>
         /// <returns></returns>
-        IComponentConditionSpecification EventOccurred<TEvent>(Func<TEvent, bool> condition)
-            where TEvent : Event;
+        IExpectationCriteriaEvaluator CreateInstance();
     }
 }

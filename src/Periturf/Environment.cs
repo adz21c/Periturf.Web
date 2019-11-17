@@ -32,6 +32,8 @@ namespace Periturf
     {
         private readonly Dictionary<string, IHost> _hosts = new Dictionary<string, IHost>();
         private readonly Dictionary<string, IComponent> _components = new Dictionary<string, IComponent>();
+        private TimeSpan _defaultExpectationTimeout = TimeSpan.FromMilliseconds(5000);
+        private bool _defaultExpectationShortCircuit = false;
 
         private Environment()
         { }
@@ -144,6 +146,19 @@ namespace Periturf
             public SetupConfigurator(Environment env)
             {
                 _env = env;
+            }
+
+            public void DefaultExpectationTimeout(TimeSpan timeout)
+            {
+                if (timeout <= TimeSpan.Zero)
+                    throw new ArgumentOutOfRangeException(nameof(timeout));
+
+                _env._defaultExpectationTimeout = timeout;
+            }
+
+            public void DefaultExpectationShortCircuit(bool shortCircuit)
+            {
+                _env._defaultExpectationShortCircuit = shortCircuit;
             }
 
             public void Host(string name, IHost host)
@@ -295,32 +310,41 @@ namespace Periturf
         #region Verify
 
         /// <summary>
-        /// Registers listeners for conditions and returns a <see cref="IVerifier" /> to evaluate if the condition has happened since creation.
+        /// Defines a verifier to establish if expectations are met.
         /// </summary>
-        /// <param name="verifierBuilder">Specifies the conditions for the verifier.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="ct">The cancellation token.</param>
-        /// <returns>
-        ///   <see cref="IVerifier" /> to evaluate if the condition has happened since creation
-        /// </returns>
-        public async Task<IVerifier> VerifyAsync(Func<IConditionContext, IConditionSpecification> verifierBuilder, CancellationToken ct = default)
+        /// <returns></returns>
+        public async Task<IVerifier> VerifyAsync(Action<IVerificationContext> builder, CancellationToken ct = default)
         {
-            var conditionContext = new ConditionContext(this);
-            var condition = verifierBuilder(conditionContext);
+            var context = new VerificationContext(this);
+            builder(context);
 
-            var verifyId = Guid.NewGuid();
-            var erasePlan = new ErasePlan();
-            var evaluator = await condition.BuildEvaluatorAsync(verifyId, erasePlan, ct);
-
-            return new Verifier(evaluator, erasePlan);
+            return await context.BuildAsync(ct);
         }
 
-        class ConditionContext : IConditionContext
+        class VerificationContext : IVerificationContext
         {
+            private readonly List<(IComponentConditionSpecification ComponentSpec, ExpectationSpecification ExpectationSpec)> _specs = new List<(IComponentConditionSpecification, ExpectationSpecification)>();
             private readonly Environment _env;
-
-            public ConditionContext(Environment env)
+            private TimeSpan? _expectationTimeout;
+            private bool? _shortCircuit;
+            
+            public VerificationContext(Environment env)
             {
                 _env = env;
+            }
+
+            public void Expect(IComponentConditionSpecification conditionSpecification, Action<IExpectationConfigurator> config)
+            {
+                var expecationSpec = new ExpectationSpecification();
+                config(expecationSpec);
+
+                _specs.Add(
+                    (
+                        conditionSpecification ?? throw new ArgumentNullException(nameof(conditionSpecification)),
+                        expecationSpec
+                    ));
             }
 
             public TComponentConditionBuilder GetComponentConditionBuilder<TComponentConditionBuilder>(string componentName) where TComponentConditionBuilder : IComponentConditionBuilder
@@ -330,65 +354,41 @@ namespace Periturf
 
                 return component.CreateConditionBuilder<TComponentConditionBuilder>();
             }
-        }
 
-        class Verifier : IVerifier
-        {
-            private readonly IConditionEvaluator _evaluator;
-            private readonly ErasePlan _erasePlan;
-
-            public Verifier(IConditionEvaluator evaluator, ErasePlan erasePlan)
+            public void Timeout(TimeSpan timeout)
             {
-                _evaluator = evaluator;
-                _erasePlan = erasePlan;
+                if (timeout <= TimeSpan.Zero)
+                    throw new ArgumentOutOfRangeException(nameof(timeout));
+
+                _expectationTimeout = timeout;
             }
 
-            public async Task VerifyAndThrowAsync(CancellationToken ct = default)
+            public void ShortCircuit(bool? shortCircuit)
             {
-                var result = await _evaluator.EvaluateAsync(ct);
-                if (!result)
-                    throw new VerificationFailedException();
+                _shortCircuit = shortCircuit;
             }
 
-            public Task CleanUpAsync(CancellationToken ct = default)
+            public async Task<Verifier> BuildAsync(CancellationToken ct)
             {
-                return _erasePlan.ExecuteCleanUpAsync(ct);
-            }
-        }
+                // use the longest defined timeout
+                var verifierTimeout = _specs
+                    .Select(x => x.ExpectationSpec.Timeout ?? TimeSpan.Zero)
+                    .Concat(new[] { _expectationTimeout ?? _env._defaultExpectationTimeout })
+                    .Max();
 
-        class ErasePlan : IConditionErasePlan
-        {
-            private readonly List<IConditionEraser> _erasers = new List<IConditionEraser>();
-
-            public void AddEraser(IConditionEraser eraser)
-            {
-                _erasers.Add(eraser ?? throw new ArgumentNullException(nameof(eraser)));
-            }
-
-            public async Task ExecuteCleanUpAsync(CancellationToken ct = default)
-            {
-                Task Erase(IConditionEraser eraser)
+                var timespanFactory = new ConditionInstanceTimeSpanFactory(DateTime.Now);
+                
+                var expectations = _specs.Select(async x =>
                 {
-                    try
-                    {
-                        return eraser.EraseAsync(ct);
-                    }
-                    catch (Exception ex)
-                    {
-                        return Task.FromException(ex);
-                    }
-                }
+                    var componentConditionEvaluator = await x.ComponentSpec.BuildAsync(timespanFactory, ct);
+                    return x.ExpectationSpec.Build(verifierTimeout, componentConditionEvaluator, x.ComponentSpec.Description);
+                }).ToList();
 
-                var erasers = _erasers.Select(Erase).ToList();
+                await Task.WhenAll(expectations);
 
-                try
-                {
-                    await Task.WhenAll(erasers);
-                }
-                catch
-                {
-                    throw new VerificationCleanUpFailedException();
-                }
+                return new Verifier(
+                    expectations.Select(x => x.Result).ToList(),
+                    _shortCircuit ?? _env._defaultExpectationShortCircuit);
             }
         }
 

@@ -1,4 +1,4 @@
-/*
+﻿/*
  *     Copyright 2019 Adam Burton (adz21c@gmail.com)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Periturf
+namespace Periturf.Verify
 {
-    /// <summary>
-    /// Evaluates if a condition has happened since creation of the instance.
-    /// </summary>
-    public interface IVerifier : IAsyncDisposable
+    class ConditionInstanceTimeSpanFactory : IConditionInstanceTimeSpanFactory
     {
-        /// <summary>
-        /// Verifies if expectations have been met.
-        /// </summary>
-        /// <param name="ct">The cancellation token.</param>
-        /// <returns></returns>
-        Task<VerificationResult> VerifyAsync(CancellationToken ct = default);
+        private readonly DateTime _start;
+
+        public ConditionInstanceTimeSpanFactory(DateTime start)
+        {
+            _start = start;
+        }
+
+        public TimeSpan Create(DateTime dateTime)
+        {
+            return dateTime - _start;
+        }
     }
 }

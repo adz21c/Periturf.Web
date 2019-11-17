@@ -13,33 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.Components;
 using System;
 
-namespace Periturf
+namespace Periturf.Verify
 {
     /// <summary>
-    /// Gathers configuration for environment setup.
+    /// The specification for expectation criteria
     /// </summary>
-    public interface ISetupConfigurator
+    public interface IExpectationCriteriaSpecification
     {
         /// <summary>
-        /// Sets the default expectation short circuit state.
+        /// The maximum time required to establish if the criteria is met.
         /// </summary>
-        /// <param name="shortCircuit">if set to <c>true</c> [short circuit].</param>
-        void DefaultExpectationShortCircuit(bool shortCircuit);
+        /// <value>
+        /// The timeout.
+        /// </value>
+        TimeSpan? Timeout { get; }
 
         /// <summary>
-        /// Sets the default expectation timeout.
+        /// Gets the criteria description.
         /// </summary>
-        /// <param name="timeout">The timeout.</param>
-        void DefaultExpectationTimeout(TimeSpan timeout);
+        /// <value>
+        /// The description.
+        /// </value>
+        string Description { get; }
 
         /// <summary>
-        /// Adds a host to the environment.
+        /// Convert the specification into an evaluator that tests the criteria is met.
         /// </summary>
-        /// <param name="name">Unique identifier for the host.</param>
-        /// <param name="host">The host.</param>
-        void Host(string name, IHost host);
+        /// <returns></returns>
+        IExpectationCriteriaEvaluatorFactory Build();
     }
 }

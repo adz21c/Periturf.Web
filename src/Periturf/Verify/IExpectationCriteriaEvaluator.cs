@@ -1,4 +1,4 @@
-/*
+﻿/*
  *     Copyright 2019 Adam Burton (adz21c@gmail.com)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,22 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Periturf
+namespace Periturf.Verify
 {
     /// <summary>
-    /// Evaluates if a condition has happened since creation of the instance.
+    /// Checks whether one or more condition instances match a criteria.
     /// </summary>
-    public interface IVerifier : IAsyncDisposable
+    public interface IExpectationCriteriaEvaluator
     {
         /// <summary>
-        /// Verifies if expectations have been met.
+        /// Gets a value indicating whether the criteria has been met.
         /// </summary>
-        /// <param name="ct">The cancellation token.</param>
-        /// <returns></returns>
-        Task<VerificationResult> VerifyAsync(CancellationToken ct = default);
+        /// <value>
+        ///   <c>true</c> if met; otherwise, <c>false</c>.
+        /// </value>
+        bool? Met { get; }
+
+        /// <summary>
+        /// Evaluates the specified condition instance.
+        /// </summary>
+        /// <param name="instance">The instance.</param>
+        /// <returns><c>true</c> if the evaluator has completed evaluation early, else <c>false</c></returns>
+        bool Evaluate(ConditionInstance instance);
     }
 }
