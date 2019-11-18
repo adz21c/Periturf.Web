@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.AspNetCore.Setup;
+using Periturf.Hosting.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 
@@ -22,30 +22,30 @@ namespace Periturf
     /// <summary>
     /// 
     /// </summary>
-    public static class WebHostEnvironmentExtensions
+    public static class HostEnvironmentExtensions
     {
         /// <summary>
-        /// Setup and AspNetCore WebHost using default name.
+        /// Setup a generic host using default name.
         /// </summary>
         /// <param name="setupConfigurator">The setup configurator.</param>
         /// <param name="config">The configuration.</param>
         [ExcludeFromCodeCoverage]
-        public static void WebHost(this ISetupConfigurator setupConfigurator, Action<IPeriturfWebHostBuilder> config)
+        public static void GenericHost(this ISetupConfigurator setupConfigurator, Action<IPeriturfHostBuilder> config)
         {
-            setupConfigurator.WebHost("WebHost", config);
+            setupConfigurator.GenericHost("GenericHost", config);
         }
 
         /// <summary>
-        /// Setup and AspNetCore WebHost.
+        /// Setup a generic host.
         /// </summary>
         /// <param name="setupConfigurator">The setup configurator.</param>
         /// <param name="hostName">Name of the host.</param>
         /// <param name="config">The configuration.</param>
-        public static void WebHost(this ISetupConfigurator setupConfigurator, string hostName, Action<IPeriturfWebHostBuilder> config)
+        public static void GenericHost(this ISetupConfigurator setupConfigurator, string hostName, Action<IPeriturfHostBuilder> config)
         {
-            var builder = new PeriturfWebHostBuilder(Microsoft.AspNetCore.WebHost.CreateDefaultBuilder());
+            var builder = new PeriturfHostBuilder(Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder());
             config(builder);
-            setupConfigurator.Host(hostName, new WebHostAdapter(builder.Build(), builder.Components));
+            setupConfigurator.Host(hostName, new HostAdapter(builder.Build(), builder.Components));
         }
     }
 }

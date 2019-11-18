@@ -13,26 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using IdentityServer4.Events;
-using Periturf.Verify;
-using System;
+using Microsoft.Extensions.Hosting;
+using Periturf.Components;
 
 namespace Periturf
 {
-
     /// <summary>
-    /// Builds IdentityServer4 specific conditions for a component.
+    /// Extension of the <see cref="IHostBuilder"/> to include the ability to register <see cref="IComponent"/>.
     /// </summary>
-    /// <seealso cref="Periturf.IComponentConditionBuilder" />
-    public interface IIdSvr4ConditionBuilder : IComponentConditionBuilder
+    /// <seealso cref="Microsoft.Extensions.Hosting.IHostBuilder" />
+    public interface IPeriturfHostBuilder : IHostBuilder
     {
         /// <summary>
-        /// Hooks into the IdentityServer4 <see cref="IdentityServer4.Services.IEventService"/> to identity if an event has occurred.
+        /// Registers component with the generic host.
         /// </summary>
-        /// <typeparam name="TEvent">The type of the event.</typeparam>
-        /// <param name="condition">The condition.</param>
-        /// <returns></returns>
-        IComponentConditionSpecification EventOccurred<TEvent>(Func<TEvent, bool> condition)
-            where TEvent : Event;
+        /// <param name="componentName">The component name.</param>
+        /// <param name="component">The component.</param>
+        void AddComponent(string componentName, IComponent component);
     }
 }
