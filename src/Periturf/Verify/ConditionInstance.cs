@@ -16,7 +16,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Periturf
+namespace Periturf.Verify
 {
     /// <summary>
     /// A moment when a component condition matched

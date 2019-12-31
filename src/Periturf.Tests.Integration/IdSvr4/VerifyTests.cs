@@ -54,7 +54,7 @@ namespace Periturf.Tests.Integration.IdSvr4
             });
             await env.StartAsync();
 
-            var configId = await env.ConfigureAsync(c =>
+            await using (var configId = await env.ConfigureAsync(c =>
             {
                 c.IdSvr4(i =>
                 {
@@ -68,39 +68,39 @@ namespace Periturf.Tests.Integration.IdSvr4
                     });
                     i.ApiResource(new ApiResource(Scope, Scope));
                 });
-            });
-
-            var verifier = await env.VerifyAsync(c =>
+            }))
             {
-                c.Expect(c.IdSvr4().EventOccurred<ClientAuthenticationSuccessEvent>(e => e.ClientId == ClientId), e => e.MustOccurWithin(TimeSpan.FromMilliseconds(500)));
-                c.Expect(c.IdSvr4().EventOccurred<ClientAuthenticationFailureEvent>(e => e.ClientId == InvalidClientId), e => e.MustOccurWithin(TimeSpan.FromMilliseconds(500)));
-            });
+                var verifier = await env.VerifyAsync(c =>
+                {
+                    c.Expect(c.IdSvr4().EventOccurred<ClientAuthenticationSuccessEvent>(e => e.ClientId == ClientId), e => e.MustOccurWithin(TimeSpan.FromMilliseconds(500)));
+                    c.Expect(c.IdSvr4().EventOccurred<ClientAuthenticationFailureEvent>(e => e.ClientId == InvalidClientId), e => e.MustOccurWithin(TimeSpan.FromMilliseconds(500)));
+                });
 
-            var client = new HttpClient
-            {
-                BaseAddress = new Uri(TokenEndpointUrl)
-            };
+                var client = new HttpClient
+                {
+                    BaseAddress = new Uri(TokenEndpointUrl)
+                };
 
-            // Assert
-            await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
-            {
-                ClientId = ClientId,
-                ClientSecret = ClientSecret,
-                Scope = Scope
-            });
-            await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
-            {
-                ClientId = InvalidClientId,
-                ClientSecret = ClientSecret,
-                Scope = Scope
-            });
+                // Assert
+                await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+                {
+                    ClientId = ClientId,
+                    ClientSecret = ClientSecret,
+                    Scope = Scope
+                });
+                await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+                {
+                    ClientId = InvalidClientId,
+                    ClientSecret = ClientSecret,
+                    Scope = Scope
+                });
 
-            var verificationResult = await verifier.VerifyAsync();
+                var verificationResult = await verifier.VerifyAsync();
 
-            await env.RemoveConfigurationAsync(configId);
+
+                Assert.That(verificationResult.ExpectationsMet, Is.True);
+            }
             await env.StopAsync();
-
-            Assert.IsTrue(verificationResult.ExpectationsMet);
         }
     }
 }

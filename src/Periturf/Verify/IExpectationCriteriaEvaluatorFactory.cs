@@ -17,7 +17,7 @@
 namespace Periturf.Verify
 {
     /// <summary>
-    /// Checks whether one or more condition instances match a criteria.
+    /// Create an evaluator.
     /// </summary>
     public interface IExpectationCriteriaEvaluatorFactory
     {

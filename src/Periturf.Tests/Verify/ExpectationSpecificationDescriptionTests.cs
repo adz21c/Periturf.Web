@@ -65,7 +65,7 @@ namespace Periturf.Tests.Verify
 
             var evaluator = spec.Build(_verifierTimeout, _componentEvaluator, ConditionDescription);
 
-            Assert.AreEqual($"{ConditionDescription} WHERE {FilterDescription} MUST {CriteriaDescription}", evaluator.Description);
+            Assert.That(evaluator.Description, Is.EqualTo($"{ConditionDescription} WHERE {FilterDescription} MUST {CriteriaDescription}"));
         }
 
         [Test]
@@ -85,7 +85,7 @@ namespace Periturf.Tests.Verify
 
             var evaluator = spec.Build(_verifierTimeout, _componentEvaluator, ConditionDescription);
 
-            Assert.AreEqual($"{ConditionDescription} WHERE {FilterDescription}, {FilterDescription2} MUST {CriteriaDescription}", evaluator.Description);
+            Assert.That(evaluator.Description, Is.EqualTo($"{ConditionDescription} WHERE {FilterDescription}, {FilterDescription2} MUST {CriteriaDescription}"));
         }
 
         [Test]
@@ -105,7 +105,7 @@ namespace Periturf.Tests.Verify
 
             var evaluator = spec.Build(_verifierTimeout, _componentEvaluator, ConditionDescription);
 
-            Assert.AreEqual($"{ConditionDescription} WHERE {FilterDescriptionOverride} MUST {CriteriaDescription}", evaluator.Description);
+            Assert.That(evaluator.Description, Is.EqualTo($"{ConditionDescription} WHERE {FilterDescriptionOverride} MUST {CriteriaDescription}"));
         }
 
         [Test]
@@ -122,7 +122,7 @@ namespace Periturf.Tests.Verify
 
             var evaluator = spec.Build(_verifierTimeout, _componentEvaluator, ConditionDescription);
 
-            Assert.AreEqual(DescriptionOverride, evaluator.Description);
+            Assert.That(evaluator.Description, Is.EqualTo(DescriptionOverride));
         }
     }
 }

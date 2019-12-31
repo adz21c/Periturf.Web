@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 using NUnit.Framework;
+using Periturf.Verify;
 using Periturf.Verify.Criterias;
+using Periturf.Verify.Criterias.RangeCount;
 using System;
 
 namespace Periturf.Tests.Verify.Criterias.RangeCount
@@ -62,7 +64,7 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
                         DateTime.Now - start,
                         i.ToString()));
 
-            Assert.AreEqual(completed, hasCompleted);
+            Assert.That(hasCompleted, Is.EqualTo(completed));
             return evaluator.Met;
         }
     }

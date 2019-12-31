@@ -4,6 +4,7 @@ branches:
   only:
     - develop
     - master
+    - feature/*
 
 skip_tags: true
 
@@ -44,7 +45,7 @@ build_script:
     
     dotnet build src --no-restore -c Release
     
-    dotnet test src --collect:"XPlat Code Coverage" --no-build -c Release --settings src/CodeCoverage.runsettings
+    dotnet test src --no-build -c Release --settings src/CodeCoverage.runsettings
 
     dotnet sonarscanner end /d:sonar.login="$env:sonar_login"
     

@@ -38,7 +38,7 @@ namespace Periturf.Tests.IdSvr4.Verify
 
             var spec = new EventOccurredConditionSpecification<Event>(eventMonitorSink, condition);
 
-            Assert.AreEqual(typeof(Event).Name, spec.Description);
+            Assert.That(spec.Description, Is.EqualTo(typeof(Event).Name));
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace Periturf.Tests.IdSvr4.Verify
             var evaluator = await spec.BuildAsync(_timeSpanFactory);
 
             // Assert
-            Assert.IsNotNull(evaluator);
+            Assert.That(evaluator, Is.Not.Null);
 
             A.CallTo(() => eventMonitorSink.AddEvaluator(typeof(Event), A<IEventOccurredConditionEvaluator>._)).MustHaveHappenedOnceExactly();
         }
@@ -71,8 +71,8 @@ namespace Periturf.Tests.IdSvr4.Verify
             var evaluator2 = await spec.BuildAsync(_timeSpanFactory);
 
             // Assert
-            Assert.IsNotNull(evaluator);
-            Assert.IsNotNull(evaluator2);
+            Assert.That(evaluator, Is.Not.Null);
+            Assert.That(evaluator2, Is.Not.Null);
             Assert.AreNotSame(evaluator, evaluator2);
 
             A.CallTo(() => eventMonitorSink.AddEvaluator(typeof(Event), A<IEventOccurredConditionEvaluator>._)).MustHaveHappenedOnceExactly();
@@ -112,6 +112,8 @@ namespace Periturf.Tests.IdSvr4.Verify
             await evaluator.DisposeAsync();
             await evaluator2.DisposeAsync();
 
+            await Task.Delay(50);
+
             // Assert
             A.CallTo(() => eventMonitorSink.AddEvaluator(typeof(Event), A<IEventOccurredConditionEvaluator>._)).MustHaveHappenedOnceExactly();
             A.CallTo(() => eventMonitorSink.RemoveEvaluator(typeof(Event), A<IEventOccurredConditionEvaluator>._)).MustHaveHappenedOnceExactly();
@@ -140,32 +142,19 @@ namespace Periturf.Tests.IdSvr4.Verify
             await eventOccurredEvaluator.CheckEventAsync(evt1);
             await eventOccurredEvaluator.CheckEventAsync(evt2);
 
+            var results = await evaluator.GetInstancesAsync().AsyncToListAsync(TimeSpan.FromMilliseconds(50));
+            var results2 = await evaluator2.GetInstancesAsync().AsyncToListAsync(TimeSpan.FromMilliseconds(50));
+
             await evaluator.DisposeAsync();
             await evaluator2.DisposeAsync();
 
-            var results = await evaluator.GetInstancesAsync().ToList();
-            var results2 = await evaluator2.GetInstancesAsync().ToList();
+            Assert.That(results, Is.Not.Empty);
+            Assert.That(results.Count, Is.EqualTo(2));
 
-            Assert.IsNotEmpty(results);
-            Assert.AreEqual(2, results.Count);
-
-            Assert.IsNotEmpty(results2);
-            Assert.AreEqual(2, results2.Count);
+            Assert.That(results2, Is.Not.Empty);
+            Assert.That(results2.Count, Is.EqualTo(2));
 
             Assert.That(results.All(x => results2.Contains(x)));
-        }
-    }
-
-    static class Helper
-    {
-        public static async Task<List<T>> ToList<T>(this IAsyncEnumerable<T> enumerable)
-        {
-            var list = new List<T>();
-            await foreach(var item in enumerable)
-            {
-                list.Add(item);
-            }
-            return list;
         }
     }
 }

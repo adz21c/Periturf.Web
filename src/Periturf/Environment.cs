@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Periturf.Clients;
 using Periturf.Components;
 using Periturf.Configuration;
 using Periturf.Setup;
@@ -194,115 +195,47 @@ namespace Periturf
         /// <param name="ct"></param>
         /// <returns>The unique identifier for the expectation configuration.</returns>
         /// <exception cref="ConfigurationApplicationException"></exception>
-        public async Task<Guid> ConfigureAsync(Action<IConfiugrationBuilder> config, CancellationToken ct = default)
+        public async Task<IConfigurationHandle> ConfigureAsync(Action<IConfigurationContext> config, CancellationToken ct = default)
         {
-            var id = Guid.NewGuid();
-
-            Task ConfigureComponent(IComponentConfigurator configurator)
-            {
-                try
-                {
-                    return configurator.RegisterConfigurationAsync(id, ct);
-                }
-                catch (Exception ex)
-                {
-                    return Task.FromException(ex);
-                }
-            }
-
             // Gather configuration
-            var builder = new ConfigurationBuilder(this);
-            config(builder);
-            var configurators = builder.GetConfigurators();
+            var context = new ConfigurationContext(this);
+            config(context);
 
-            // Apply configuration
-            var configuringComponents = configurators
-                .Select(x => new { Name = x.Key, Task = ConfigureComponent(x.Value) })
-                .ToList();
-
-            try
-            {
-                await Task.WhenAll(configuringComponents.Select(x => x.Task));
-
-                return id;
-            }
-            catch
-            {
-                var componentDetails = configuringComponents
-                    .Where(x => x.Task.IsFaulted)
-                    .Select(x => new ComponentExceptionDetails(
-                        x.Name,
-                        x.Task.Exception.InnerExceptions.First()))
-                    .ToArray();
-
-                throw new ConfigurationApplicationException(componentDetails);
-            }
+            return await context.ApplyAsync(ct);
         }
 
-        /// <summary>
-        /// Removes the specified expectation configuration from the environment.
-        /// </summary>
-        /// <param name="configId">The configuration identifier.</param>
-        /// <param name="ct">The cancellation token.</param>
-        /// <returns></returns>
-        /// <exception cref="ConfigurationRemovalException"></exception>
-        public async Task RemoveConfigurationAsync(Guid configId, CancellationToken ct = default)
+        class ConfigurationContext : IConfigurationContext
         {
-            Task RemoveConfiguration(IComponent component)
-            {
-                try
-                {
-                    return component.UnregisterConfigurationAsync(configId, ct);
-                }
-                catch (Exception ex)
-                {
-                    return Task.FromException(ex);
-                }
-            }
-
-            var configuringComponents = _components
-                .Select(x => new { Name = x.Key, Task = RemoveConfiguration(x.Value) })
-                .ToList();
-
-            try
-            {
-                await Task.WhenAll(configuringComponents.Select(x => x.Task));
-            }
-            catch
-            {
-                var componentDetails = configuringComponents
-                    .Where(x => x.Task.IsFaulted)
-                    .Select(x => new ComponentExceptionDetails(
-                        x.Name,
-                        x.Task.Exception.InnerExceptions.First()))
-                    .ToArray();
-
-                throw new ConfigurationRemovalException(configId, componentDetails);
-            }
-        }
-
-        class ConfigurationBuilder : IConfiugrationBuilder
-        {
-            private readonly Dictionary<string, IComponentConfigurator> _configurators = new Dictionary<string, IComponentConfigurator>();
             private readonly Environment _environment;
+            private readonly List<IConfigurationSpecification> _specifications = new List<IConfigurationSpecification>();
 
-            public ConfigurationBuilder(Environment environment)
+            public ConfigurationContext(Environment environment)
             {
                 _environment = environment;
             }
 
-            public void AddComponentConfigurator<T>(string componentName, Func<T, IComponentConfigurator> config)
-                where T : IComponent
+            public TSpecification CreateComponentConfigSpecification<TSpecification>(string componentName) where TSpecification : IConfigurationSpecification
             {
                 if (string.IsNullOrWhiteSpace(componentName))
                     throw new ArgumentNullException(nameof(componentName));
 
-                var component = (T)_environment._components[componentName];
-                var componentConfigurator = config(component);
-                _configurators.Add(componentName, componentConfigurator);
+                if (!_environment._components.TryGetValue(componentName, out var component))
+                    throw new ComponentLocationFailedException(componentName);
+
+                return component.CreateConfigurationSpecification<TSpecification>();
             }
 
-            public Dictionary<string, IComponentConfigurator> GetConfigurators() => _configurators;
+            public void AddSpecification(IConfigurationSpecification specification)
+            {
+                _specifications.Add(specification ?? throw new ArgumentNullException(nameof(specification)));
+            }
+
+            public async Task<IConfigurationHandle> ApplyAsync(CancellationToken ct)
+            {
+                var specTasks = _specifications.Select(x => x.ApplyAsync(ct)).ToList();
+                await Task.WhenAll(specTasks);
+                return new ConfigurationHandle(specTasks.Select(x => x.Result));
+            }
         }
 
         #endregion

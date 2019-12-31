@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-namespace Periturf.Verify.Criterias
+namespace Periturf.Verify.Criterias.RangeCount
 {
     class RangeCountCriteriaEvaluator : IExpectationCriteriaEvaluator
     {

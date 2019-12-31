@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 using Periturf.Hosting.Setup;
+using Periturf.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 

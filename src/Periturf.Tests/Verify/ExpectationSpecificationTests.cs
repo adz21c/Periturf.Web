@@ -127,9 +127,9 @@ namespace Periturf.Tests.Verify
 
             var result = await evaluator.EvaluateAsync();
 
-            Assert.NotNull(result);
-            Assert.IsTrue(result.Met);
-            Assert.IsTrue(result.Completed);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Met, Is.True);
+            Assert.That(result.Completed, Is.True);
         }
     }
 }

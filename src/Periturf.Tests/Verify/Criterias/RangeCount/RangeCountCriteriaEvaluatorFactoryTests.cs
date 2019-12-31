@@ -15,6 +15,7 @@
  */
 using NUnit.Framework;
 using Periturf.Verify.Criterias;
+using Periturf.Verify.Criterias.RangeCount;
 
 namespace Periturf.Tests.Verify.Criterias.RangeCount
 {
@@ -30,13 +31,13 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
 
             var evaluator = evaluatorFactory.CreateInstance();
 
-            Assert.IsNotNull(evaluator);
+            Assert.That(evaluator, Is.Not.Null);
             
             var typedEvaluator = evaluator as RangeCountCriteriaEvaluator;
-            Assert.IsNotNull(typedEvaluator);
+            Assert.That(typedEvaluator, Is.Not.Null);
 
-            Assert.AreEqual(minimum, typedEvaluator.Minimum);
-            Assert.AreEqual(maximum, typedEvaluator.Maximum);
+            Assert.That(typedEvaluator.Minimum, Is.EqualTo(minimum));
+            Assert.That(typedEvaluator.Maximum, Is.EqualTo(maximum));
         }
 
         [Test]
@@ -49,8 +50,8 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
             var evaluator = evaluatorFactory.CreateInstance();
             var evaluator2 = evaluatorFactory.CreateInstance();
 
-            Assert.IsNotNull(evaluator);
-            Assert.IsNotNull(evaluator2);
+            Assert.That(evaluator, Is.Not.Null);
+            Assert.That(evaluator2, Is.Not.Null);
             Assert.AreNotSame(evaluator, evaluator2);
         }
     }

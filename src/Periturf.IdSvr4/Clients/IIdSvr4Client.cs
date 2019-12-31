@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 using IdentityModel.Client;
+using Periturf.Clients;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Periturf
+namespace Periturf.IdSvr4.Clients
 {
     /// <summary>
     /// Client for IdentityServer4 components
     /// </summary>
-    /// <seealso cref="Periturf.IComponentClient" />
+    /// <seealso cref="IComponentClient" />
     public interface IIdSvr4Client : IComponentClient
     {
         /// <summary>

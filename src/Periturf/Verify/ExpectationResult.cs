@@ -15,7 +15,7 @@
  */
 using System.Diagnostics.CodeAnalysis;
 
-namespace Periturf
+namespace Periturf.Verify
 {
 
     /// <summary>

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 using Periturf.AspNetCore.Setup;
+using Periturf.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 

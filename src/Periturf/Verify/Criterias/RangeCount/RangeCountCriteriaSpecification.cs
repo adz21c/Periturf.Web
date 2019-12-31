@@ -15,7 +15,7 @@
  */
 using System;
 
-namespace Periturf.Verify.Criterias
+namespace Periturf.Verify.Criterias.RangeCount
 {
     class RangeCountCriteriaSpecification : IExpectationCriteriaSpecification
     {

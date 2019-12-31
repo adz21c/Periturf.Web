@@ -82,8 +82,8 @@ namespace Periturf.Tests.Verify
             var result = await verifier.VerifyAsync();
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsTrue(result.ExpectationsMet);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.ExpectationsMet, Is.True);
         }
 
         [Test]
@@ -100,8 +100,8 @@ namespace Periturf.Tests.Verify
             var result = await verifier.VerifyAsync();
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsFalse(result.ExpectationsMet);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.ExpectationsMet, Is.False);
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace Periturf.Tests.Verify
                 c.Expect(
                     c.GetComponentConditionBuilder<ITestComponentConditionBuilder>(wrongComponentName).CreateCondition(),
                     e => e.Must(_expectationSpecification))));
-            Assert.AreEqual(wrongComponentName, exception.ComponentName);
+            Assert.That(exception.ComponentName, Is.EqualTo(wrongComponentName));
         }
 
         [Test]
@@ -125,7 +125,7 @@ namespace Periturf.Tests.Verify
             var exception = Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _environment.VerifyAsync(c =>
                 c.Timeout(TimeSpan.Zero)));
 
-            Assert.AreEqual("timeout", exception.ParamName);
+            Assert.That(exception.ParamName, Is.EqualTo("timeout"));
         }
 
         [TestCase(true)]
@@ -142,8 +142,8 @@ namespace Periturf.Tests.Verify
             });
             var typedVerifier = verifier as Verifier;
 
-            Assert.IsNotNull(typedVerifier);
-            Assert.AreEqual(enabled, typedVerifier.ShortCircuit);
+            Assert.That(typedVerifier, Is.Not.Null);
+            Assert.That(typedVerifier.ShortCircuit, Is.EqualTo(enabled));
         }
 
         [Test]
@@ -165,9 +165,9 @@ namespace Periturf.Tests.Verify
 
             var typedVerifier = verifier as Verifier;
 
-            Assert.IsNotNull(typedVerifier);
-            Assert.AreEqual(1, typedVerifier.Expectations.Count);
-            Assert.AreEqual(globalTimeout, typedVerifier.Expectations.Single().Timeout);
+            Assert.That(typedVerifier, Is.Not.Null);
+            Assert.That(typedVerifier.Expectations.Count, Is.EqualTo(1));
+            Assert.That(typedVerifier.Expectations.Single().Timeout, Is.EqualTo(globalTimeout));
         }
     }
 }

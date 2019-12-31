@@ -18,6 +18,7 @@ using FakeItEasy;
 using NUnit.Framework;
 using Periturf.Verify;
 using Periturf.Verify.Criterias;
+using Periturf.Verify.Criterias.RangeCount;
 using System;
 
 namespace Periturf.Tests.Verify.Criterias.RangeCount
@@ -36,6 +37,7 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
                 .Returns(_expectationConfigurator);
         }
 
+        [SetUp]
         public void EachSetup()
         {
             Fake.ClearRecordedCalls(_expectationConfigurator);
@@ -47,11 +49,11 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
         {
             _expectationConfigurator.MustNeverOccur();
 
-            Assert.IsNotNull(_spec);
-            Assert.AreEqual(0, _spec.Maximum);
-            Assert.IsNull(_spec.Minimum);
-            Assert.IsNull(_spec.Timeout);
-            Assert.AreEqual("Must never occur", _spec.Description);
+            Assert.That(_spec, Is.Not.Null);
+            Assert.That(_spec.Maximum, Is.EqualTo(0));
+            Assert.That(_spec.Minimum, Is.Null);
+            Assert.That(_spec.Timeout, Is.Null);
+            Assert.That(_spec.Description, Is.EqualTo("Must never occur"));
         }
 
         [Test]
@@ -60,11 +62,11 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
             var timeout = TimeSpan.FromMilliseconds(1000);
             _expectationConfigurator.MustNeverOccurWithin(timeout);
 
-            Assert.IsNotNull(_spec);
-            Assert.AreEqual(0, _spec.Maximum);
-            Assert.IsNull(_spec.Minimum);
-            Assert.AreEqual(timeout, _spec.Timeout);
-            Assert.AreEqual($"Must never occur within {timeout.TotalMilliseconds}ms", _spec.Description);
+            Assert.That(_spec, Is.Not.Null);
+            Assert.That(_spec.Maximum, Is.EqualTo(0));
+            Assert.That(_spec.Minimum, Is.Null);
+            Assert.That(_spec.Timeout, Is.EqualTo(timeout));
+            Assert.That(_spec.Description, Is.EqualTo($"Must never occur within {timeout.TotalMilliseconds}ms"));
         }
 
         [Test]
@@ -72,11 +74,11 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
         {
             _expectationConfigurator.MustOccur();
 
-            Assert.IsNotNull(_spec);
-            Assert.AreEqual(1, _spec.Minimum);
-            Assert.IsNull(_spec.Maximum);
-            Assert.IsNull(_spec.Timeout);
-            Assert.AreEqual("Must occur", _spec.Description);
+            Assert.That(_spec, Is.Not.Null);
+            Assert.That(_spec.Minimum, Is.EqualTo(1));
+            Assert.That(_spec.Maximum, Is.Null);
+            Assert.That(_spec.Timeout, Is.Null);
+            Assert.That(_spec.Description, Is.EqualTo("Must occur"));
         }
 
         [Test]
@@ -85,11 +87,11 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
             var timeout = TimeSpan.FromMilliseconds(1000);
             _expectationConfigurator.MustOccurWithin(timeout);
 
-            Assert.IsNotNull(_spec);
-            Assert.AreEqual(1, _spec.Minimum);
-            Assert.IsNull(_spec.Maximum);
-            Assert.AreEqual(timeout, _spec.Timeout);
-            Assert.AreEqual($"Must occur within {timeout.TotalMilliseconds}ms", _spec.Description);
+            Assert.That(_spec, Is.Not.Null);
+            Assert.That(_spec.Minimum, Is.EqualTo(1));
+            Assert.That(_spec.Maximum, Is.Null);
+            Assert.That(_spec.Timeout, Is.EqualTo(timeout));
+            Assert.That(_spec.Description, Is.EqualTo($"Must occur within {timeout.TotalMilliseconds}ms"));
         }
 
         [Test]
@@ -100,11 +102,11 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
 
             _expectationConfigurator.MustOccurBetweenTimes(minimum, maximum);
 
-            Assert.IsNotNull(_spec);
-            Assert.AreEqual(minimum, _spec.Minimum);
-            Assert.AreEqual(maximum, _spec.Maximum);
-            Assert.IsNull(_spec.Timeout);
-            Assert.AreEqual($"Must occur between {minimum} and {maximum} times", _spec.Description);
+            Assert.That(_spec, Is.Not.Null);
+            Assert.That(_spec.Minimum, Is.EqualTo(minimum));
+            Assert.That(_spec.Maximum, Is.EqualTo(maximum));
+            Assert.That(_spec.Timeout, Is.Null);
+            Assert.That(_spec.Description, Is.EqualTo($"Must occur between {minimum} and {maximum} times"));
         }
 
         [Test]
@@ -116,11 +118,11 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
 
             _expectationConfigurator.MustOccurBetweenTimesWithin(minimum, maximum, timeout);
 
-            Assert.IsNotNull(_spec);
-            Assert.AreEqual(minimum, _spec.Minimum);
-            Assert.AreEqual(maximum, _spec.Maximum);
-            Assert.AreEqual(timeout, _spec.Timeout);
-            Assert.AreEqual($"Must occur between {minimum} and {maximum} times within {timeout.TotalMilliseconds}ms", _spec.Description);
+            Assert.That(_spec, Is.Not.Null);
+            Assert.That(_spec.Minimum, Is.EqualTo(minimum));
+            Assert.That(_spec.Maximum, Is.EqualTo(maximum));
+            Assert.That(_spec.Timeout, Is.EqualTo(timeout));
+            Assert.That(_spec.Description, Is.EqualTo($"Must occur between {minimum} and {maximum} times within {timeout.TotalMilliseconds}ms"));
         }
 
         [Test]
@@ -130,11 +132,11 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
 
             _expectationConfigurator.MustOccurMaximumTimes(maximum);
 
-            Assert.IsNotNull(_spec);
-            Assert.IsNull(_spec.Minimum);
-            Assert.AreEqual(maximum, _spec.Maximum);
-            Assert.IsNull(_spec.Timeout);
-            Assert.AreEqual($"Must occur a maximum of {maximum} times", _spec.Description);
+            Assert.That(_spec, Is.Not.Null);
+            Assert.That(_spec.Minimum, Is.Null);
+            Assert.That(_spec.Maximum, Is.EqualTo(maximum));
+            Assert.That(_spec.Timeout, Is.Null);
+            Assert.That(_spec.Description, Is.EqualTo($"Must occur a maximum of {maximum} times"));
         }
 
         [Test]
@@ -145,11 +147,11 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
 
             _expectationConfigurator.MustOccurMaximumTimesWithin(maximum, timeout);
 
-            Assert.IsNotNull(_spec);
-            Assert.IsNull(_spec.Minimum);
-            Assert.AreEqual(maximum, _spec.Maximum);
-            Assert.AreEqual(timeout, _spec.Timeout);
-            Assert.AreEqual($"Must occur a maximum of {maximum} times within {timeout.TotalMilliseconds}ms", _spec.Description);
+            Assert.That(_spec, Is.Not.Null);
+            Assert.That(_spec.Minimum, Is.Null);
+            Assert.That(_spec.Maximum, Is.EqualTo(maximum));
+            Assert.That(_spec.Timeout, Is.EqualTo(timeout));
+            Assert.That(_spec.Description, Is.EqualTo($"Must occur a maximum of {maximum} times within {timeout.TotalMilliseconds}ms"));
         }
 
         [Test]
@@ -159,11 +161,11 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
 
             _expectationConfigurator.MustOccurMinimumTimes(minimum);
 
-            Assert.IsNotNull(_spec);
-            Assert.AreEqual(minimum, _spec.Minimum);
-            Assert.IsNull(_spec.Maximum);
-            Assert.IsNull(_spec.Timeout);
-            Assert.AreEqual($"Must occur a minimum of {minimum} times", _spec.Description);
+            Assert.That(_spec, Is.Not.Null);
+            Assert.That(_spec.Minimum, Is.EqualTo(minimum));
+            Assert.That(_spec.Maximum, Is.Null);
+            Assert.That(_spec.Timeout, Is.Null);
+            Assert.That(_spec.Description, Is.EqualTo($"Must occur a minimum of {minimum} times"));
         }
 
         [Test]
@@ -174,11 +176,11 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
 
             _expectationConfigurator.MustOccurMinimumTimesWithin(minimum, timeout);
 
-            Assert.IsNotNull(_spec);
-            Assert.AreEqual(minimum, _spec.Minimum);
-            Assert.IsNull(_spec.Maximum);
-            Assert.AreEqual(timeout, _spec.Timeout);
-            Assert.AreEqual($"Must occur a minimum of {minimum} times within {timeout.TotalMilliseconds}ms", _spec.Description);
+            Assert.That(_spec, Is.Not.Null);
+            Assert.That(_spec.Minimum, Is.EqualTo(minimum));
+            Assert.That(_spec.Maximum, Is.Null);
+            Assert.That(_spec.Timeout, Is.EqualTo(timeout));
+            Assert.That(_spec.Description, Is.EqualTo($"Must occur a minimum of {minimum} times within {timeout.TotalMilliseconds}ms"));
         }
     }
 }

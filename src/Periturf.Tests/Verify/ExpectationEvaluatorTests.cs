@@ -65,9 +65,9 @@ namespace Periturf.Tests.Verify
         {
             var result = await _sut.EvaluateAsync();
 
-            Assert.NotNull(result);
-            Assert.IsTrue(result.Met);
-            Assert.IsTrue(result.Completed);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Met, Is.True);
+            Assert.That(result.Completed, Is.True);
 
             TestDependenciesCleanUp();
         }
@@ -113,9 +113,9 @@ namespace Periturf.Tests.Verify
 
             var result = await evaluateTask;
 
-            Assert.NotNull(result);
+            Assert.That(result, Is.Not.Null);
             Assert.True(result.Completed);
-            Assert.NotNull(result.Met);
+            Assert.That(result.Met, Is.Not.Null);
         }
 
         [Test]
@@ -139,9 +139,9 @@ namespace Periturf.Tests.Verify
             var firstResult = await _sut.EvaluateAsync();
             var secondResult = await _sut.EvaluateAsync();
 
-            Assert.NotNull(firstResult);
-            Assert.NotNull(secondResult);
-            Assert.AreSame(firstResult, secondResult);
+            Assert.That(firstResult, Is.Not.Null);
+            Assert.That(secondResult, Is.Not.Null);
+            Assert.That(secondResult, Is.SameAs(firstResult));
         }
 
         [Test]
@@ -158,7 +158,7 @@ namespace Periturf.Tests.Verify
 
             await _sut.DisposeAsync();
 
-            Assert.IsFalse(_componentEvaluator.DisposeCalled);
+            Assert.That(_componentEvaluator.DisposeCalled, Is.False);
         }
 
         [Test]
@@ -178,7 +178,7 @@ namespace Periturf.Tests.Verify
             _componentEvaluator.ResetCalls();
             await _sut.DisposeAsync();
 
-            Assert.IsFalse(_componentEvaluator.DisposeCalled);
+            Assert.That(_componentEvaluator.DisposeCalled, Is.False);
         }
 
         [Test]
@@ -208,12 +208,12 @@ namespace Periturf.Tests.Verify
 
             await _sut.EvaluateAsync();
 
-            Assert.AreEqual(incompleteCount + 1, _componentEvaluator.InstanceCount);
+            Assert.That(_componentEvaluator.InstanceCount, Is.EqualTo(incompleteCount + 1));
         }
 
         private void TestDependenciesCleanUp()
         {
-            Assert.IsTrue(_componentEvaluator.DisposeCalled);
+            Assert.That(_componentEvaluator.DisposeCalled, Is.True);
         }
     }
 }

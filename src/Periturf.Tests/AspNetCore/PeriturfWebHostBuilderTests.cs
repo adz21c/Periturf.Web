@@ -17,6 +17,7 @@ using FakeItEasy;
 using Microsoft.AspNetCore.Hosting;
 using NUnit.Framework;
 using Periturf.Components;
+using Periturf.Setup;
 using System;
 using System.Collections.Generic;
 
@@ -124,7 +125,7 @@ namespace Periturf.Tests.AspNetCore
             }));
 
             // Assert
-            Assert.AreEqual("componentName", exception.ParamName);
+            Assert.That(exception.ParamName, Is.EqualTo("componentName"));
         }
 
         [Test]
@@ -142,7 +143,7 @@ namespace Periturf.Tests.AspNetCore
             }));
 
             // Assert
-            Assert.AreEqual("component", exception.ParamName);
+            Assert.That(exception.ParamName, Is.EqualTo("component"));
         }
 
         private class StartupDummy

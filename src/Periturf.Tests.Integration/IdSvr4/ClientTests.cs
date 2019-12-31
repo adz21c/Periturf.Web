@@ -18,7 +18,6 @@ using IdentityServer4.Events;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Hosting;
 using NUnit.Framework;
-using Periturf.Verify.Criterias;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -52,7 +51,7 @@ namespace Periturf.Tests.Integration.IdSvr4
             });
             await env.StartAsync();
 
-            var configId = await env.ConfigureAsync(c =>
+            await using (var configId = await env.ConfigureAsync(c =>
             {
                 c.IdSvr4(i =>
                 {
@@ -66,28 +65,26 @@ namespace Periturf.Tests.Integration.IdSvr4
                     });
                     i.ApiResource(new ApiResource(Scope, Scope));
                 });
-            });
-
-            var verifier = await env.VerifyAsync(c => 
-                c.Expect(
-                    c.IdSvr4().EventOccurred<ClientAuthenticationSuccessEvent>(e => e.ClientId == ClientId),
-                    e => e.MustOccurWithin(TimeSpan.FromMilliseconds(500))));
-
-            var idSvr4Client = env.IdSvr4Client();
-
-            await idSvr4Client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+            }))
             {
-                ClientId = ClientId,
-                ClientSecret = ClientSecret,
-                Scope = Scope
-            });
+                var verifier = await env.VerifyAsync(c =>
+                    c.Expect(
+                        c.IdSvr4().EventOccurred<ClientAuthenticationSuccessEvent>(e => e.ClientId == ClientId),
+                        e => e.MustOccurWithin(TimeSpan.FromMilliseconds(500))));
 
-            var verificationResult = await verifier.VerifyAsync();
+                var idSvr4Client = env.IdSvr4Client();
 
-            await env.RemoveConfigurationAsync(configId);
+                await idSvr4Client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+                {
+                    ClientId = ClientId,
+                    ClientSecret = ClientSecret,
+                    Scope = Scope
+                });
+                var verificationResult = await verifier.VerifyAsync();
+                Assert.That(verificationResult.ExpectationsMet, Is.True);
+            }
+
             await env.StopAsync();
-
-            Assert.IsTrue(verificationResult.ExpectationsMet);
         }
     }
 }

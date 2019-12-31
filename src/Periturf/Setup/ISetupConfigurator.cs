@@ -16,7 +16,7 @@
 using Periturf.Components;
 using System;
 
-namespace Periturf
+namespace Periturf.Setup
 {
     /// <summary>
     /// Gathers configuration for environment setup.

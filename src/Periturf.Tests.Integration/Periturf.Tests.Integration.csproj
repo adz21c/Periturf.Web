@@ -5,7 +5,12 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CodeAnalysisRuleSet />
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Periturf.AspNetCore\Periturf.AspNetCore.csproj" />
     <ProjectReference Include="..\Periturf.IdSvr4\Periturf.IdSvr4.csproj" />
+    <ProjectReference Include="..\Periturf.MT\Periturf.MT.csproj" />
     <ProjectReference Include="..\Periturf\Periturf.csproj" />
   </ItemGroup>
 

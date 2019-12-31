@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-using Periturf.Verify.Criterias;
+using Periturf.Verify;
+using Periturf.Verify.Criterias.RangeCount;
 using System;
 
 namespace Periturf

@@ -18,6 +18,7 @@ using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using NUnit.Framework;
 using Periturf.IdSvr4;
+using Periturf.IdSvr4.Clients;
 using Periturf.IdSvr4.Configuration;
 using Periturf.IdSvr4.Verify;
 using System;
@@ -31,12 +32,9 @@ namespace Periturf.Tests.IdSvr4
     class IdSvr4ComponentTests
     {
         [Test]
-        public void Given_Store_When_RegisterConfiguration_Then_ConfigurationPassedToStore()
+        public void Given_Component_When_CreateClient_Then_ClientInstanceReturned()
         {
             // Arrange
-            var id = A.Dummy<Guid>();
-            var config = A.Dummy<ConfigurationRegistration>();
-
             var store = A.Fake<IStore>();
             var sink = A.Fake<IEventMonitorSink>();
             var client = A.Fake<IIdSvr4Client>();
@@ -44,17 +42,16 @@ namespace Periturf.Tests.IdSvr4
             var component = new IdSvr4Component(store, sink, client);
 
             // Act
-            component.RegisterConfiguration(id, config);
+            var resultClient = component.CreateClient();
 
-            A.CallTo(() => store.RegisterConfiguration(id, config)).MustHaveHappened();
+            Assert.That(resultClient, Is.Not.Null);
+            Assert.That(resultClient, Is.SameAs(client));
         }
 
         [Test]
-        public async Task Given_Store_When_UnregisterConfigurationAsync_Then_ConfigurationRemovedFromStore()
+        public void Given_Component_When_CreateConfigurationSpecification_Then_SpecInstanceReturned()
         {
             // Arrange
-            var id = A.Dummy<Guid>();
-
             var store = A.Fake<IStore>();
             var sink = A.Fake<IEventMonitorSink>();
             var client = A.Fake<IIdSvr4Client>();
@@ -62,15 +59,13 @@ namespace Periturf.Tests.IdSvr4
             var component = new IdSvr4Component(store, sink, client);
 
             // Act
-            await component.UnregisterConfigurationAsync(id);
+            var spec = component.CreateConfigurationSpecification<IdSvr4Specification>();
 
-            A.CallTo(() => store.UnregisterConfiguration(id)).MustHaveHappened();
+            Assert.That(spec, Is.Not.Null);
         }
 
-
-
         [Test]
-        public void Given_ConditionBuilder_When_CreateConditionBuilder_Then_CreatesBuilder()
+        public void Given_Component_When_CreateConditionBuilder_Then_ConditionBuilderInstanceReturned()
         {
             // Arrange
             var store = A.Fake<IStore>();
@@ -82,7 +77,7 @@ namespace Periturf.Tests.IdSvr4
             // Act
             var builder = component.CreateConditionBuilder<IdSvr4ConditionBuilder>();
 
-            Assert.IsNotNull(builder);
+            Assert.That(builder, Is.Not.Null);
         }
     }
 }

@@ -18,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using Periturf.Components;
+using Periturf.Setup;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -125,7 +126,7 @@ namespace Periturf.Tests.Hosting
             }));
 
             // Assert
-            Assert.AreEqual("componentName", exception.ParamName);
+            Assert.That(exception.ParamName, Is.EqualTo("componentName"));
         }
 
         [Test]
@@ -143,7 +144,7 @@ namespace Periturf.Tests.Hosting
             }));
 
             // Assert
-            Assert.AreEqual("component", exception.ParamName);
+            Assert.That(exception.ParamName, Is.EqualTo("component"));
         }
 
         private class StartupDummy : IHostedService

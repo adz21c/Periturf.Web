@@ -16,7 +16,7 @@
 using Microsoft.Extensions.Hosting;
 using Periturf.Components;
 
-namespace Periturf
+namespace Periturf.Hosting.Setup
 {
     /// <summary>
     /// Extension of the <see cref="IHostBuilder"/> to include the ability to register <see cref="IComponent"/>.

@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.Verify;
 using System;
 
-namespace Periturf
+namespace Periturf.Verify
 {
     /// <summary>
     /// Context within which the verification will be defined.

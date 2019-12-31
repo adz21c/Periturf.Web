@@ -34,8 +34,8 @@ namespace Periturf.Tests.Verify
             var result1 = factory.Create(start.Add(ts1));
             var result2 = factory.Create(start.Add(ts2));
 
-            Assert.AreEqual(ts1, result1);
-            Assert.AreEqual(ts2, result2);
+            Assert.That(result1, Is.EqualTo(ts1));
+            Assert.That(result2, Is.EqualTo(ts2));
         }
     }
 }

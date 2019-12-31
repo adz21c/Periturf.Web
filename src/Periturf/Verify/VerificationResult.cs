@@ -16,7 +16,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Periturf
+namespace Periturf.Verify
 {
     /// <summary>
     /// The aggregated result expectations.

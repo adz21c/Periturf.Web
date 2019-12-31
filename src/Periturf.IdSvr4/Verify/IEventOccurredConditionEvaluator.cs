@@ -15,6 +15,7 @@
  */
 using IdentityServer4.Events;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Periturf.IdSvr4.Verify
@@ -23,6 +24,6 @@ namespace Periturf.IdSvr4.Verify
     {
         Guid Id { get; }
 
-        Task CheckEventAsync(Event @event);
+        Task CheckEventAsync(Event @event, CancellationToken ct = default);
     }
 }

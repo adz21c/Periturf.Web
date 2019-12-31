@@ -17,7 +17,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Periturf
+namespace Periturf.Verify
 {
     /// <summary>
     /// Evaluates if a condition has happened since creation of the instance.

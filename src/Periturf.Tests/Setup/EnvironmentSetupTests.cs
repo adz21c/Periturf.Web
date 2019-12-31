@@ -41,7 +41,7 @@ namespace Periturf.Tests.Setup
             });
 
             // Assert
-            Assert.IsNotNull(environment);
+            Assert.That(environment, Is.Not.Null);
         }
 
         [TestCase(null, Description = "Null Host Name")]
@@ -61,7 +61,7 @@ namespace Periturf.Tests.Setup
             }));
 
             // Assert
-            Assert.AreEqual("name", exception.ParamName);
+            Assert.That(exception.ParamName, Is.EqualTo("name"));
         }
 
         [Test]
@@ -74,7 +74,7 @@ namespace Periturf.Tests.Setup
             }));
 
             // Assert
-            Assert.AreEqual("host", exception.ParamName);
+            Assert.That(exception.ParamName, Is.EqualTo("host"));
         }
 
         [Test]
@@ -97,7 +97,7 @@ namespace Periturf.Tests.Setup
             });
 
             // Assert
-            Assert.IsNotNull(environment);
+            Assert.That(environment, Is.Not.Null);
         }
 
         [Test]
@@ -120,7 +120,7 @@ namespace Periturf.Tests.Setup
             }));
 
             // Assert
-            Assert.AreEqual(nameof(host), exception.HostName);
+            Assert.That(exception.HostName, Is.EqualTo(nameof(host)));
         }
 
 
@@ -144,7 +144,7 @@ namespace Periturf.Tests.Setup
             }));
 
             // Assert
-            Assert.AreEqual(nameof(component), exception.ComponentName);
+            Assert.That(exception.ComponentName, Is.EqualTo(nameof(component)));
         }
 
         [TestCase(-1)]
@@ -153,7 +153,7 @@ namespace Periturf.Tests.Setup
         {
             var ex = Assert.Throws<ArgumentOutOfRangeException>(() => Environment.Setup(s => s.DefaultExpectationTimeout(TimeSpan.FromMilliseconds(milliseconds))));
 
-            Assert.AreEqual("timeout", ex.ParamName);
+            Assert.That(ex.ParamName, Is.EqualTo("timeout"));
         }
 
         [Test]
@@ -161,7 +161,7 @@ namespace Periturf.Tests.Setup
         {
             var env = Environment.Setup(s => s.DefaultExpectationTimeout(TimeSpan.FromMilliseconds(1)));
 
-            Assert.IsNotNull(env);
+            Assert.That(env, Is.Not.Null);
         }
 
         [TestCase(false)]
@@ -170,7 +170,7 @@ namespace Periturf.Tests.Setup
         {
             var env = Environment.Setup(s => s.DefaultExpectationShortCircuit(shortCircuit));
 
-            Assert.IsNotNull(env);
+            Assert.That(env, Is.Not.Null);
         }
     }
 }

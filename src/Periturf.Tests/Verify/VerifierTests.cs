@@ -76,11 +76,11 @@ namespace Periturf.Tests.Verify
 
             var result = await sut.VerifyAsync();
             
-            Assert.NotNull(result);
+            Assert.That(result, Is.Not.Null);
             Assert.True(result.ExpectationsMet);
-            Assert.IsNotEmpty(result.ExpectationResults);
-            Assert.IsTrue(result.ExpectationResults.All(x => x.Met ?? false));
-            Assert.IsTrue(result.ExpectationResults.All(x => x.Completed));
+            Assert.That(result.ExpectationResults, Is.Not.Empty);
+            Assert.That(result.ExpectationResults.All(x => x.Met ?? false), Is.True);
+            Assert.That(result.ExpectationResults.All(x => x.Completed), Is.True);
         }
 
         [Test]
@@ -92,11 +92,11 @@ namespace Periturf.Tests.Verify
 
             var result = await sut.VerifyAsync();
 
-            Assert.NotNull(result);
-            Assert.IsFalse(result.ExpectationsMet);
-            Assert.IsNotEmpty(result.ExpectationResults);
-            Assert.IsTrue(result.ExpectationResults.All(x => !(x.Met ?? false)));
-            Assert.IsTrue(result.ExpectationResults.All(x => x.Completed));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.ExpectationsMet, Is.False);
+            Assert.That(result.ExpectationResults, Is.Not.Empty);
+            Assert.That(result.ExpectationResults.All(x => !(x.Met ?? false)), Is.True);
+            Assert.That(result.ExpectationResults.All(x => x.Completed), Is.True);
         }
 
         [Test]
@@ -107,12 +107,12 @@ namespace Periturf.Tests.Verify
 
             var result = await sut.VerifyAsync();
 
-            Assert.NotNull(result);
-            Assert.IsFalse(result.ExpectationsMet);
-            Assert.IsNotEmpty(result.ExpectationResults);
-            Assert.IsFalse(result.ExpectationResults.All(x => x.Met ?? false));
-            Assert.IsTrue(result.ExpectationResults.Any(x => x.Met ?? false));
-            Assert.IsTrue(result.ExpectationResults.All(x => x.Completed));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.ExpectationsMet, Is.False);
+            Assert.That(result.ExpectationResults, Is.Not.Empty);
+            Assert.That(result.ExpectationResults.All(x => x.Met ?? false), Is.False);
+            Assert.That(result.ExpectationResults.Any(x => x.Met ?? false), Is.True);
+            Assert.That(result.ExpectationResults.All(x => x.Completed), Is.True);
         }
 
         [Test]
@@ -135,11 +135,11 @@ namespace Periturf.Tests.Verify
 
             var result = await sut.VerifyAsync();
 
-            Assert.NotNull(result);
+            Assert.That(result, Is.Not.Null);
             Assert.True(result.ExpectationsMet);
-            Assert.IsNotEmpty(result.ExpectationResults);
-            Assert.IsTrue(result.ExpectationResults.All(x => x.Met ?? false));
-            Assert.IsTrue(result.ExpectationResults.All(x => x.Completed));
+            Assert.That(result.ExpectationResults, Is.Not.Empty);
+            Assert.That(result.ExpectationResults.All(x => x.Met ?? false), Is.True);
+            Assert.That(result.ExpectationResults.All(x => x.Completed), Is.True);
         }
 
         [Test]
@@ -164,13 +164,13 @@ namespace Periturf.Tests.Verify
 
             var result = await sut.VerifyAsync();
 
-            Assert.NotNull(result);
+            Assert.That(result, Is.Not.Null);
             Assert.False(result.ExpectationsMet);
-            Assert.IsNotEmpty(result.ExpectationResults);
-            Assert.IsFalse(result.ExpectationResults.All(x => x.Met ?? false));
-            Assert.IsTrue(result.ExpectationResults.Any(x => x.Met == false));
-            Assert.IsFalse(result.ExpectationResults.All(x => x.Completed));
-            Assert.IsTrue(result.ExpectationResults.Any(x => x.Completed));
+            Assert.That(result.ExpectationResults, Is.Not.Empty);
+            Assert.That(result.ExpectationResults.All(x => x.Met ?? false), Is.False);
+            Assert.That(result.ExpectationResults.Any(x => x.Met == false), Is.True);
+            Assert.That(result.ExpectationResults.All(x => x.Completed), Is.False);
+            Assert.That(result.ExpectationResults.Any(x => x.Completed), Is.True);
         }
 
         [Test]
@@ -182,7 +182,7 @@ namespace Periturf.Tests.Verify
 
             var result2 = await sut.VerifyAsync();
 
-            Assert.AreSame(result, result2);
+            Assert.That(result2, Is.SameAs(result));
         }
 
         [Test]
@@ -213,8 +213,8 @@ namespace Periturf.Tests.Verify
             await sut.DisposeAsync();
 
 
-            Assert.IsFalse(_componentEvaluator1.DisposeCalled);
-            Assert.IsFalse(_componentEvaluator2.DisposeCalled);
+            Assert.That(_componentEvaluator1.DisposeCalled, Is.False);
+            Assert.That(_componentEvaluator2.DisposeCalled, Is.False);
         }
 
         [Test]
@@ -224,8 +224,8 @@ namespace Periturf.Tests.Verify
 
             await sut.DisposeAsync();
 
-            Assert.IsTrue(_componentEvaluator1.DisposeCalled);
-            Assert.IsTrue(_componentEvaluator2.DisposeCalled);
+            Assert.That(_componentEvaluator1.DisposeCalled, Is.True);
+            Assert.That(_componentEvaluator2.DisposeCalled, Is.True);
         }
 
         [Test]
@@ -238,8 +238,8 @@ namespace Periturf.Tests.Verify
             _componentEvaluator2.ResetCalls();
 
             await sut.DisposeAsync();
-            Assert.IsFalse(_componentEvaluator1.DisposeCalled);
-            Assert.IsFalse(_componentEvaluator2.DisposeCalled);
+            Assert.That(_componentEvaluator1.DisposeCalled, Is.False);
+            Assert.That(_componentEvaluator2.DisposeCalled, Is.False);
         }
 
         [Test]

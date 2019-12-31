@@ -15,6 +15,7 @@
  */
 using NUnit.Framework;
 using Periturf.Verify.Criterias;
+using Periturf.Verify.Criterias.RangeCount;
 using System;
 
 namespace Periturf.Tests.Verify.Criterias.RangeCount
@@ -31,9 +32,9 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
 
             var spec = new RangeCountCriteriaSpecification(minimum, maximum, timeout);
 
-            Assert.AreEqual(minimum, spec.Minimum);
-            Assert.AreEqual(maximum, spec.Maximum);
-            Assert.AreEqual(timeout, spec.Timeout);
+            Assert.That(spec.Minimum, Is.EqualTo(minimum));
+            Assert.That(spec.Maximum, Is.EqualTo(maximum));
+            Assert.That(spec.Timeout, Is.EqualTo(timeout));
         }
 
         [Test]
@@ -46,13 +47,13 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
 
             var factory = spec.Build();
 
-            Assert.NotNull(factory);
+            Assert.That(factory, Is.Not.Null);
 
             var typedFactory = factory as RangeCountCriteriaEvaluatorFactory;
-            Assert.NotNull(typedFactory);
+            Assert.That(typedFactory, Is.Not.Null);
 
-            Assert.AreEqual(minimum, typedFactory.Minimum);
-            Assert.AreEqual(maximum, typedFactory.Maximum);
+            Assert.That(typedFactory.Minimum, Is.EqualTo(minimum));
+            Assert.That(typedFactory.Maximum, Is.EqualTo(maximum));
         }
 
         [Test]
@@ -63,7 +64,7 @@ namespace Periturf.Tests.Verify.Criterias.RangeCount
 
             var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new RangeCountCriteriaSpecification(minimum, maximum, null));
 
-            Assert.AreEqual("maximum", ex.ParamName);
+            Assert.That(ex.ParamName, Is.EqualTo("maximum"));
         }
 
         [Test]

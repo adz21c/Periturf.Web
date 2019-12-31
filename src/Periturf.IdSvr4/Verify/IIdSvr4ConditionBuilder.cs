@@ -17,13 +17,13 @@ using IdentityServer4.Events;
 using Periturf.Verify;
 using System;
 
-namespace Periturf
+namespace Periturf.IdSvr4.Verify
 {
 
     /// <summary>
     /// Builds IdentityServer4 specific conditions for a component.
     /// </summary>
-    /// <seealso cref="Periturf.IComponentConditionBuilder" />
+    /// <seealso cref="IComponentConditionBuilder" />
     public interface IIdSvr4ConditionBuilder : IComponentConditionBuilder
     {
         /// <summary>
