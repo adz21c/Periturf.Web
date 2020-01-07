@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using MassTransit;
 using Periturf.Clients;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Periturf.MT.Clients
 {
@@ -25,11 +26,11 @@ namespace Periturf.MT.Clients
     public interface IMTClient : IComponentClient
     {
         /// <summary>
-        /// Gets the component instance MassTransit Bus.
+        /// Publishes the specified message to the bus.
         /// </summary>
-        /// <value>
-        /// The bus.
-        /// </value>
-        IBus Bus { get; }
+        /// <param name="message">The message.</param>
+        /// <param name="ct">The ct.</param>
+        /// <returns></returns>
+         Task Publish(object message, CancellationToken ct = default);
     }
 }

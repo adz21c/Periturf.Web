@@ -14,31 +14,28 @@
  * limitations under the License.
  */
 using MassTransit;
-using Periturf.MT.Configuration;
+using Periturf.Events;
+using Periturf.MT.Events;
 using Periturf.Verify;
 using Periturf.Verify.ComponentConditions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Periturf.MT.Verify
 {
-    class WhenMessagePublishedSpecification<TMessage> : ComponentMonitorSpecification, IMtVerifySpecification where TMessage : class
+    class WhenMessagePublishedSpecification<TMessage> : ComponentMonitorSpecification, IWhenMessagePublishedConfigurator<TMessage>, IMtVerifySpecification where TMessage : class
     {
         private readonly IBusManager _busManager;
         private IVerificationHandle? _verificationHandle;
-        private readonly List<Func<IMessageReceivedContext<TMessage>, bool>> _predicates;
+        private readonly List<Func<IMessageReceivedContext<TMessage>, bool>> _predicates = new List<Func<IMessageReceivedContext<TMessage>, bool>>();
 
-        public WhenMessagePublishedSpecification(IBusManager busManager, IEnumerable<Func<IMessageReceivedContext<TMessage>, bool>> predicates) : base()
+        public WhenMessagePublishedSpecification(IBusManager busManager) : base()
         {
             _busManager = busManager;
-            _predicates = predicates.ToList();
             Description = typeof(TMessage).Name;
         }
-
-        public IReadOnlyList<Func<IMessageReceivedContext<TMessage>, bool>> Predicates => _predicates;
 
         protected override async Task StartMonitorAsync(IConditionInstanceTimeSpanFactory timeSpanFactory, CancellationToken ct)
         {
@@ -51,9 +48,17 @@ namespace Periturf.MT.Verify
                 await _verificationHandle.DisposeAsync().ConfigureAwait(false);
         }
 
-        public void Configure(IConditionInstanceTimeSpanFactory timeSpanFactory, IReceiveEndpointConfigurator configurator)
+        public IReadOnlyList<Func<IMessageReceivedContext<TMessage>, bool>> Predicates => _predicates;
+
+        void IEventConfigurator<IMessageReceivedContext<TMessage>>.Predicate(Func<IMessageReceivedContext<TMessage>, bool> predicate)
         {
-            configurator.Consumer(() => new MessagePublishConsumer<TMessage>(timeSpanFactory, ConditionInstanceHandler, Predicates));
+            _predicates.Add(predicate ?? throw new ArgumentNullException(nameof(predicate)));
         }
+
+        void IMtVerifySpecification.Configure(IConditionInstanceTimeSpanFactory timeSpanFactory, IReceiveEndpointConfigurator configurator)
+        {
+            configurator.Consumer(() => new VerificationEventConsumer<TMessage>(timeSpanFactory, ConditionInstanceHandler, Predicates));
+        }
+
     }
 }

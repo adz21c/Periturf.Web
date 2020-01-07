@@ -13,24 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.MT.Clients;
+using Periturf.Clients;
 
-namespace Periturf
+namespace Periturf.Events
 {
     /// <summary>
-    /// 
+    /// The context within which an action responding to an event executes.
     /// </summary>
-    public static class EnvironmentExtensions
+    /// <typeparam name="TEventData">The type of the event data.</typeparam>
+    public interface IEventResponseContext<out TEventData> where TEventData : class
     {
         /// <summary>
-        /// Creates a MassTransit client for the component within the environment.
+        /// The event data.
         /// </summary>
-        /// <param name="environment">The environment.</param>
-        /// <param name="componentName">Name of the component for which the client belongs.</param>
+        /// <value>
+        /// The data.
+        /// </value>
+        TEventData Data { get; }
+
+        /// <summary>
+        /// Creates the component client.
+        /// </summary>
+        /// <param name="componentName">Name of the component.</param>
         /// <returns></returns>
-        public static IMTClient MTClient(this Environment environment, string componentName = "MTBus")
-        {
-            return (IMTClient)environment.CreateComponentClient(componentName);
-        }
+        IComponentClient CreateComponentClient(string componentName);
     }
 }

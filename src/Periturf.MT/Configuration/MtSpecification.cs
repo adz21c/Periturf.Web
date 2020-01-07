@@ -20,15 +20,21 @@ namespace Periturf.MT.Configuration
 {
     class MtSpecification : IMtConfigurator, IMtSpecification
     {
-        private readonly List<IMessageReceivedSpecification> _messageReceivedSpecifications = new List<IMessageReceivedSpecification>();
+        private readonly string _componentName;
+        private readonly List<IWhenMessagePublishedSpecification> _whenMessagePublishedSpecifications = new List<IWhenMessagePublishedSpecification>();
 
-        public IReadOnlyList<IMessageReceivedSpecification> MessageReceivedSpecifications => _messageReceivedSpecifications;
-
-        public void WhenMessageReceived<TReceivedMessage>(Action<IMessageReceivedConfigurator<TReceivedMessage>> config) where TReceivedMessage : class
+        public MtSpecification(string componentName)
         {
-            var spec = new MessageReceivedSpecification<TReceivedMessage>();
+            _componentName = componentName;
+        }
+
+        public IReadOnlyList<IWhenMessagePublishedSpecification> WhenMessagePublishedSpecifications => _whenMessagePublishedSpecifications;
+
+        public void WhenMessagePublished<TReceivedMessage>(Action<IWhenMessagePublishedConfigurator<TReceivedMessage>> config) where TReceivedMessage : class
+        {
+            var spec = new WhenMessagePublishedSpecification<TReceivedMessage>(_componentName);
             config?.Invoke(spec);
-            _messageReceivedSpecifications.Add(spec);
+            _whenMessagePublishedSpecifications.Add(spec);
         }
     }
 }

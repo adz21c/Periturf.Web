@@ -17,9 +17,10 @@
 using FakeItEasy;
 using MassTransit;
 using NUnit.Framework;
+using Periturf.Events;
 using Periturf.MT.Configuration;
+using Periturf.MT.Events;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Periturf.Tests.MT.Configuration
@@ -27,136 +28,66 @@ namespace Periturf.Tests.MT.Configuration
     [TestFixture]
     class MessageReceivedSpecificationTests
     {
+        private const string componentName = "ComponentName";
+        
         [Test]
         public void Given_GenericType_When_MessageType_Then_GenericTypeMatches()
         {
-            var spec = (IMessageReceivedSpecification) new MessageReceivedSpecification<TestMessage>();
-            Assert.That(spec.MessageType, Is.EqualTo(typeof(TestMessage)));
+            var spec = (IWhenMessagePublishedSpecification) new WhenMessagePublishedSpecification<ITestMessage>(componentName);
+            Assert.That(spec.MessageType, Is.EqualTo(typeof(ITestMessage)));
         }
 
         [Test]
-        public void Given_Null_When_Predicate_Then_Throws()
+        public void Given_NullConfigurator_When_Apply_Then_Throws()
         {
-            var spec = new MessageReceivedSpecification<TestMessage>();
-            var configurator = (IMessageReceivedConfigurator<TestMessage>)spec;
+            var spec = new WhenMessagePublishedSpecification<ITestMessage>(componentName);
+            var ispec = (IWhenMessagePublishedSpecification)spec;
+            var configurator = (IWhenMessagePublishedConfigurator<ITestMessage>)spec;
+            var action = A.Dummy<Func<IEventResponseContext<IMessageReceivedContext<ITestMessage>>, Task>>();
+            var factory = A.Dummy<IEventResponseContextFactory>();
 
-            var ex = Assert.Throws<ArgumentNullException>(() => configurator.Predicate(null));
+            configurator.Response(action);
 
-            Assert.That(ex.ParamName, Is.EqualTo("predicate"));
-        }
-
-        [Test]
-        public void Given_SinglePredicate_When_Predicate_Then_AddedToSpec()
-        {
-            var spec = new MessageReceivedSpecification<TestMessage>();
-            var configurator = (IMessageReceivedConfigurator<TestMessage>)spec;
-
-            var predicate = A.Dummy<Func<IMessageReceivedContext<TestMessage>, bool>>();
-
-            configurator.Predicate(predicate);
-
-            Assert.That(spec.Predicates, Is.Not.Null);
-            Assert.That(spec.Predicates, Is.Not.Empty);
-            Assert.That(spec.Predicates.Count, Is.EqualTo(1));
-            Assert.That(predicate, Is.SameAs(spec.Predicates.Single()));
-        }
-
-        [Test]
-        public void Given_MultiplePredicates_When_Predicate_Then_AddedToSpec()
-        {
-            var spec = new MessageReceivedSpecification<TestMessage>();
-            var configurator = (IMessageReceivedConfigurator<TestMessage>)spec;
-
-            var predicate = A.Dummy<Func<IMessageReceivedContext<TestMessage>, bool>>();
-            var predicate2 = A.Dummy<Func<IMessageReceivedContext<TestMessage>, bool>>();
-
-            configurator.Predicate(predicate);
-            configurator.Predicate(predicate2);
-
-            Assert.That(spec.Predicates, Is.Not.Null);
-            Assert.That(spec.Predicates, Is.Not.Empty);
-            Assert.That(spec.Predicates.Count, Is.EqualTo(2));
-            Assert.That(spec.Predicates, Does.Contain(predicate));
-            Assert.That(spec.Predicates, Does.Contain(predicate2));
-        }
-
-        [Test]
-        public void Given_NullFactory_When_PublishMessage_Then_Throws()
-        {
-            var spec = new MessageReceivedSpecification<TestMessage>();
-            var configurator = (IMessageReceivedConfigurator<TestMessage>)spec;
-
-            var ex1 = Assert.Throws<ArgumentNullException>(() => configurator.PublishMessage(null));
-
-            Assert.That(ex1.ParamName, Is.EqualTo("factory"));
-        }
-
-        [Test]
-        public void Given_Message_When_PublishMessage_Then_Configured()
-        {
-            var spec = new MessageReceivedSpecification<TestMessage>();
-            var configurator = (IMessageReceivedConfigurator<TestMessage>)spec;
-            var factory = A.Dummy<Func<IMessageReceivedContext<TestMessage>, IPublishEndpoint, Task>>();
-
-            configurator.PublishMessage(factory);
-
-            Assert.That(spec.MessagesToPublish, Is.Not.Null);
-            Assert.That(spec.MessagesToPublish, Is.Not.Empty);
-            Assert.That(spec.MessagesToPublish.Count, Is.EqualTo(1));
-            Assert.That(factory, Is.SameAs(spec.MessagesToPublish.Single().Factory));
-        }
-
-        [Test]
-        public void Given_MultipleMessages_When_PublishMessage_Then_Configured()
-        {
-            var spec = new MessageReceivedSpecification<TestMessage>();
-            var configurator = (IMessageReceivedConfigurator<TestMessage>)spec;
-            var factory = A.Dummy<Func<IMessageReceivedContext<TestMessage>, IPublishEndpoint, Task>>();
-            var factory2 = A.Dummy<Func<IMessageReceivedContext<TestMessage>, IPublishEndpoint, Task>>();
-
-            configurator.PublishMessage(factory);
-            configurator.PublishMessage(factory2);
-
-            Assert.That(spec.MessagesToPublish, Is.Not.Null);
-            Assert.That(spec.MessagesToPublish, Is.Not.Empty);
-            Assert.That(spec.MessagesToPublish.Count, Is.EqualTo(2));
-            Assert.That(spec.MessagesToPublish.Where(x => x.Factory == factory), Is.Not.Empty);
-            Assert.That(spec.MessagesToPublish.Where(x => x.Factory == factory2), Is.Not.Empty);
-        }
-
-        [Test]
-        public void Given_Spec_When_Apply_Then_Throws()
-        {
-            var spec = new MessageReceivedSpecification<TestMessage>();
-            var ispec = (IMessageReceivedSpecification)spec;
-            var configurator = (IMessageReceivedConfigurator<TestMessage>)spec;
-            var factory = A.Dummy<Func<IMessageReceivedContext<TestMessage>, IPublishEndpoint, Task>>();
-
-            configurator.PublishMessage(factory);
-
-            var ex = Assert.Throws<ArgumentNullException>(() => ispec.Configure(null));
+            var ex = Assert.Throws<ArgumentNullException>(() => ispec.Configure(null, factory));
             Assert.That(ex.ParamName, Is.EqualTo("configurator"));
+        }
+
+        [Test]
+        public void Given_NullFactory_When_Apply_Then_Throws()
+        {
+            var spec = new WhenMessagePublishedSpecification<ITestMessage>(componentName);
+            var ispec = (IWhenMessagePublishedSpecification)spec;
+            var configurator = (IWhenMessagePublishedConfigurator<ITestMessage>)spec;
+            var action = A.Dummy<Func<IEventResponseContext<IMessageReceivedContext<ITestMessage>>, Task>>();
+            var receiveEndpointConfigurator = A.Fake<IReceiveEndpointConfigurator>();
+
+            configurator.Response(action);
+
+            var ex = Assert.Throws<ArgumentNullException>(() => ispec.Configure(receiveEndpointConfigurator, null));
+            Assert.That(ex.ParamName, Is.EqualTo("eventResponseContextFactory"));
         }
 
         [Test]
         public void Given_Spec_When_Apply_Then_ConfiguresConsumer()
         {
-            var spec = new MessageReceivedSpecification<TestMessage>();
-            var ispec = (IMessageReceivedSpecification)spec;
+            var spec = new WhenMessagePublishedSpecification<ITestMessage>(componentName);
+            var ispec = (IWhenMessagePublishedSpecification)spec;
             
-            var factory = A.Dummy<Func<IMessageReceivedContext<TestMessage>, IPublishEndpoint, Task>>();
-            
-            var configurator = (IMessageReceivedConfigurator<TestMessage>)spec;
-            configurator.PublishMessage(factory);
+            var action = A.Dummy<Func<IEventResponseContext<IMessageReceivedContext<ITestMessage>>, Task>>();
+
+            var factory = A.Dummy<IEventResponseContextFactory>();
+
+            var configurator = (IWhenMessagePublishedConfigurator<ITestMessage>)spec;
+            configurator.Response(action);
 
             var receiveEndpointConfigurator = A.Fake<IReceiveEndpointConfigurator>();
 
-            Assert.DoesNotThrow(() => ispec.Configure(receiveEndpointConfigurator));
+            Assert.DoesNotThrow(() => ispec.Configure(receiveEndpointConfigurator, factory));
 
-            //A.CallTo(() => receiveEndpointConfigurator.cons)
+            // TODO: A.CallTo(() => receiveEndpointConfigurator.cons)
         }
 
-        public interface TestMessage
+        public interface ITestMessage
         { }
     }
 }

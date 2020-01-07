@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 using MassTransit;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 
-namespace Periturf.MT.Configuration
+namespace Periturf.MT.Events
 {
-    [ExcludeFromCodeCoverage]   // just while it has no logic
-    class PublishMessageSpecification<TReceivedMessage>
+    /// <summary>
+    /// MassTransit Message Context.
+    /// </summary>
+    /// <typeparam name="TReceivedMessage">The type of the received message.</typeparam>
+    /// <seealso cref="MassTransit.MessageContext" />
+    public interface IMessageReceivedContext<out TReceivedMessage> : MessageContext
     {
-        public Func<IMessageReceivedContext<TReceivedMessage>, IPublishEndpoint, Task>? Factory { get; set; }
+        /// <summary>
+        /// Gets the message.
+        /// </summary>
+        /// <value>
+        /// The message.
+        /// </value>
+        TReceivedMessage Message { get; }
     }
 }

@@ -14,31 +14,25 @@
  * limitations under the License.
  */
 using FakeItEasy;
+using MassTransit;
 using NUnit.Framework;
-using Periturf.Events;
-using Periturf.MT;
-using Periturf.MT.Configuration;
+using Periturf.MT.Events;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Periturf.Tests.MT.Configuration
+namespace Periturf.Tests.MT.Events
 {
     [TestFixture]
-    class MtConfigurationSpecificationTests
+    class ConsumerMtClientTests
     {
         [Test]
-        public async Task Given_Configuration_When_Apply_Then_BusConfigured()
+        public async Task Given_Client_When_Publish_Then_MessagePublished()
         {
-            const string componentName = "ComponentName";
+            var consumeContext = A.Fake<ConsumeContext>();
+            var message = new object();
+            await new ConsumerMtClient(consumeContext).Publish(message);
 
-            var busManager = A.Fake<IBusManager>();
-            var factory = A.Fake<IEventResponseContextFactory>();
-
-            var configSpec = new MtConfigurationSpecification(busManager, factory, componentName);
-            var configHandle = await configSpec.ApplyAsync(CancellationToken.None);
-
-            Assert.That(configHandle, Is.Not.Null);
-            A.CallTo(() => busManager.ApplyConfigurationAsync(configSpec.MtSpec, factory)).MustHaveHappened();
+            A.CallTo(() => consumeContext.Publish(message, A<CancellationToken>._)).MustHaveHappened();
         }
     }
 }

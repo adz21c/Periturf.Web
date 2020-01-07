@@ -31,7 +31,7 @@ namespace Periturf
         /// <param name="setupConfigurator">The setup configurator.</param>
         /// <param name="config">The configuration.</param>
         [ExcludeFromCodeCoverage]
-        public static void GenericHost(this ISetupConfigurator setupConfigurator, Action<IPeriturfHostBuilder> config)
+        public static void GenericHost(this ISetupContext setupConfigurator, Action<IPeriturfHostBuilder> config)
         {
             setupConfigurator.GenericHost("GenericHost", config);
         }
@@ -42,7 +42,7 @@ namespace Periturf
         /// <param name="setupConfigurator">The setup configurator.</param>
         /// <param name="hostName">Name of the host.</param>
         /// <param name="config">The configuration.</param>
-        public static void GenericHost(this ISetupConfigurator setupConfigurator, string hostName, Action<IPeriturfHostBuilder> config)
+        public static void GenericHost(this ISetupContext setupConfigurator, string hostName, Action<IPeriturfHostBuilder> config)
         {
             var builder = new PeriturfHostBuilder(Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder());
             config(builder);

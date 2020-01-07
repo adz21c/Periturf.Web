@@ -13,28 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using MassTransit;
-using System;
-using System.Threading.Tasks;
+using Periturf.Events;
+using Periturf.MT.Events;
 
-namespace Periturf.MT.Configuration
+namespace Periturf.MT.Verify
 {
     /// <summary>
     /// Configures what to do when a message is received.
     /// </summary>
     /// <typeparam name="TReceivedMessage">The type of the received message.</typeparam>
-    public interface IMessageReceivedConfigurator<TReceivedMessage> where TReceivedMessage : class
-    {
-        /// <summary>
-        /// Define message requirements.
-        /// </summary>
-        /// <param name="predicate">The predicate.</param>
-        void Predicate(Func<IMessageReceivedContext<TReceivedMessage>, bool> predicate);
-
-        /// <summary>
-        /// Publish a message when another message is received.
-        /// </summary>
-        /// <param name="factory">The factory.</param>
-        void PublishMessage(Func<IMessageReceivedContext<TReceivedMessage>, IPublishEndpoint, Task> factory);
-    }
+    public interface IWhenMessagePublishedConfigurator<TReceivedMessage> : IEventConfigurator<IMessageReceivedContext<TReceivedMessage>>
+        where TReceivedMessage : class
+    { }
 }

@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 using MassTransit;
+using Periturf.MT.Clients;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Periturf.MT.Clients
+namespace Periturf.MT.Events
 {
-    class ComponentClient : IMTClient
+    class ConsumerMtClient : IMTClient
     {
-        public ComponentClient(IBus bus)
+        public ConsumerMtClient(ConsumeContext consumeContext)
         {
-            Bus = bus;
+            ConsumeContext = consumeContext;
         }
 
-        public IBus Bus { get; }
+        public ConsumeContext ConsumeContext { get; }
 
         public async Task Publish(object message, CancellationToken ct = default)
         {
-            await Bus.Publish(message, ct).ConfigureAwait(false);
+            await ConsumeContext.Publish(message, ct);
         }
     }
 }

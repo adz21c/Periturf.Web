@@ -15,10 +15,7 @@
  */
 
 using FakeItEasy;
-using MassTransit;
 using NUnit.Framework;
-using Periturf;
-using Periturf.Components;
 using Periturf.MT;
 using Periturf.MT.Setup;
 using Periturf.Setup;
@@ -34,7 +31,7 @@ namespace Periturf.Tests.MT.Setup
         [TestCase(" ")]
         public void Given_BadName_When_MTBus_Then_Throws(string name)
         {
-            var configurator = A.Fake<ISetupConfigurator>();
+            var configurator = A.Fake<ISetupContext>();
 
             var ex = Assert.Throws<ArgumentNullException>(() => configurator.MTBus(name, A.Dummy<Action<IBusConfigurator>>()));
             Assert.That(ex.ParamName, Is.EqualTo("hostName"));
@@ -43,7 +40,7 @@ namespace Periturf.Tests.MT.Setup
         [Test]
         public void Given_NullConfig_When_MTBus_Then_Throws()
         {
-            var configurator = A.Fake<ISetupConfigurator>();
+            var configurator = A.Fake<ISetupContext>();
 
             var ex = Assert.Throws<ArgumentNullException>(() => configurator.MTBus("HostName", null));
             Assert.That(ex.ParamName, Is.EqualTo("config"));
@@ -57,7 +54,7 @@ namespace Periturf.Tests.MT.Setup
             A.CallTo(() => config.Invoke(A<IBusConfigurator>._)).Invokes((IBusConfigurator f) => f.InMemoryHost());
             const string hostName = "MTBus";
 
-            var configurator = A.Fake<ISetupConfigurator>();
+            var configurator = A.Fake<ISetupContext>();
 
             configurator.MTBus(hostName, config);
 

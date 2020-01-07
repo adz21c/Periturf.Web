@@ -13,23 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using MassTransit;
+using System;
+using System.Threading.Tasks;
 
-namespace Periturf.MT.Configuration
+namespace Periturf.Events
 {
     /// <summary>
-    /// MassTransit Message Context.
+    /// Defines actions to be executed on identification of an event.
     /// </summary>
-    /// <typeparam name="TReceivedMessage">The type of the received message.</typeparam>
-    /// <seealso cref="MassTransit.MessageContext" />
-    public interface IMessageReceivedContext<out TReceivedMessage> : MessageContext
+    /// <typeparam name="TEventData">The type of the event data.</typeparam>
+    public interface IEventResponseConfigurator<TEventData> where TEventData : class
     {
         /// <summary>
-        /// Gets the message.
+        /// The action to be executed in response to an event. Can be executed multiple times to define multiple actions.
         /// </summary>
-        /// <value>
-        /// The message.
-        /// </value>
-        TReceivedMessage Message { get; }
+        /// <param name="response">The response.</param>
+        void Response(Func<IEventResponseContext<TEventData>, Task> response);
     }
 }

@@ -17,7 +17,7 @@
 using FakeItEasy;
 using NUnit.Framework;
 using Periturf.MT;
-using Periturf.MT.Configuration;
+using Periturf.MT.Events;
 using Periturf.MT.Verify;
 using System;
 
@@ -40,11 +40,11 @@ namespace Periturf.Tests.MT.Verify
         public void Given_ConditionBuilder_When_WhenMessagePublished_Then_SpecificationReturned()
         {
             var condition = A.Dummy<Func<IMessageReceivedContext<ITestMessage>, bool>>();
-            var spec = _sut.WhenMessagePublished<ITestMessage>(condition);
+            var spec = _sut.WhenMessagePublished<ITestMessage>(c => c.Predicate(condition));
             
             Assert.That(spec, Is.Not.Null);
-            Assert.That(spec, Is.TypeOf<WhenMessagePublishedSpecification<ITestMessage>>());
-            var typedSpec = (WhenMessagePublishedSpecification<ITestMessage>)spec;
+            Assert.That(spec, Is.TypeOf<Periturf.MT.Verify.WhenMessagePublishedSpecification<ITestMessage>>());
+            var typedSpec = (Periturf.MT.Verify.WhenMessagePublishedSpecification<ITestMessage>)spec;
             Assert.That(typedSpec.Predicates, Does.Contain(condition));
         }
     }

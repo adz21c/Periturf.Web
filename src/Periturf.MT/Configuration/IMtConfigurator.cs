@@ -27,6 +27,6 @@ namespace Periturf.MT.Configuration
         /// </summary>
         /// <typeparam name="TReceivedMessage">The type of the received message.</typeparam>
         /// <param name="config">The configuration.</param>
-        void WhenMessageReceived<TReceivedMessage>(Action<IMessageReceivedConfigurator<TReceivedMessage>> config) where TReceivedMessage : class;
+        void WhenMessagePublished<TReceivedMessage>(Action<IWhenMessagePublishedConfigurator<TReceivedMessage>> config) where TReceivedMessage : class;
     }
 }

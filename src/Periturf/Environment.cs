@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Periturf.Clients;
 using Periturf.Components;
 using Periturf.Configuration;
+using Periturf.Events;
 using Periturf.Setup;
 using Periturf.Verify;
 
@@ -33,11 +34,14 @@ namespace Periturf
     {
         private readonly Dictionary<string, IHost> _hosts = new Dictionary<string, IHost>();
         private readonly Dictionary<string, IComponent> _components = new Dictionary<string, IComponent>();
+        private readonly EventResponseContextFactory _eventResponseContextFactory;
         private TimeSpan _defaultExpectationTimeout = TimeSpan.FromMilliseconds(5000);
         private bool _defaultExpectationShortCircuit = false;
 
         private Environment()
-        { }
+        {
+            _eventResponseContextFactory = new EventResponseContextFactory(this);
+        }
 
         /// <summary>
         /// Starts all hosts in the environment.
@@ -130,24 +134,26 @@ namespace Periturf
         /// </summary>
         /// <param name="config">The configuration.</param>
         /// <returns></returns>
-        public static Environment Setup(Action<ISetupConfigurator> config)
+        public static Environment Setup(Action<ISetupContext> config)
         {
             var env = new Environment();
 
-            var configurator = new SetupConfigurator(env);
+            var configurator = new SetupContext(env);
             config(configurator);
 
             return env;
         }
 
-        class SetupConfigurator : ISetupConfigurator
+        class SetupContext : ISetupContext
         {
             private readonly Environment _env;
 
-            public SetupConfigurator(Environment env)
+            public SetupContext(Environment env)
             {
                 _env = env;
             }
+
+            public IEventResponseContextFactory EventResponseContextFactory => _env._eventResponseContextFactory;
 
             public void DefaultExpectationTimeout(TimeSpan timeout)
             {
@@ -222,7 +228,7 @@ namespace Periturf
                 if (!_environment._components.TryGetValue(componentName, out var component))
                     throw new ComponentLocationFailedException(componentName);
 
-                return component.CreateConfigurationSpecification<TSpecification>();
+                return component.CreateConfigurationSpecification<TSpecification>(_environment._eventResponseContextFactory);
             }
 
             public void AddSpecification(IConfigurationSpecification specification)
@@ -345,6 +351,43 @@ namespace Periturf
                 throw new ComponentLocationFailedException(componentName);
 
             return component.CreateClient();
+        }
+
+        #endregion
+
+        #region Events
+
+        class EventResponseContextFactory : IEventResponseContextFactory
+        {
+            private readonly Environment _env;
+
+            public EventResponseContextFactory(Environment env)
+            {
+                _env = env;
+            }
+
+            public IEventResponseContext<TEventData> Create<TEventData>(TEventData eventData) where TEventData : class
+            {
+                return new EventResponseContext<TEventData>(_env, eventData);
+            }
+        }
+
+        class EventResponseContext<TEventData> : IEventResponseContext<TEventData> where TEventData : class
+        {
+            private readonly Environment _env;
+
+            public EventResponseContext(Environment env, TEventData eventData)
+            {
+                _env = env;
+                Data = eventData;
+            }
+
+            public TEventData Data { get; }
+
+            public IComponentClient CreateComponentClient(string componentName)
+            {
+                return _env.CreateComponentClient(componentName);
+            }
         }
 
         #endregion

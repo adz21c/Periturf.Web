@@ -14,25 +14,32 @@
  * limitations under the License.
  */
 using MassTransit;
+using Periturf.Events;
+using Periturf.MT.Events;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Periturf.MT.Configuration
 {
-    class ReceivedMessageConsumer<TMessage> : IConsumer<TMessage> where TMessage : class
+    class EventActionConsumer<TMessage> : IConsumer<TMessage> where TMessage : class
     {
+        private readonly string _componentName;
+        private readonly IEventResponseContextFactory _eventResponseContextFactory;
         private readonly IReadOnlyCollection<Func<IMessageReceivedContext<TMessage>, bool>> _predicates;
-        private readonly IReadOnlyCollection<PublishMessageSpecification<TMessage>> _publishMessages;
+        private readonly IReadOnlyCollection<Func<IEventResponseContext<IMessageReceivedContext<TMessage>>, Task>> _actions;
 
-        public ReceivedMessageConsumer(
+        public EventActionConsumer(
+            string componentName,
+            IEventResponseContextFactory eventResponseContextFactory,
             IReadOnlyCollection<Func<IMessageReceivedContext<TMessage>, bool>> predicates,
-            IReadOnlyCollection<PublishMessageSpecification<TMessage>> publishMessages)
+            IReadOnlyCollection<Func<IEventResponseContext<IMessageReceivedContext<TMessage>>, Task>> actions)
         {
+            _componentName = componentName;
+            _eventResponseContextFactory = eventResponseContextFactory;
             _predicates = predicates;
-            _publishMessages = publishMessages;
+            _actions = actions;
         }
 
         public async Task Consume(ConsumeContext<TMessage> context)
@@ -41,11 +48,12 @@ namespace Periturf.MT.Configuration
             if (_predicates.Any() && !_predicates.Any(x => x(adapter)))
                 return;
 
-            foreach(var message in _publishMessages)
-            {
-                Debug.Assert(message.Factory != null);
-                await message.Factory(adapter, context);
-            }
+            var eventResponseContext = new ConsumerEventResponseContext<TMessage>(
+                _componentName,
+                context,
+                _eventResponseContextFactory.Create<IMessageReceivedContext<TMessage>>(adapter));
+            foreach (var action in _actions)
+                await action(eventResponseContext).ConfigureAwait(false);
         }
     }
 }

@@ -15,6 +15,7 @@
  */
 using System;
 using Periturf.Components;
+using Periturf.Events;
 using Periturf.MT.Configuration;
 
 namespace Periturf.MT.Setup
@@ -22,11 +23,13 @@ namespace Periturf.MT.Setup
     class BusSpecification : MtSpecification, IBusConfigurator
     {
         private readonly string _hostName;
+        private readonly IEventResponseContextFactory _eventResponseContextFactory;
         private IBusManager? _busManager;
 
-        public BusSpecification(string hostName)
+        public BusSpecification(string hostName, IEventResponseContextFactory eventResponseContextFactory) : base(hostName)
         {
             _hostName = hostName;
+            _eventResponseContextFactory = eventResponseContextFactory;
         }
 
         public void SetBusManager(IBusManager busManager)
@@ -39,7 +42,7 @@ namespace Periturf.MT.Setup
             if (_busManager == null)
                 throw new InvalidOperationException("Specification not configured");
 
-            _busManager.Setup(this);
+            _busManager.Setup(this, _eventResponseContextFactory);
 
             return new MtHostComponent(_busManager, _hostName);
         }

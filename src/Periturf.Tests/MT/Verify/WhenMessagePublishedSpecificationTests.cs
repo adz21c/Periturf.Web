@@ -17,7 +17,7 @@ using FakeItEasy;
 using MassTransit;
 using NUnit.Framework;
 using Periturf.MT;
-using Periturf.MT.Configuration;
+using Periturf.MT.Events;
 using Periturf.MT.Verify;
 using Periturf.Verify;
 using System;
@@ -37,9 +37,8 @@ namespace Periturf.Tests.MT.Verify
         {
             _busManager = A.Fake<IBusManager>();
             _condition = A.Fake<Func<IMessageReceivedContext<ITestMessage>, bool>>();
-            _sut = new WhenMessagePublishedSpecification<ITestMessage>(
-                _busManager,
-                new[] { _condition });
+            _sut = new WhenMessagePublishedSpecification<ITestMessage>(_busManager);
+            ((IWhenMessagePublishedConfigurator<ITestMessage>)_sut).Predicate(_condition);
         }
 
         [Test]
@@ -47,8 +46,8 @@ namespace Periturf.Tests.MT.Verify
         {
             var timeSpanFactory = A.Fake<IConditionInstanceTimeSpanFactory>();
             var configurator = A.Fake<IReceiveEndpointConfigurator>();
-            _sut.Configure(timeSpanFactory, configurator);
-
+            var _verifySut = (IMtVerifySpecification)_sut;
+            _verifySut.Configure(timeSpanFactory, configurator);
             A.CallTo(() => configurator.AddEndpointSpecification(A<IReceiveEndpointSpecification>._)).MustHaveHappened();
         }
 

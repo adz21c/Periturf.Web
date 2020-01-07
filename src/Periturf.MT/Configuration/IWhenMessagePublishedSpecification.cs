@@ -13,21 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System.Collections.Generic;
+using MassTransit;
+using Periturf.Events;
+using System;
 
 namespace Periturf.MT.Configuration
 {
     /// <summary>
-    /// Specification for a MT test configuration
+    /// Specification of what to do when a specific type of mesage, matching a criteria, is received.
     /// </summary>
-    public interface IMtSpecification
+    public interface IWhenMessagePublishedSpecification
     {
         /// <summary>
-        /// Gets the message received specifications.
+        /// Gets the type of the message.
         /// </summary>
         /// <value>
-        /// The message received specifications.
+        /// The type of the message.
         /// </value>
-        IReadOnlyList<IWhenMessagePublishedSpecification> WhenMessagePublishedSpecifications { get; }
+        Type MessageType { get; }
+
+        /// <summary>
+        /// Configures the specified receieve endpoint.
+        /// </summary>
+        /// <param name="configurator">The receive endpoint configurator.</param>
+        /// <param name="eventResponseContextFactory">The event response action context factory.</param>
+        void Configure(IReceiveEndpointConfigurator configurator, IEventResponseContextFactory eventResponseContextFactory);
     }
 }

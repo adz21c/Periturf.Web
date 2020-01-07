@@ -16,29 +16,30 @@
 using FakeItEasy;
 using NUnit.Framework;
 using Periturf.Events;
-using Periturf.MT;
-using Periturf.MT.Configuration;
-using System.Threading;
+using System;
 using System.Threading.Tasks;
 
-namespace Periturf.Tests.MT.Configuration
+namespace Periturf.Tests.Events
 {
     [TestFixture]
-    class MtConfigurationSpecificationTests
+    class EventActionSpecificationTests
     {
         [Test]
-        public async Task Given_Configuration_When_Apply_Then_BusConfigured()
+        public void Given_MultipleResponses_When_ResponseAction_Then_Recorded()
         {
-            const string componentName = "ComponentName";
+            var spec = new EventResponseSpecification<Object>();
 
-            var busManager = A.Fake<IBusManager>();
-            var factory = A.Fake<IEventResponseContextFactory>();
+            var action1 = A.Dummy<Func<Object, Task>>();
+            var action2 = A.Dummy<Func<Object, Task>>();
 
-            var configSpec = new MtConfigurationSpecification(busManager, factory, componentName);
-            var configHandle = await configSpec.ApplyAsync(CancellationToken.None);
+            spec.Response(action1);
+            spec.Response(action2);
 
-            Assert.That(configHandle, Is.Not.Null);
-            A.CallTo(() => busManager.ApplyConfigurationAsync(configSpec.MtSpec, factory)).MustHaveHappened();
+            Assert.That(spec.Actions, Does.Contain(action1));
+            Assert.That(spec.Actions, Does.Contain(action2));
+
+            A.CallTo(() => action1.Invoke(A<Object>._)).MustNotHaveHappened();
+            A.CallTo(() => action2.Invoke(A<Object>._)).MustNotHaveHappened();
         }
     }
 }

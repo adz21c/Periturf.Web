@@ -13,24 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using MassTransit;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Periturf.MT.Clients
+namespace Periturf.Events
 {
-    class ComponentClient : IMTClient
+    /// <summary>
+    /// Creates event response contexts.
+    /// </summary>
+    public interface IEventResponseContextFactory
     {
-        public ComponentClient(IBus bus)
-        {
-            Bus = bus;
-        }
-
-        public IBus Bus { get; }
-
-        public async Task Publish(object message, CancellationToken ct = default)
-        {
-            await Bus.Publish(message, ct).ConfigureAwait(false);
-        }
+        /// <summary>
+        /// Creates an event response context.
+        /// </summary>
+        /// <typeparam name="TEventData">The type of the event data.</typeparam>
+        /// <param name="eventData">The event data.</param>
+        /// <returns></returns>
+        IEventResponseContext<TEventData> Create<TEventData>(TEventData eventData) where TEventData : class;
     }
 }

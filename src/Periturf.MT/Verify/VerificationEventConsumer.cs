@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 using MassTransit;
-using Periturf.MT.Configuration;
+using Periturf.MT.Events;
 using Periturf.Verify;
 using Periturf.Verify.ComponentConditions;
 using System;
@@ -25,13 +25,13 @@ using System.Threading.Tasks;
 
 namespace Periturf.MT.Verify
 {
-    class MessagePublishConsumer<TMessage> : IConsumer<TMessage> where TMessage : class
+    class VerificationEventConsumer<TMessage> : IConsumer<TMessage> where TMessage : class
     {
         private readonly IConditionInstanceTimeSpanFactory _timeSpanFactory;
         private readonly IReadOnlyList<Func<IMessageReceivedContext<TMessage>, bool>> _predicates;
         private readonly IConditionInstanceHandler _conditionInstanceHandler;
 
-        public MessagePublishConsumer(
+        public VerificationEventConsumer(
             IConditionInstanceTimeSpanFactory timeSpanFactory,
             IConditionInstanceHandler conditionInstanceHandler,
             IReadOnlyList<Func<IMessageReceivedContext<TMessage>, bool>> predicates)

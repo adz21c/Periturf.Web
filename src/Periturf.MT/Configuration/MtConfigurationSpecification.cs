@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 using Periturf.Configuration;
+using Periturf.Events;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,18 +22,22 @@ namespace Periturf.MT.Configuration
 {
     class MtConfigurationSpecification : IConfigurationSpecification
     {
-        public MtConfigurationSpecification(IBusManager busManager)
+        public MtConfigurationSpecification(IBusManager busManager, IEventResponseContextFactory eventResponseContextFactory, string componentName)
         {
             BusManager = busManager;
+            EventResponseContextFactory = eventResponseContextFactory;
+            MtSpec = new MtSpecification(componentName);
         }
 
         public IBusManager BusManager { get; }
 
-        public MtSpecification MtSpec { get; } = new MtSpecification();
+        public IEventResponseContextFactory EventResponseContextFactory { get; }
+
+        public MtSpecification MtSpec { get; }
 
         public async Task<IConfigurationHandle> ApplyAsync(CancellationToken ct = default)
         {
-            return await BusManager.ApplyConfigurationAsync(MtSpec);
+            return await BusManager.ApplyConfigurationAsync(MtSpec, EventResponseContextFactory);
         }
     }
 }

@@ -2,10 +2,6 @@
 using MassTransit;
 using NUnit.Framework;
 using Periturf.MT;
-using Periturf.MT.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Periturf.Tests.MT.Clients
 {
@@ -32,8 +28,6 @@ namespace Periturf.Tests.MT.Clients
             var client = env.MTClient(componentName);
 
             Assert.That(client, Is.Not.Null);
-            Assert.That(client.Bus, Is.Not.Null);
-            Assert.That(bus, Is.SameAs(client.Bus));
         }
     }
 }

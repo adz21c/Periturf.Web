@@ -17,6 +17,7 @@ using FakeItEasy;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using NUnit.Framework;
+using Periturf.Events;
 using Periturf.IdSvr4;
 using Periturf.IdSvr4.Clients;
 using Periturf.IdSvr4.Configuration;
@@ -58,8 +59,10 @@ namespace Periturf.Tests.IdSvr4
 
             var component = new IdSvr4Component(store, sink, client);
 
+            var factory = A.Fake<IEventResponseContextFactory>();
+
             // Act
-            var spec = component.CreateConfigurationSpecification<IdSvr4Specification>();
+            var spec = component.CreateConfigurationSpecification<IdSvr4Specification>(factory);
 
             Assert.That(spec, Is.Not.Null);
         }

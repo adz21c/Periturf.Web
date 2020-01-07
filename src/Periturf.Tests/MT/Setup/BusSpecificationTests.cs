@@ -15,8 +15,8 @@
  */
 using FakeItEasy;
 using NUnit.Framework;
+using Periturf.Events;
 using Periturf.MT;
-using Periturf.MT.Configuration;
 using Periturf.MT.Setup;
 using System;
 
@@ -28,7 +28,8 @@ namespace Periturf.Tests.MT.Setup
         [Test]
         public void Given_Null_When_SetBusManager_Then_Throws()
         {
-            var spec = new BusSpecification(A.Dummy<string>());
+            var factory = A.Fake<IEventResponseContextFactory>();
+            var spec = new BusSpecification(A.Dummy<string>(), factory);
             var ex = Assert.Throws<ArgumentNullException>(() => spec.SetBusManager(null));
             Assert.That(ex.ParamName, Is.EqualTo("busManager"));
         }
@@ -39,8 +40,9 @@ namespace Periturf.Tests.MT.Setup
             const string componentName = "Component1";
             
             var busManager = A.Fake<IBusManager>();
-            
-            var spec = new BusSpecification(componentName);
+            var factory = A.Fake<IEventResponseContextFactory>();
+
+            var spec = new BusSpecification(componentName, factory);
             
             spec.SetBusManager(busManager);
 
@@ -48,13 +50,14 @@ namespace Periturf.Tests.MT.Setup
 
             Assert.That(host, Is.Not.Null);
             Assert.That(host.Components, Does.ContainKey(componentName));
-            A.CallTo(() => busManager.Setup(spec)).MustHaveHappened();
+            A.CallTo(() => busManager.Setup(spec, factory)).MustHaveHappened();
         }
 
         [Test]
         public void Given_NotConfigured_When_Build_Then_Throws()
         {
-            var spec = new BusSpecification("Host");
+            var factory = A.Fake<IEventResponseContextFactory>();
+            var spec = new BusSpecification("Host", factory);
             var ex = Assert.Throws<InvalidOperationException>(() => spec.Build());
             Assert.That(ex.Message, Is.EqualTo("Specification not configured"));
         }

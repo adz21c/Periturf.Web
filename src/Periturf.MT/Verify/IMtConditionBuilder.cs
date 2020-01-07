@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Periturf.MT.Configuration;
 using Periturf.Verify;
 using System;
 
@@ -29,8 +28,8 @@ namespace Periturf.MT.Verify
         /// Verify when a message is published to the bus.
         /// </summary>
         /// <typeparam name="TMessage">The type of the message.</typeparam>
-        /// <param name="condition">The condition.</param>
+        /// <param name="config">The configuration.</param>
         /// <returns></returns>
-        IComponentConditionSpecification WhenMessagePublished<TMessage>(Func<IMessageReceivedContext<TMessage>, bool> condition) where TMessage : class;
+        IComponentConditionSpecification WhenMessagePublished<TMessage>(Action<IWhenMessagePublishedConfigurator<TMessage>> config) where TMessage : class;
     }
 }

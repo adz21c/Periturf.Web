@@ -15,6 +15,7 @@
  */
 using Periturf.Clients;
 using Periturf.Configuration;
+using Periturf.Events;
 using Periturf.Verify;
 
 namespace Periturf.Components
@@ -37,8 +38,9 @@ namespace Periturf.Components
         /// Creates a component configuration specification.
         /// </summary>
         /// <typeparam name="TSpecification">The type of the specification.</typeparam>
+        /// <param name="eventResponseContextFactory">The event response action context factory.</param>
         /// <returns></returns>
-        TSpecification CreateConfigurationSpecification<TSpecification>()
+        TSpecification CreateConfigurationSpecification<TSpecification>(IEventResponseContextFactory eventResponseContextFactory)
             where TSpecification : IConfigurationSpecification;
         
         /// <summary>

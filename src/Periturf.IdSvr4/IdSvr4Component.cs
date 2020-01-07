@@ -16,6 +16,7 @@
 using Periturf.Clients;
 using Periturf.Components;
 using Periturf.Configuration;
+using Periturf.Events;
 using Periturf.IdSvr4.Clients;
 using Periturf.IdSvr4.Configuration;
 using Periturf.IdSvr4.Verify;
@@ -47,7 +48,7 @@ namespace Periturf.IdSvr4
             return _client;
         }
 
-        public TSpecification CreateConfigurationSpecification<TSpecification>() where TSpecification : IConfigurationSpecification
+        public TSpecification CreateConfigurationSpecification<TSpecification>(IEventResponseContextFactory eventResponseContextFactory) where TSpecification : IConfigurationSpecification
         {
             return (TSpecification)(object)new IdSvr4Specification(_store);
         }

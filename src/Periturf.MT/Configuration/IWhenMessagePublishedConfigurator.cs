@@ -13,24 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using MassTransit;
-using System.Threading;
-using System.Threading.Tasks;
+using Periturf.Events;
+using Periturf.MT.Events;
 
-namespace Periturf.MT.Clients
+namespace Periturf.MT.Configuration
 {
-    class ComponentClient : IMTClient
-    {
-        public ComponentClient(IBus bus)
-        {
-            Bus = bus;
-        }
-
-        public IBus Bus { get; }
-
-        public async Task Publish(object message, CancellationToken ct = default)
-        {
-            await Bus.Publish(message, ct).ConfigureAwait(false);
-        }
-    }
+    /// <summary>
+    /// Configures what to do when a message is received.
+    /// </summary>
+    /// <typeparam name="TReceivedMessage">The type of the received message.</typeparam>
+    public interface IWhenMessagePublishedConfigurator<TReceivedMessage> : IEventResponseConfigurator<IMessageReceivedContext<TReceivedMessage>>
+        where TReceivedMessage : class
+    { }
 }

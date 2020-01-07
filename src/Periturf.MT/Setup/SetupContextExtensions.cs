@@ -23,31 +23,29 @@ namespace Periturf
     /// <summary>
     /// 
     /// </summary>
-    public static class SetupConfiguratorExtensions
+    public static class SetupContextExtensions
     {
         /// <summary>
         /// Configures an MassTransit Host and Component.
         /// </summary>
-        /// <param name="configurator">The configurator.</param>
+        /// <param name="context">The context.</param>
         /// <param name="config">The configuration.</param>
         [ExcludeFromCodeCoverage]
-        public static void MTBus(this ISetupConfigurator configurator, Action<IBusConfigurator> config)
+        public static void MTBus(this ISetupContext context, Action<IBusConfigurator> config)
         {
-            configurator.MTBus("MTBus", config);
+            context.MTBus("MTBus", config);
         }
 
         /// <summary>
         /// Configures an MassTransit Host and Component.
         /// </summary>
-        /// <param name="configurator">The configurator.</param>
+        /// <param name="context">The context.</param>
         /// <param name="hostName">Name of the host.</param>
         /// <param name="config">The configuration.</param>
-        /// <exception cref="ArgumentNullException">
-        /// hostName
+        /// <exception cref="ArgumentNullException">hostName
         /// or
-        /// config
-        /// </exception>
-        public static void MTBus(this ISetupConfigurator configurator, string hostName, Action<IBusConfigurator> config)
+        /// config</exception>
+        public static void MTBus(this ISetupContext context, string hostName, Action<IBusConfigurator> config)
         {
             if (string.IsNullOrWhiteSpace(hostName))
                 throw new ArgumentNullException(nameof(hostName));
@@ -55,9 +53,9 @@ namespace Periturf
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
 
-            var busSpec = new BusSpecification(hostName);
+            var busSpec = new BusSpecification(hostName, context.EventResponseContextFactory);
             config(busSpec);
-            configurator.Host(hostName, busSpec.Build());
+            context.Host(hostName, busSpec.Build());
         }
     }
 }

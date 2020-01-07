@@ -17,6 +17,7 @@ using MassTransit;
 using MassTransit.Definition;
 using MassTransit.RabbitMqTransport;
 using Periturf.Configuration;
+using Periturf.Events;
 using Periturf.MT.Configuration;
 using Periturf.MT.Verify;
 using Periturf.Verify;
@@ -47,31 +48,31 @@ namespace Periturf.MT.RabbitMQ
 
         public IBusControl? BusControl { get; private set; }
 
-        public void Setup(IMtSpecification specification)
+        public void Setup(IMtSpecification specification, IEventResponseContextFactory eventResponseContextFactory)
         {
             BusControl = Bus.Factory.CreateUsingRabbitMq(b =>
             {
                 _host = b.Host(_hostUri, _hostConfigurator);
 
-                foreach (var endpoint in specification.MessageReceivedSpecifications)
+                foreach (var endpoint in specification.WhenMessagePublishedSpecifications)
                 {
-                    b.ReceiveEndpoint(new TemporaryEndpointDefinition(), r => endpoint.Configure(r));
+                    b.ReceiveEndpoint(new TemporaryEndpointDefinition(), r => endpoint.Configure(r, eventResponseContextFactory));
                 }
             });
         }
 
-        public async Task<IConfigurationHandle> ApplyConfigurationAsync(IMtSpecification specification)
+        public async Task<IConfigurationHandle> ApplyConfigurationAsync(IMtSpecification specification, IEventResponseContextFactory eventResponseContextFactory)
         {
             Debug.Assert(_host != null);
 
             var receiveEndpointHandles = new List<HostReceiveEndpointHandle>();
 
-            foreach (var endpoint in specification.MessageReceivedSpecifications)
+            foreach (var endpoint in specification.WhenMessagePublishedSpecifications)
             {
                 var handle = _host.ConnectReceiveEndpoint(
                     new TemporaryEndpointDefinition(),
                     DefaultEndpointNameFormatter.Instance,
-                    r => endpoint.Configure(r));
+                    r => endpoint.Configure(r, eventResponseContextFactory));
                 receiveEndpointHandles.Add(handle);
             }
 

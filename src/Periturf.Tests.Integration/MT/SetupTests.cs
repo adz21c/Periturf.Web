@@ -41,20 +41,28 @@ namespace Periturf.Tests.Integration.MT
                 e.MTBus(b =>
                 {
                     b.InMemoryHost();
-                    b.WhenMessageReceived<ITestMessage>(m => 
-                        m.PublishMessage((ctx, p) => p.Publish(new TestMessage2 { })));
-                    b.WhenMessageReceived<ITestMessage2>(m =>
-                        m.PublishMessage((ctx, p) =>
+                    b.WhenMessagePublished<ITestMessage>(m =>
+                    {
+                        m.Response(c =>
+                        {
+                            c.MTClient().Publish(new TestMessage2 { });
+                            return Task.CompletedTask;
+                        });
+                    });
+                    b.WhenMessagePublished<ITestMessage2>(m =>
+                    {
+                        m.Response(c =>
                         {
                             received = true;
                             return Task.CompletedTask;
-                        }));
+                        });
+                    });
                 });
             });
             await env.StartAsync();
 
             var mtClient = env.MTClient();
-            await mtClient.Bus.Publish(new TestMessage { });
+            await mtClient.Publish(new TestMessage { });
 
             await Task.Delay(1000);
 

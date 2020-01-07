@@ -15,7 +15,6 @@
  */
 using MassTransit;
 using Periturf.Verify;
-using System;
 
 namespace Periturf.MT.Verify
 {
@@ -27,7 +26,7 @@ namespace Periturf.MT.Verify
         /// <summary>
         /// Configures the supplied configurator to handle the verification.
         /// </summary>
-        /// <param name="timeSpanFactory">The <see cref="TimeSpan"/> factory.</param>
+        /// <param name="timeSpanFactory">The <see cref="System.TimeSpan"/> factory.</param>
         /// <param name="configurator">The configurator.</param>
         void Configure(IConditionInstanceTimeSpanFactory timeSpanFactory, IReceiveEndpointConfigurator configurator);
     }

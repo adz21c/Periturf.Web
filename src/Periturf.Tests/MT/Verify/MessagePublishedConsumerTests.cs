@@ -17,7 +17,7 @@
 using FakeItEasy;
 using MassTransit;
 using NUnit.Framework;
-using Periturf.MT.Configuration;
+using Periturf.MT.Events;
 using Periturf.MT.Verify;
 using Periturf.Verify;
 using Periturf.Verify.ComponentConditions;
@@ -36,7 +36,7 @@ namespace Periturf.Tests.MT.Verify
         private ConsumeContext<ITestMessage> _consumeContext;
         private IConditionInstanceTimeSpanFactory _timeSpanFactory;
         private IConditionInstanceHandler _conditionInstanceHandler;
-        private MessagePublishConsumer<ITestMessage> _consumer;
+        private VerificationEventConsumer<ITestMessage> _consumer;
 
         [SetUp]
         public void Setup()
@@ -50,7 +50,7 @@ namespace Periturf.Tests.MT.Verify
             _timeSpanFactory = A.Fake<IConditionInstanceTimeSpanFactory>();
             _conditionInstanceHandler = A.Fake<IConditionInstanceHandler>();
 
-            _consumer = new MessagePublishConsumer<ITestMessage>(
+            _consumer = new VerificationEventConsumer<ITestMessage>(
                 _timeSpanFactory,
                 _conditionInstanceHandler,
                 new List<Func<IMessageReceivedContext<ITestMessage>, bool>> { _predicate, _predicate2 });

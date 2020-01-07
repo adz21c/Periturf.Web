@@ -13,28 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using MassTransit;
 using System;
 
-namespace Periturf.MT.Configuration
+namespace Periturf.Events
 {
     /// <summary>
-    /// Specification of what to do when a specific type of mesage, matching a criteria, is received.
+    /// Configures the identification of an event.
     /// </summary>
-    public interface IMessageReceivedSpecification
+    /// <typeparam name="TEventData">The type of the event data.</typeparam>
+    public interface IEventConfigurator<TEventData> where TEventData : class
     {
         /// <summary>
-        /// Gets the type of the message.
+        /// Predicates to filter the events. Can be called multiple times to define multiple possible conditions.
         /// </summary>
-        /// <value>
-        /// The type of the message.
-        /// </value>
-        Type MessageType { get; }
-
-        /// <summary>
-        /// Configures the specified receieve endpoint.
-        /// </summary>
-        /// <param name="configurator">The receive endpoint configurator.</param>
-        void Configure(IReceiveEndpointConfigurator configurator);
+        /// <param name="predicate">The predicate.</param>
+        void Predicate(Func<TEventData, bool> predicate);
     }
 }

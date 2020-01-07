@@ -16,6 +16,7 @@
 using System.Threading.Tasks;
 using MassTransit;
 using Periturf.Configuration;
+using Periturf.Events;
 using Periturf.MT.Configuration;
 using Periturf.MT.Verify;
 using Periturf.Verify;
@@ -39,14 +40,18 @@ namespace Periturf.MT
         /// Initial bus creation and configuration
         /// </summary>
         /// <param name="specification">The specification.</param>
-        void Setup(IMtSpecification specification);
+        /// <param name="eventResponseContextFactory">The event response action context factory.</param>
+        void Setup(IMtSpecification specification, IEventResponseContextFactory eventResponseContextFactory);
 
         /// <summary>
         /// Applies temporary configuration to the bus.
         /// </summary>
         /// <param name="specification">The specification.</param>
-        /// <returns>Disposable configuration handle.</returns>
-        Task<IConfigurationHandle> ApplyConfigurationAsync(IMtSpecification specification);
+        /// <param name="eventResponseContextFactory">The event response action context factory.</param>
+        /// <returns>
+        /// Disposable configuration handle.
+        /// </returns>
+        Task<IConfigurationHandle> ApplyConfigurationAsync(IMtSpecification specification, IEventResponseContextFactory eventResponseContextFactory);
 
         /// <summary>
         /// Applies verification setup on the bus.

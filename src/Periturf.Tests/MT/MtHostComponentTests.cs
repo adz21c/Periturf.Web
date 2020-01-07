@@ -16,6 +16,7 @@
 using FakeItEasy;
 using MassTransit;
 using NUnit.Framework;
+using Periturf.Events;
 using Periturf.MT;
 using Periturf.MT.Clients;
 using Periturf.MT.Configuration;
@@ -30,12 +31,15 @@ namespace Periturf.Tests.MT
     {
         private const string _componentName = "Component";
         private IBusManager _busManager;
+        private IEventResponseContextFactory _factory;
         private IBusControl _busControl;
         private MtHostComponent _host;
 
         [SetUp]
         public void SetUp()
         {
+            _factory = A.Fake<IEventResponseContextFactory>();
+
             _busControl = A.Fake<IBusControl>();
             _busManager = A.Fake<IBusManager>();
             A.CallTo(() => _busManager.BusControl).Returns(_busControl);
@@ -68,7 +72,7 @@ namespace Periturf.Tests.MT
         [Test]
         public void Given_HostComponent_When_CreateConfigurationSpecification_Then_Created()
         {
-            var spec = _host.CreateConfigurationSpecification<MtConfigurationSpecification>();
+            var spec = _host.CreateConfigurationSpecification<MtConfigurationSpecification>(_factory);
             Assert.That(spec, Is.Not.Null);
         }
 

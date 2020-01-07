@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 using System;
-using Periturf.MT.Configuration;
 using Periturf.Verify;
 
 namespace Periturf.MT.Verify
@@ -28,9 +27,11 @@ namespace Periturf.MT.Verify
             _busManager = busManager;
         }
 
-        public IComponentConditionSpecification WhenMessagePublished<TMessage>(Func<IMessageReceivedContext<TMessage>, bool> condition) where TMessage : class
+        public IComponentConditionSpecification WhenMessagePublished<TMessage>(Action<IWhenMessagePublishedConfigurator<TMessage>> config) where TMessage : class
         {
-            return new WhenMessagePublishedSpecification<TMessage>(_busManager, new[] { condition });
+            var spec = new WhenMessagePublishedSpecification<TMessage>(_busManager);
+            config(spec);
+            return spec;
         }
     }
 }

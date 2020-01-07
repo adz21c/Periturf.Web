@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 using Periturf.Components;
+using Periturf.Events;
 using System;
 
 namespace Periturf.Setup
@@ -21,8 +22,16 @@ namespace Periturf.Setup
     /// <summary>
     /// Gathers configuration for environment setup.
     /// </summary>
-    public interface ISetupConfigurator
+    public interface ISetupContext
     {
+        /// <summary>
+        /// Gets the event response action context factory.
+        /// </summary>
+        /// <value>
+        /// The event response action context factory.
+        /// </value>
+        IEventResponseContextFactory EventResponseContextFactory { get; }
+
         /// <summary>
         /// Sets the default expectation short circuit state.
         /// </summary>

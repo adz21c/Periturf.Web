@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 using MassTransit;
-using Periturf.MT.Configuration;
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Periturf.MT
+namespace Periturf.MT.Events
 {
     [ExcludeFromCodeCoverage]
     class ConsumeContextToMessageReceivedContextAdapter<TMessage> : IMessageReceivedContext<TMessage> where TMessage : class

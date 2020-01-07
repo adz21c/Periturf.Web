@@ -16,29 +16,29 @@
 using FakeItEasy;
 using NUnit.Framework;
 using Periturf.Events;
-using Periturf.MT;
-using Periturf.MT.Configuration;
-using System.Threading;
-using System.Threading.Tasks;
+using Periturf.MT.Clients;
+using System;
 
 namespace Periturf.Tests.MT.Configuration
 {
     [TestFixture]
-    class MtConfigurationSpecificationTests
+    class MtClientExtensionTests
     {
         [Test]
-        public async Task Given_Configuration_When_Apply_Then_BusConfigured()
+        public void Given_Context_When_MtClient_Then_GetMtClient()
         {
             const string componentName = "ComponentName";
 
-            var busManager = A.Fake<IBusManager>();
-            var factory = A.Fake<IEventResponseContextFactory>();
+            var client = A.Dummy<IMTClient>();
+            
+            var context = A.Fake<IEventResponseContext<Object>>();
+            A.CallTo(() => context.CreateComponentClient(A<string>._)).Returns(client);
 
-            var configSpec = new MtConfigurationSpecification(busManager, factory, componentName);
-            var configHandle = await configSpec.ApplyAsync(CancellationToken.None);
+            var result = context.MTClient(componentName);
 
-            Assert.That(configHandle, Is.Not.Null);
-            A.CallTo(() => busManager.ApplyConfigurationAsync(configSpec.MtSpec, factory)).MustHaveHappened();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.SameAs(client));
+            A.CallTo(() => context.CreateComponentClient(componentName)).MustHaveHappened();
         }
     }
 }

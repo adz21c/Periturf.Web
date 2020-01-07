@@ -16,6 +16,7 @@
 using Periturf.Clients;
 using Periturf.Components;
 using Periturf.Configuration;
+using Periturf.Events;
 using Periturf.MT.Clients;
 using Periturf.MT.Configuration;
 using Periturf.MT.Verify;
@@ -29,9 +30,12 @@ namespace Periturf.MT
 {
     class MtHostComponent : Components.IHost, IComponent
     {
+        private readonly string _componentName;
+
         public MtHostComponent(IBusManager busManager, string componentName)
         {
             BusManager = busManager;
+            _componentName = componentName;
             Components = new Dictionary<string, IComponent> { { componentName, this } };
         }
         public IBusManager BusManager { get; }
@@ -61,9 +65,9 @@ namespace Periturf.MT
             return (TComponentConditionBuilder)(object) new MtConditionBuilder(BusManager);
         }
 
-        public TSpecification CreateConfigurationSpecification<TSpecification>() where TSpecification : IConfigurationSpecification
+        public TSpecification CreateConfigurationSpecification<TSpecification>(IEventResponseContextFactory eventResponseContextFactory) where TSpecification : IConfigurationSpecification
         {
-            return (TSpecification)(object) new MtConfigurationSpecification(BusManager);
+            return (TSpecification)(object) new MtConfigurationSpecification(BusManager, eventResponseContextFactory, _componentName);
         }
     }
 }

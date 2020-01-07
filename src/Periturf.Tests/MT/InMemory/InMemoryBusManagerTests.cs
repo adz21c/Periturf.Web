@@ -17,6 +17,7 @@
 using FakeItEasy;
 using MassTransit;
 using NUnit.Framework;
+using Periturf.Events;
 using Periturf.MT.Configuration;
 using Periturf.MT.InMemory;
 using Periturf.MT.Verify;
@@ -36,30 +37,33 @@ namespace Periturf.Tests.MT.InMemory
         [SetUp]
         public void SetUp()
         {
+            var factory = A.Fake<IEventResponseContextFactory>();
+
             _setupSpec = A.Fake<IMtSpecification>();
             _sut = new InMemoryBusManager();
-            _sut.Setup(_setupSpec);
+            _sut.Setup(_setupSpec, factory);
         }
 
         [Test]
         public void Given_BusManager_When_Setup_Then_BusCreated()
         {
             Assert.That(_sut.BusControl, Is.Not.Null);
-            A.CallTo(() => _setupSpec.MessageReceivedSpecifications).MustHaveHappened();
+            A.CallTo(() => _setupSpec.WhenMessagePublishedSpecifications).MustHaveHappened();
         }
 
         [Test]
         public async Task Given_BusManager_When_ApplyConfiguration_Then_ConfigurationApplied()
         {
-            var messageSpec = A.Fake<IMessageReceivedSpecification>();
+            var messageSpec = A.Fake<IWhenMessagePublishedSpecification>();
             var spec = A.Fake<IMtSpecification>();
-            A.CallTo(() => spec.MessageReceivedSpecifications).Returns(new List<IMessageReceivedSpecification> { messageSpec });
+            var factory = A.Fake<IEventResponseContextFactory>();
+            A.CallTo(() => spec.WhenMessagePublishedSpecifications).Returns(new List<IWhenMessagePublishedSpecification> { messageSpec });
 
-            var handle = await _sut.ApplyConfigurationAsync(spec);
+            var handle = await _sut.ApplyConfigurationAsync(spec, factory);
 
             Assert.That(handle, Is.Not.Null);
-            A.CallTo(() => spec.MessageReceivedSpecifications).MustHaveHappened();
-            A.CallTo(() => messageSpec.Configure(A<IReceiveEndpointConfigurator>._)).MustHaveHappened();
+            A.CallTo(() => spec.WhenMessagePublishedSpecifications).MustHaveHappened();
+            A.CallTo(() => messageSpec.Configure(A<IReceiveEndpointConfigurator>._, A<IEventResponseContextFactory>._)).MustHaveHappened();
         }
 
         [Test]

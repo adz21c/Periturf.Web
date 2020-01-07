@@ -30,7 +30,7 @@ namespace Periturf.Tests.AspNetCore
         public void Given_MultipleComponents_When_WebHost_Then_NewHostRegisteredWithComponents()
         {
             // Arrange
-            var configurator = A.Dummy<ISetupConfigurator>();
+            var configurator = A.Dummy<ISetupContext>();
             var component1 = A.Dummy<IComponent>();
             var component2 = A.Dummy<IComponent>();
             const string hostName = "HostName";
@@ -113,7 +113,7 @@ namespace Periturf.Tests.AspNetCore
         public void Given_BadComponentName_When_AddComponent_Then_ThrowException(string componentName)
         {
             // Arrange
-            var configurator = A.Dummy<ISetupConfigurator>();
+            var configurator = A.Dummy<ISetupContext>();
             var component1 = A.Dummy<IComponent>();
             const string hostName1 = "HostName1";
 
@@ -132,7 +132,7 @@ namespace Periturf.Tests.AspNetCore
         public void Given_NullComponent_When_AddComponent_Then_ThrowException()
         {
             // Arrange
-            var configurator = A.Dummy<ISetupConfigurator>();
+            var configurator = A.Dummy<ISetupContext>();
             const string hostName1 = "HostName1";
 
             // Act
