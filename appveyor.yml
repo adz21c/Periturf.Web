@@ -15,7 +15,7 @@ environment:
     secure: 6qD93a8X/HlviVML1h7oaD5Z57iWiGc6BLkgizomSUHAgcNeC6eQoY8sprEtlHtN
   
   CODECOV_TOKEN:
-    secure: qpg2oUby8/m76bjOwVR+hoiGl5/k2CzSDtXnXoog0eZvvgC8k34Yj+IAUedg0yOM
+    secure: nmYDDKAcYWK1ORYBiUOa3o3PlxKeTuu38OVhcxSL5utxfUxGlgATEyQvu8qwNLEf
   
 build: off
 test: off
@@ -36,18 +36,18 @@ build_script:
   ps: >-
     if ("$env:APPVEYOR_PULL_REQUEST_NUMBER" -eq "")
     {
-      dotnet sonarscanner begin /k:"adz21c_Periturf" /o:"adz21c-github" /v:"$env:GitVersion_FullSemVer" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="$env:sonar_login" /d:sonar.branch.name="$env:APPVEYOR_REPO_BRANCH" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
+      dotnet sonarscanner begin /k:"adz21c_Periturf.Web" /o:"adz21c-github" /v:"$env:GitVersion_FullSemVer" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="$env:sonar_login" /d:sonar.branch.name="$env:APPVEYOR_REPO_BRANCH" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
     }
     else
     {
-      dotnet sonarscanner begin /k:"adz21c_Periturf" /o:"adz21c-github" /v:"$env:GitVersion_FullSemVer" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="$env:sonar_login" /d:sonar.pullrequest.key="$env:APPVEYOR_PULL_REQUEST_NUMBER" /d:sonar.pullrequest.branch="$env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH" /d:sonar.pullrequest.base="$env:APPVEYOR_REPO_BRANCH" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" 
+      dotnet sonarscanner begin /k:"adz21c_Periturf.Web" /o:"adz21c-github" /v:"$env:GitVersion_FullSemVer" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="$env:sonar_login" /d:sonar.pullrequest.key="$env:APPVEYOR_PULL_REQUEST_NUMBER" /d:sonar.pullrequest.branch="$env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH" /d:sonar.pullrequest.base="$env:APPVEYOR_REPO_BRANCH" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" 
     }
     
     dotnet build src --no-restore -c Release
     
-    dotnet test .\src\Periturf.Tests --collect:"XPlat code coverage" --settings:.\src\CodeCoverage.runsettings
+    dotnet test .\src\Periturf.Web.Tests --collect:"XPlat code coverage" --settings:.\src\CodeCoverage.runsettings
 
-    dotnet test .\src\Periturf.Tests.Integration
+    dotnet test .\src\Periturf.Web.Tests.Integration
 
     dotnet sonarscanner end /d:sonar.login="$env:sonar_login"
     
