@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using Periturf.Web.Setup;
@@ -38,17 +39,19 @@ namespace Periturf.Web.Tests.Setup
 
             var component1 = A.Dummy<Periturf.Components.IComponent>();
             var component1Spec = A.Fake<IWebComponentSetupSpecification>();
-            var component1Config = A.Dummy<Action<IApplicationBuilder>>();
+            var component1ConfigureApp = A.Dummy<Action<IApplicationBuilder>>();
+            var component1ConfigureServices = A.Dummy<Action<IServiceCollection>>();
             A.CallTo(() => component1Spec.Name).Returns(nameof(component1));
             A.CallTo(() => component1Spec.Path).Returns("/" + nameof(component1));
-            A.CallTo(() => component1Spec.Configure()).Returns((component1, component1Config));
+            A.CallTo(() => component1Spec.Configure()).Returns(new ConfigureWebAppDto(component1, component1ConfigureApp, component1ConfigureServices));
 
             var component2 = A.Dummy<Periturf.Components.IComponent>();
             var component2Spec = A.Fake<IWebComponentSetupSpecification>();
-            var component2Config = A.Dummy<Action<IApplicationBuilder>>();
+            var component2ConfigureApp = A.Dummy<Action<IApplicationBuilder>>();
+            var component2ConfigureServices = A.Dummy<Action<IServiceCollection>>();
             A.CallTo(() => component2Spec.Name).Returns(nameof(component2));
             A.CallTo(() => component2Spec.Path).Returns("/" + nameof(component2));
-            A.CallTo(() => component2Spec.Configure()).Returns((component2, component2Config));
+            A.CallTo(() => component2Spec.Configure()).Returns(new ConfigureWebAppDto(component2, component2ConfigureApp, component2ConfigureServices));
 
             var sut = new GenericWebHostSpecification();
             sut.AddWebComponentSpecification(component1Spec);

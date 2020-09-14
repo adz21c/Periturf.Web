@@ -37,7 +37,8 @@ namespace Periturf.Web.Setup
                         x.Name,
                         x.Path,
                         config.Component,
-                        config.Config
+                        config.ConfigureApp,
+                        config.ConfigureServices
                     };
                 }).ToList();
 
@@ -45,15 +46,16 @@ namespace Periturf.Web.Setup
             {
                 _configureWebHostBuilder?.Invoke(w);
 
+                w.ConfigureServices(s =>
+                {
+                    foreach (var config in componentsAndConfig)
+                        config.ConfigureServices(s);
+                });
+
                 w.Configure(app =>
                 {
                     foreach (var config in componentsAndConfig)
-                    {
-                        app.Map(config.Path, subApp =>
-                        {
-                            config.Config(subApp);
-                        });
-                    }
+                        app.Map(config.Path, subApp => config.ConfigureApp(subApp));
                 });
             });
 
