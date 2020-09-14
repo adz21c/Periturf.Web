@@ -46,7 +46,7 @@ namespace Periturf.Web.Tests
             A.CallTo(() => _handlerSpec.Build()).Returns(_handler);
 
             _sut = new WebComponent();
-            var configSpec = _sut.CreateConfigurationSpecification<WebComponentSpecification>(_eventHandlerFactory);
+            var configSpec = _sut.CreateConfigurationSpecification<Web.Configuration.WebComponentSpecification>(_eventHandlerFactory);
             configSpec.OnRequest(r =>
             {
                 r.AddPredicateSpecification(predicateSpec);

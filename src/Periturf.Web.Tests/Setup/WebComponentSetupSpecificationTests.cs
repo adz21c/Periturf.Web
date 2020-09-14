@@ -1,5 +1,7 @@
 ﻿using FakeItEasy;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using Periturf.Web;
@@ -16,17 +18,12 @@ namespace Periturf.Web.Tests.Setup
         [Test]
         public void Given_BuilderAction_When_Apply_Then_IsExecuted()
         {
-            var builder = A.Fake<IHostBuilder>();
-            var builderAction = A.Dummy<Action<IWebHostBuilder>>();
+            var sut = new WebComponentSetupSpecification("Name", "/Path");
+            
+            var config = sut.Configure();
 
-            var sut = new WebComponentSetupSpecification("Name");
-            sut.ConfigureBuilder(builderAction);
-
-            var component = sut.Apply(builder);
-
-            Assert.That(component, Is.Not.Null);
-            Assert.That(component, Is.TypeOf<WebComponent>());
-            A.CallTo(() => builderAction.Invoke(A<IWebHostBuilder>._)).MustHaveHappened();
+            Assert.That(config.Component, Is.Not.Null);
+            Assert.That(config.Component, Is.TypeOf<WebComponent>());
         }
     }
 }

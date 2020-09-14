@@ -29,20 +29,12 @@ namespace Periturf
     [ExcludeFromCodeCoverage]
     public static class GenericHostExtensions
     {
-        public static void Web(this IGenericHostConfigurator configurator, Action<IWebComponentSetupConfigurator> config)
+        public static void Web(this IGenericHostConfigurator configurator, Action<IWebSetupConfigurator> config)
         {
-            configurator.Web("Web", config);
-        }
-
-        public static void Web(this IGenericHostConfigurator configurator, string name, Action<IWebComponentSetupConfigurator> config)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentNullException(nameof(name));
-
-            var spec = new WebComponentSetupSpecification(name);
+            var spec = new GenericWebHostSpecification();
             config?.Invoke(spec);
 
-            configurator.AddComponentSpecification(spec);
+            configurator.AddMultipleComponentSpecification(spec);
         }
     }
 }

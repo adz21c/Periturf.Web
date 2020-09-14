@@ -19,6 +19,7 @@ namespace Periturf.Web.Tests.Integration
         {
             // Arrange
             const string WebHostUrl = "http://localhost:3510";
+            const string WebAppUrl = "/WebApp";
 
             var env = Environment.Setup(e =>
             {
@@ -26,13 +27,14 @@ namespace Periturf.Web.Tests.Integration
                 {
                     h.Web(w =>
                     {
-                        w.ConfigureBuilder(wb => wb.UseUrls(WebHostUrl));
+                        w.Configure(wb => wb.UseUrls(WebHostUrl));
+                        w.WebApp();
                     });
                 });
             });
 
             var client = new HttpClient();
-            client.BaseAddress = new Uri(WebHostUrl);
+            client.BaseAddress = new Uri(WebHostUrl + WebAppUrl);
 
             await env.StartAsync();
             try
@@ -54,15 +56,15 @@ namespace Periturf.Web.Tests.Integration
                                     ob.JsonSerializer();
                                 });
                             });
-                            r.Handle(async (e, ct) => Console.Write("something"));
+                            r.Handle(async (e, ct) => Console.WriteLine("something"));
                         });
                     });
                 }))
                 {
-                    var testResponse = await client.PostAsync(WebHostUrl, new StringContent(""));
+                    var testResponse = await client.PostAsync(WebHostUrl + WebAppUrl, new StringContent(""));
                     Assert.That(testResponse.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
 
-                    var testResponse2 = await client.GetAsync(WebHostUrl);
+                    var testResponse2 = await client.GetAsync(WebHostUrl + WebAppUrl);
                     var testText2 = await testResponse2.Content.ReadAsStringAsync();
                     Assert.That(testResponse2.StatusCode, Is.EqualTo(HttpStatusCode.OK));
                 }
