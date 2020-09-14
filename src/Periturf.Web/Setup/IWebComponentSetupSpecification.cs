@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Periturf.Components;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace Periturf.Web.Setup
 {
@@ -14,6 +8,6 @@ namespace Periturf.Web.Setup
 
         PathString Path { get; }
 
-        (IComponent Component, Action<IApplicationBuilder> Config) Configure();
+        ConfigureWebAppDto Configure();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Periturf.Components;
 using System;
 
@@ -18,18 +19,19 @@ namespace Periturf.Web.Setup
 
         public PathString Path { get; }
         
-        public (IComponent Component, Action<IApplicationBuilder> Config) Configure()
+        public ConfigureWebAppDto Configure()
         {
             var component = new WebComponent();
 
-            return (
-                component, 
+            return new ConfigureWebAppDto(
+                component,
                 (IApplicationBuilder app) => app.Use(async (context, next) =>
-                    {
-                        await component.ProcessAsync(context);
-                        await next();
-                    })
-            );
+                {
+                    await component.ProcessAsync(context);
+                    await next();
+                }),
+                (IServiceCollection s) => { });
         }
+
     }
 }
