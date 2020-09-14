@@ -29,7 +29,7 @@ namespace Periturf
     {
         public static void Web(this IConfigurationContext builder, Action<IWebComponentConfigurator> config)
         {
-            builder.Web("Web", config);
+            builder.Web("WebApp", config);
         }
 
         public static void Web(this IConfigurationContext builder, string name, Action<IWebComponentConfigurator> config)
