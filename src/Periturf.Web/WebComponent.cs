@@ -21,7 +21,7 @@ namespace Periturf.Web
             throw new NotImplementedException();
         }
 
-        public TComponentConditionBuilder CreateConditionBuilder<TComponentConditionBuilder>() where TComponentConditionBuilder : IComponentConditionBuilder
+        public IConditionBuilder CreateConditionBuilder()
         {
             throw new NotImplementedException();
         }
