@@ -17,7 +17,6 @@ using Periturf.Configuration;
 using Periturf.Web;
 using Periturf.Web.Configuration;
 using Periturf.Web.Configuration.Requests;
-using Periturf.Web.Configuration.Requests.Predicates;
 using Periturf.Web.Configuration.Requests.Responses;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -37,11 +36,6 @@ namespace Periturf
             var spec = builder.CreateComponentConfigSpecification<WebComponentSpecification>(name);
             config(spec);
             builder.AddSpecification(spec);
-        }
-
-        public static void Predicate(this IWebRequestEventConfigurator configurator, Func<IWebRequestEvent, bool> predicate)
-        {
-            configurator.AddPredicateSpecification(new WebRequestPredicateSpecification(predicate));
         }
 
         public static void Response(this IWebRequestEventConfigurator configurator, Action<IWebRequestResponseConfigurator> config)

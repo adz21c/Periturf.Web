@@ -46,7 +46,7 @@ namespace Periturf.Web.Tests.Integration
                     {
                         w.OnRequest(r =>
                         {
-                            r.Predicate(x => x.Request.Method.ToLower() == "get");
+                            r.Criteria(c => c.Method().EqualTo("GET"));
                             r.Response(rs =>
                             {
                                 rs.StatusCode = HttpStatusCode.OK;

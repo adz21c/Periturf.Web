@@ -1,6 +1,6 @@
 ﻿using Periturf.Events;
-using Periturf.Web.Configuration.Requests.Predicates;
 using Periturf.Web.Configuration.Requests.Responses;
+using Periturf.Web.RequestCriteria;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,15 +10,15 @@ namespace Periturf.Web.Configuration.Requests
 {
     class WebRequestEventSpecification : EventSpecification<IWebRequest>, IWebRequestEventConfigurator
     {
-        private readonly List<IWebRequestPredicateSpecification> _predicates = new List<IWebRequestPredicateSpecification>();
+        private IWebRequestCriteriaSpecification? _criteriaSpecification;
         private IWebRequestResponseSpecification? _responseSpecification;
 
         public WebRequestEventSpecification(IEventHandlerFactory eventHandlerFactory) : base(eventHandlerFactory)
         { }
 
-        public void AddPredicateSpecification(IWebRequestPredicateSpecification spec)
+        public void AddCriteriaSpecification(IWebRequestCriteriaSpecification spec)
         {
-            _predicates.Add(spec ?? throw new ArgumentNullException(nameof(spec)));
+            _criteriaSpecification = spec;
         }
 
         public void SetResponseSpecification(IWebRequestResponseSpecification spec)
@@ -31,7 +31,7 @@ namespace Periturf.Web.Configuration.Requests
             Debug.Assert(_responseSpecification != null, "ResponseSpecification != null");
 
             return new WebConfiguration(
-                _predicates.Select(x => x.Build()).ToList(),
+                _criteriaSpecification.Build(),
                 _responseSpecification.BuildFactory(),
                 CreateHandler());
         }

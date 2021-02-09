@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Periturf.Web.RequestCriteria;
+using Periturf.Web.RequestCriteria.Logical;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Periturf.Web.RequestCriteria.Logical
+namespace Periturf
 {
     public static class LogicalValueConditionBuilderExtensions
     {

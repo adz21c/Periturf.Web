@@ -4,8 +4,8 @@ using NUnit.Framework;
 using Periturf.Events;
 using Periturf.Web;
 using Periturf.Web.Configuration;
-using Periturf.Web.Configuration.Requests.Predicates;
 using Periturf.Web.Configuration.Requests.Responses;
+using Periturf.Web.RequestCriteria;
 using Periturf.Web.Setup;
 using System;
 using System.Collections.Generic;
@@ -22,7 +22,7 @@ namespace Periturf.Web.Tests
         private Func<IEventContext<IWebRequest>, CancellationToken, Task> _handler;
         private IEventHandlerSpecification<IWebRequest> _handlerSpec;
         private Func<IWebResponse, Task> _responseFactory;
-        private Func<IWebRequestEvent, bool> _predicate;
+        private Func<IWebRequestEvent, bool> _criteria;
         private IEventHandler<IWebRequest> _eventHandler;
         private IEventHandlerFactory _eventHandlerFactory;
 
@@ -33,9 +33,9 @@ namespace Periturf.Web.Tests
             _eventHandlerFactory = A.Fake<IEventHandlerFactory>();
             A.CallTo(() => _eventHandlerFactory.Create(A<IEnumerable<IEventHandlerSpecification<IWebRequest>>>._)).Returns(_eventHandler);
 
-            _predicate = A.Fake<Func<IWebRequestEvent, bool>>();
-            var predicateSpec = A.Fake<IWebRequestPredicateSpecification>();
-            A.CallTo(() => predicateSpec.Build()).Returns(_predicate);
+            _criteria = A.Fake<Func<IWebRequestEvent, bool>>();
+            var criteriaSpec = A.Fake<IWebRequestCriteriaSpecification>();
+            A.CallTo(() => criteriaSpec.Build()).Returns(_criteria);
 
             _responseFactory = A.Fake<Func<IWebResponse, Task>>();
             var responseSpec = A.Fake<IWebRequestResponseSpecification>();
@@ -49,7 +49,7 @@ namespace Periturf.Web.Tests
             var configSpec = _sut.CreateConfigurationSpecification<Web.Configuration.WebComponentSpecification>(_eventHandlerFactory);
             configSpec.OnRequest(r =>
             {
-                r.AddPredicateSpecification(predicateSpec);
+                r.AddCriteriaSpecification(criteriaSpec);
                 r.SetResponseSpecification(responseSpec);
                 r.AddHandlerSpecification(_handlerSpec);
             });
@@ -60,16 +60,16 @@ namespace Periturf.Web.Tests
         public async Task Given_ConfiguredRequest_When_Process_Then_HandlersCalledAfterPredicate()
         {
             var context = new DefaultHttpContext();
-            A.CallTo(() => _predicate.Invoke(A<IWebRequestEvent>._)).Returns(true);
+            A.CallTo(() => _criteria.Invoke(A<IWebRequestEvent>._)).Returns(true);
 
             await _sut.ProcessAsync(context);
 
             A.CallTo(() => _eventHandlerFactory.Create(A<IEnumerable<IEventHandlerSpecification<IWebRequest>>>.That.Contains(_handlerSpec))).MustHaveHappened();
 
-            A.CallTo(() => _predicate.Invoke(A<IWebRequestEvent>._)).MustHaveHappened().Then(
+            A.CallTo(() => _criteria.Invoke(A<IWebRequestEvent>._)).MustHaveHappened().Then(
                 A.CallTo(() => _responseFactory.Invoke(A<IWebResponse>._)).MustHaveHappened());
 
-            A.CallTo(() => _predicate.Invoke(A<IWebRequestEvent>._)).MustHaveHappened().Then(
+            A.CallTo(() => _criteria.Invoke(A<IWebRequestEvent>._)).MustHaveHappened().Then(
                 A.CallTo(() => _eventHandler.ExecuteHandlersAsync(A<IWebRequest>._, A<CancellationToken>._)).MustHaveHappened());
         }
 
@@ -77,7 +77,7 @@ namespace Periturf.Web.Tests
         public async Task Given_UnusedConfiguredRequest_When_Process_Then_HandlersNotCalledAfterPredicate()
         {
             var context = new DefaultHttpContext();
-            A.CallTo(() => _predicate.Invoke(A<IWebRequestEvent>._)).Returns(false);
+            A.CallTo(() => _criteria.Invoke(A<IWebRequestEvent>._)).Returns(false);
 
             await _sut.ProcessAsync(context);
 
@@ -85,7 +85,7 @@ namespace Periturf.Web.Tests
 
             Assert.That(context.Response.StatusCode, Is.EqualTo(404));
 
-            A.CallTo(() => _predicate.Invoke(A<IWebRequestEvent>._)).MustHaveHappened();
+            A.CallTo(() => _criteria.Invoke(A<IWebRequestEvent>._)).MustHaveHappened();
             A.CallTo(() => _responseFactory.Invoke(A<IWebResponse>._)).MustNotHaveHappened();
             A.CallTo(() => _eventHandler.ExecuteHandlersAsync(A<IWebRequest>._, A<CancellationToken>._)).MustNotHaveHappened();
         }

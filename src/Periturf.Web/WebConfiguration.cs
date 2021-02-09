@@ -12,25 +12,25 @@ namespace Periturf.Web
 {
     class WebConfiguration
     {
-        private readonly List<Func<IWebRequestEvent, bool>> _predicates;
+        private readonly Func<IWebRequestEvent, bool> _criteria;
         private readonly Func<IWebResponse, Task> _responseFactory;
         private readonly IEventHandler<IWebRequest> _handlers;
 
         public WebConfiguration(
-            List<Func<IWebRequestEvent, bool>> predicates,
+            Func<IWebRequestEvent, bool> criteria,
             Func<IWebResponse, Task> responseFactory,
             IEventHandler<IWebRequest> handlers)
         {
-            Debug.Assert(predicates?.Any() == true, "predicates?.Any() == true");
+            Debug.Assert(criteria != null, "criteria != null");
             Debug.Assert(responseFactory != null, "responseFactory != null");
             Debug.Assert(handlers != null, "handlers != null");
 
-            _predicates = predicates;
+            _criteria = criteria;
             _responseFactory = responseFactory;
             _handlers = handlers;
         }
 
-        public bool Matches(IWebRequestEvent request) => _predicates.Any(x => x(request));
+        public bool Matches(IWebRequestEvent request) => _criteria(request);
 
         public async Task WriteResponse(IWebResponse response)
         {
