@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Periturf.Web.Tests.Configuration
 {
     [TestFixture]
-    class WebRequestEventSpecificationTests
+    class WebRequestEventTests
     {
         private IEventHandlerFactory _eventHandlerFactory;
         private WebRequestEventSpecification _sut;
@@ -25,20 +25,6 @@ namespace Periturf.Web.Tests.Configuration
             _eventHandlerFactory = A.Fake<IEventHandlerFactory>();
 
             _sut = new WebRequestEventSpecification(_eventHandlerFactory);
-        }
-
-        [Test]
-        public void Given_Null_When_AddPredicateSpec_Then_Exception()
-        {
-            // TODO
-            //Assert.That(() => _sut.AddPredicateSpecification(null), Throws.ArgumentNullException.With.Property("ParamName").EqualTo("spec"));
-        }
-
-
-        [Test]
-        public void Given_Null_When_SetResponseSpec_Then_Exception()
-        {
-            Assert.That(() => _sut.SetResponseSpecification(null), Throws.ArgumentNullException.With.Property("ParamName").EqualTo("spec"));
         }
 
         [Test]

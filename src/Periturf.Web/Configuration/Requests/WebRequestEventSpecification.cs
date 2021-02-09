@@ -23,12 +23,13 @@ namespace Periturf.Web.Configuration.Requests
 
         public void SetResponseSpecification(IWebRequestResponseSpecification spec)
         {
-            _responseSpecification = spec ?? throw new ArgumentNullException(nameof(spec));
+            _responseSpecification = spec;
         }
 
         public WebConfiguration Build()
         {
-            Debug.Assert(_responseSpecification != null, "ResponseSpecification != null");
+            Debug.Assert(_criteriaSpecification != null, "_criteriaSpecification != null");
+            Debug.Assert(_responseSpecification != null, "_responseSpecification != null");
 
             return new WebConfiguration(
                 _criteriaSpecification.Build(),
