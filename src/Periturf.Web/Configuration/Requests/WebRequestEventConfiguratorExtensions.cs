@@ -2,9 +2,11 @@
 using Periturf.Web.RequestCriteria;
 using Periturf.Web.RequestCriteria.Logical;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Periturf
 {
+    [ExcludeFromCodeCoverage]
     public static class WebRequestEventConfiguratorExtensions
     {
         public static void Criteria(this IWebRequestEventConfigurator configurator, Action<IWebRequestCriteriaConfigurator> config)
