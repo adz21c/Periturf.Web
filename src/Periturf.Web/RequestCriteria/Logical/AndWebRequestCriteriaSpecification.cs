@@ -8,14 +8,7 @@ namespace Periturf.Web.RequestCriteria.Logical
     class AndWebRequestCriteriaSpecification : IWebRequestCriteriaSpecification, IWebRequestCriteriaConfigurator
     {
         private readonly List<IWebRequestCriteriaSpecification> _criteriaSpecs = new List<IWebRequestCriteriaSpecification>();
-        private bool _not = false;
-
-        public IWebRequestCriteriaConfigurator Not()
-        {
-            _not = !_not;
-            return this;
-        }
-
+        
         public void AddCriteriaSpecification(IWebRequestCriteriaSpecification spec)
         {
             _criteriaSpecs.Add(spec);
@@ -24,11 +17,7 @@ namespace Periturf.Web.RequestCriteria.Logical
         public Func<IWebRequestEvent, bool> Build()
         {
             var criterias = _criteriaSpecs.Select(x => x.Build());
-            return request =>
-            {
-                var result = criterias.All(x => x(request));
-                return _not ? !result : result;
-            };
+            return request => criterias.All(x => x(request));
         }
     }
 }

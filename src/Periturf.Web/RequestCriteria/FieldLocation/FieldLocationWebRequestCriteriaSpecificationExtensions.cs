@@ -10,7 +10,7 @@ using System.Text;
 namespace Periturf
 {
     [ExcludeFromCodeCoverage]
-    public static class WebRequestCriteriaSpecificationExtensions
+    public static class FieldLocationWebRequestCriteriaSpecificationExtensions
     {
         public static IValueConditionBuilder<StringValues> Header(this IWebRequestCriteriaConfigurator configurator, string headerName)
         {

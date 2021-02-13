@@ -6,8 +6,6 @@ namespace Periturf.Web.RequestCriteria
 {
     public interface IWebRequestCriteriaConfigurator
     {
-        IWebRequestCriteriaConfigurator Not();
-
         void AddCriteriaSpecification(IWebRequestCriteriaSpecification spec);
     }
 }

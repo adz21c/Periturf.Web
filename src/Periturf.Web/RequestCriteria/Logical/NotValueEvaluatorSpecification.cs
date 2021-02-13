@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace Periturf.Web.RequestCriteria.Logical
@@ -15,8 +16,9 @@ namespace Periturf.Web.RequestCriteria.Logical
 
         public Func<T, bool> Build()
         {
-            var next = _next?.Build();
-            return value => !(next?.Invoke(value) ?? true);
+            Debug.Assert(_next != null, "_next != null");
+            var next = _next.Build();
+            return value => !next(value);
         }
     }
 }

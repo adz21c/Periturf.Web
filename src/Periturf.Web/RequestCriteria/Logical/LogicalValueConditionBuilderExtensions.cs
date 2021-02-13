@@ -2,10 +2,12 @@
 using Periturf.Web.RequestCriteria.Logical;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Periturf
 {
+    [ExcludeFromCodeCoverage]
     public static class LogicalValueConditionBuilderExtensions
     {
         public static IValueConditionBuilder<T> EqualTo<T>(this IValueConditionBuilder<T> builder, T comparisonValue)
