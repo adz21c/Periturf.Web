@@ -62,10 +62,5 @@ namespace Periturf.Web
         public Stream Body { get; }
 
         public PipeReader BodyReader { get; }
-
-        public Task<TContent> GetContentAsync<TContent>(CancellationToken ct = default)
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

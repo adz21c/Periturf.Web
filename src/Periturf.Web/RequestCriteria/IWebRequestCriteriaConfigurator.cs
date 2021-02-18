@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Periturf.Web.RequestCriteria
 {
-    public interface IWebRequestCriteriaConfigurator
+    public interface IWebRequestCriteriaConfigurator<TWebRequestEvent> where TWebRequestEvent : IWebRequestEvent
     {
-        void AddCriteriaSpecification(IWebRequestCriteriaSpecification spec);
+        void AddCriteriaSpecification(IWebRequestCriteriaSpecification<TWebRequestEvent> spec);
     }
 }

@@ -38,7 +38,8 @@ namespace Periturf
             builder.AddSpecification(spec);
         }
 
-        public static void Response(this IWebRequestEventConfigurator configurator, Action<IWebRequestResponseConfigurator> config)
+        public static void Response<TWebRequestEvent>(this IWebRequestEventConfigurator<TWebRequestEvent> configurator, Action<IWebRequestResponseConfigurator> config)
+            where TWebRequestEvent : IWebRequestEvent
         {
             var spec = new WebRequestResponseSpecification();
             config?.Invoke(spec);

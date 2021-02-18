@@ -12,16 +12,16 @@ namespace Periturf.Web.Configuration
 {
     class WebComponentSpecification : IWebComponentConfigurator, IConfigurationSpecification
     {
-        private readonly List<WebConfiguration> _configurations;
+        private readonly List<IWebConfiguration> _configurations;
         private readonly IEventHandlerFactory _eventHandlerFactory;
 
-        public WebComponentSpecification(List<WebConfiguration> configurations, IEventHandlerFactory eventHandlerFactory)
+        public WebComponentSpecification(List<IWebConfiguration> configurations, IEventHandlerFactory eventHandlerFactory)
         {
             _configurations = configurations;
             _eventHandlerFactory = eventHandlerFactory;
         }
 
-        public void OnRequest(Action<IWebRequestEventConfigurator> config)
+        public void OnRequest(Action<IWebRequestEventConfigurator<IWebRequestEvent>> config)
         {
             if (config == null)
                 return;
@@ -31,7 +31,17 @@ namespace Periturf.Web.Configuration
             WebRequestSpecifications.Add(spec);
         }
 
-        public List<WebRequestEventSpecification> WebRequestSpecifications { get; } = new List<WebRequestEventSpecification>();
+        public void OnRequest<TBody>(Action<IWebRequestEventConfigurator<IWebRequestEvent<TBody>>> config)
+        {
+            if (config == null)
+                return;
+
+            var spec = new WebRequestEventSpecification<TBody>(_eventHandlerFactory);
+            config(spec);
+            WebRequestSpecifications.Add(spec);
+        }
+
+        public List<IWebRequestEventSpecification> WebRequestSpecifications { get; } = new List<IWebRequestEventSpecification>();
 
         public Task<IConfigurationHandle> ApplyAsync(CancellationToken ct = default)
         {
@@ -43,10 +53,10 @@ namespace Periturf.Web.Configuration
 
         class ConfigurationHandle : IConfigurationHandle
         {
-            private readonly List<WebConfiguration> _newConfig;
-            private readonly List<WebConfiguration> _configurations;
+            private readonly List<IWebConfiguration> _newConfig;
+            private readonly List<IWebConfiguration> _configurations;
 
-            public ConfigurationHandle(List<WebConfiguration> newConfig, List<WebConfiguration> configurations)
+            public ConfigurationHandle(List<IWebConfiguration> newConfig, List<IWebConfiguration> configurations)
             {
                 _newConfig = newConfig;
                 _configurations = configurations;

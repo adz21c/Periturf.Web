@@ -6,9 +6,10 @@ using System;
 
 namespace Periturf.Web.Configuration.Requests
 {
-    public interface IWebRequestEventConfigurator : IEventConfigurator<IWebRequest>
+    public interface IWebRequestEventConfigurator<TWebRequestEvent> : IEventConfigurator<TWebRequestEvent>
+        where TWebRequestEvent : IWebRequestEvent
     {
-        void AddCriteriaSpecification(IWebRequestCriteriaSpecification spec);
+        void AddCriteriaSpecification(IWebRequestCriteriaSpecification<TWebRequestEvent> spec);
 
         void SetResponseSpecification(IWebRequestResponseSpecification spec);
     }

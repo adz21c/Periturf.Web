@@ -14,7 +14,7 @@ namespace Periturf.Web
 {
     class WebComponent : IComponent
     {
-        private readonly List<WebConfiguration> _configurations = new List<WebConfiguration>();
+        private readonly List<IWebConfiguration> _configurations = new List<IWebConfiguration>();
 
         public IComponentClient CreateClient()
         {
@@ -33,6 +33,7 @@ namespace Periturf.Web
         
         public async Task ProcessAsync(HttpContext context)
         {
+            context.Request.EnableBuffering();
             var @event = new WebRequestEvent(
                 context.TraceIdentifier,
                 new WebRequest(context.Request));
@@ -50,7 +51,7 @@ namespace Periturf.Web
             await config.WriteResponse(response);
             await context.Response.CompleteAsync();
 
-            await config.ExecuteHandlers(@event.Request);
+            await config.ExecuteHandlers(@event);
         }
     }
 }

@@ -44,7 +44,7 @@ namespace Periturf.Web.Tests.Integration
                 {
                     c.Web(w =>
                     {
-                        w.OnRequest(r =>
+                        w.OnRequest<int>(r =>
                         {
                             r.Criteria(c => c.Method().EqualTo("GET"));
                             r.Response(rs =>

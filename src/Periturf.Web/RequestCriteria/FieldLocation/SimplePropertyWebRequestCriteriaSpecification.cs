@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
 namespace Periturf.Web.RequestCriteria.FieldLocation
 {
-    class SimplePropertyWebRequestCriteriaSpecification<T> : IWebRequestCriteriaSpecification, IValueConditionBuilder<T>
+    class SimplePropertyWebRequestCriteriaSpecification<TWebRequestEvent, T> : IWebRequestCriteriaSpecification<TWebRequestEvent>, IValueConditionBuilder<T>
+        where TWebRequestEvent : IWebRequestEvent
     {
         private IValueEvaluatorSpecification<T>? _valueEvaluatorSpec;
-        private readonly Func<IWebRequestEvent, T> _getProperty;
+        private readonly Func<TWebRequestEvent, T> _getProperty;
 
-        public SimplePropertyWebRequestCriteriaSpecification(Func<IWebRequestEvent, T> getProperty)
+        public SimplePropertyWebRequestCriteriaSpecification(Func<TWebRequestEvent, T> getProperty)
         {
             _getProperty = getProperty;
         }
@@ -20,14 +22,12 @@ namespace Periturf.Web.RequestCriteria.FieldLocation
             _valueEvaluatorSpec = spec;
         }
 
-        public Func<IWebRequestEvent, bool> Build()
+        public Func<TWebRequestEvent, bool> Build()
         {
+            Debug.Assert(_valueEvaluatorSpec != null, "_valueEvaluatorSpec != null");
             var valueEvaluator = _valueEvaluatorSpec.Build();
 
-            return request =>
-            {
-                return valueEvaluator(_getProperty(request));
-            };
+            return request => valueEvaluator(_getProperty(request));
         }
     }
 }

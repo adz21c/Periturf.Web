@@ -35,11 +35,5 @@ namespace Periturf.Web
         long? ContentLength { get; }
         
         IRequestCookieCollection Cookies { get; }
-
-        Stream Body { get; }
-
-        PipeReader BodyReader { get; }
-
-        Task<TContent> GetContentAsync<TContent>(CancellationToken ct = default);
     }
 }

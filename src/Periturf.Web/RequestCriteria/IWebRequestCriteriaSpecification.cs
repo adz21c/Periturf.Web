@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Periturf.Web.RequestCriteria
 {
-    public interface IWebRequestCriteriaSpecification
+    public interface IWebRequestCriteriaSpecification<TWebRequestEvent>
+        where TWebRequestEvent : IWebRequestEvent
     {
-
-        Func<IWebRequestEvent, bool> Build();
+        Func<TWebRequestEvent, bool> Build();
     }
 }

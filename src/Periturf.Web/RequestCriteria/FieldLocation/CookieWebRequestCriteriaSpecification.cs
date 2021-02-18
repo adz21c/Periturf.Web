@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
 namespace Periturf.Web.RequestCriteria.FieldLocation
 {
-    class CookieWebRequestCriteriaSpecification : IWebRequestCriteriaSpecification, IValueConditionBuilder<string>
+    class CookieWebRequestCriteriaSpecification<TWebRequestEvent> : IWebRequestCriteriaSpecification<TWebRequestEvent>, IValueConditionBuilder<string>
+        where TWebRequestEvent : IWebRequestEvent
     {
         private IValueEvaluatorSpecification<string>? _valueEvaluatorSpec;
         private readonly string _cookieName;
@@ -20,8 +22,9 @@ namespace Periturf.Web.RequestCriteria.FieldLocation
             _valueEvaluatorSpec = spec;
         }
 
-        public Func<IWebRequestEvent, bool> Build()
+        public Func<TWebRequestEvent, bool> Build()
         {
+            Debug.Assert(_valueEvaluatorSpec != null, "_valueEvaluatorSpec != null");
             var valueEvaluator = _valueEvaluatorSpec.Build();
 
             return request =>

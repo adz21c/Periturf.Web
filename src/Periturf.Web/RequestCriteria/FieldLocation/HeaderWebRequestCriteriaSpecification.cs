@@ -1,12 +1,14 @@
 ﻿using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
 namespace Periturf.Web.RequestCriteria.FieldLocation
 {
-    class HeaderWebRequestCriteriaSpecification : IWebRequestCriteriaSpecification, IValueConditionBuilder<StringValues>
+    class HeaderWebRequestCriteriaSpecification<TWebRequestEvent> : IWebRequestCriteriaSpecification<TWebRequestEvent>, IValueConditionBuilder<StringValues>
+        where TWebRequestEvent : IWebRequestEvent
     {
         private IValueEvaluatorSpecification<StringValues>? _valueEvaluatorSpec;
         private readonly string _headerName;
@@ -21,8 +23,9 @@ namespace Periturf.Web.RequestCriteria.FieldLocation
             _valueEvaluatorSpec = spec;
         }
 
-        public Func<IWebRequestEvent, bool> Build()
+        public Func<TWebRequestEvent, bool> Build()
         {
+            Debug.Assert(_valueEvaluatorSpec != null, "_valueEvaluatorSpec != null");
             var valueEvaluator = _valueEvaluatorSpec.Build();
 
             return request =>

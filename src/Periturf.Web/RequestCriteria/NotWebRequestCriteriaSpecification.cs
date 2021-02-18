@@ -5,16 +5,17 @@ using System.Text;
 
 namespace Periturf.Web.RequestCriteria
 {
-    class NotWebRequestCriteriaSpecification : IWebRequestCriteriaConfigurator, IWebRequestCriteriaSpecification
+    class NotWebRequestCriteriaSpecification<TWebRequestEvent> : IWebRequestCriteriaConfigurator<TWebRequestEvent>, IWebRequestCriteriaSpecification<TWebRequestEvent>
+        where TWebRequestEvent : IWebRequestEvent
     {
-        private IWebRequestCriteriaSpecification? _next;
+        private IWebRequestCriteriaSpecification<TWebRequestEvent>? _next;
 
-        public void AddCriteriaSpecification(IWebRequestCriteriaSpecification spec)
+        public void AddCriteriaSpecification(IWebRequestCriteriaSpecification<TWebRequestEvent> spec)
         {
             _next = spec;
         }
 
-        public Func<IWebRequestEvent, bool> Build()
+        public Func<TWebRequestEvent, bool> Build()
         {
             Debug.Assert(_next != null, "_next != null");
             var next = _next.Build();
