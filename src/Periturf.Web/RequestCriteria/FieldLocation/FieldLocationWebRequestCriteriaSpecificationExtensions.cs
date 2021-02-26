@@ -127,5 +127,13 @@ namespace Periturf
             configurator.AddCriteriaSpecification(spec);
             return spec;
         }
+
+
+        public static IValueConditionBuilder<TValue> Body<TBody, TValue>(this IWebRequestCriteriaConfigurator<IWebRequestEvent<TBody>> configurator, Func<TBody, TValue> valueLocator)
+        {
+            var spec = new SimplePropertyWebRequestCriteriaSpecification<IWebRequestEvent<TBody>, TValue>(x => valueLocator(x.Body));
+            configurator.AddCriteriaSpecification(spec);
+            return spec;
+        }
     }
 }

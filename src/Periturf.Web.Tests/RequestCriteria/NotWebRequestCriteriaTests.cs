@@ -12,13 +12,13 @@ namespace Periturf.Web.Tests.RequestCriteria.Logical
     class NotWebRequestCriteriaTests
     {
         private Func<IWebRequestEvent, bool> _criteria;
-        private IWebRequestCriteriaSpecification _criteriaSpec;
+        private IWebRequestCriteriaSpecification<IWebRequestEvent> _criteriaSpec;
 
         [SetUp]
         public void SetUp()
         {
             _criteria = A.Fake<Func<IWebRequestEvent, bool>>();
-            _criteriaSpec = A.Fake<IWebRequestCriteriaSpecification>();
+            _criteriaSpec = A.Fake<IWebRequestCriteriaSpecification<IWebRequestEvent>>();
             A.CallTo(() => _criteriaSpec.Build()).Returns(_criteria);
         }
 
@@ -28,7 +28,7 @@ namespace Periturf.Web.Tests.RequestCriteria.Logical
         {
             A.CallTo(() => _criteria.Invoke(A<IWebRequestEvent>._)).Returns(nextResult);
             
-            var spec = new NotWebRequestCriteriaSpecification();
+            var spec = new NotWebRequestCriteriaSpecification<IWebRequestEvent>();
             spec.AddCriteriaSpecification(_criteriaSpec);
             var sut = spec.Build();
             var result = sut(A.Dummy<IWebRequestEvent>());

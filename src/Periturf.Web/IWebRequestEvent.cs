@@ -1,5 +1,7 @@
 ﻿using Periturf.Web.Configuration;
 using Periturf.Web.Interpretation;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Periturf.Web
 {
@@ -9,7 +11,7 @@ namespace Periturf.Web
 
         IWebRequest Request { get; }
 
-        IWebRequestEvent<TBody> ToWithBody<TBody>(IBodyInterprettor<TBody> bodyInterprettor);
+        ValueTask<IWebRequestEvent<TNewBody>> ToWithBodyAsync<TNewBody>(IBodyInterprettor<TNewBody> bodyInterprettor, CancellationToken ct);
     }
 
     public interface IWebRequestEvent<out TBody> : IWebRequestEvent

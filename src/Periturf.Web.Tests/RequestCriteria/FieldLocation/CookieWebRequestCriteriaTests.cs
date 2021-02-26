@@ -46,7 +46,7 @@ namespace Periturf.Web.Tests.RequestCriteria.FieldLocation
             A.CallTo(() => cookieCollection.TryGetValue("Cookie3", out cookie3Value)).Returns(false);
             A.CallTo(() => _webRequest.Cookies).Returns(cookieCollection);
 
-            var sut = new CookieWebRequestCriteriaSpecification(cookieName);
+            var sut = new CookieWebRequestCriteriaSpecification<IWebRequestEvent>(cookieName);
             sut.AddNextValueEvaluatorSpecification(_evaluatorSpec);
             var criteria = sut.Build();
 

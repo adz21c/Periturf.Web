@@ -44,7 +44,7 @@ namespace Periturf.Web.Tests.RequestCriteria.FieldLocation
             A.CallTo(() => queryCollection.TryGetValue("Query2", out query2Value)).Returns(true);
             A.CallTo(() => _webRequest.Query).Returns(queryCollection);
 
-            var sut = new QueryWebRequestCriteriaSpecification(queryName);
+            var sut = new QueryWebRequestCriteriaSpecification<IWebRequestEvent>(queryName);
             sut.AddNextValueEvaluatorSpecification(_evaluatorSpec);
             var criteria = sut.Build();
 

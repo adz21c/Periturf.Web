@@ -43,7 +43,7 @@ namespace Periturf.Web.Tests.RequestCriteria.FieldLocation
             }.ToImmutableDictionary();
             A.CallTo(() => _webRequest.Headers).Returns(headerDictionary);
 
-            var sut = new HeaderWebRequestCriteriaSpecification(headerName);
+            var sut = new HeaderWebRequestCriteriaSpecification<IWebRequestEvent>(headerName);
             sut.AddNextValueEvaluatorSpecification(_evaluatorSpec);
             var criteria = sut.Build();
 

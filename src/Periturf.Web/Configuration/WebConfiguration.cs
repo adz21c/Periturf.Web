@@ -14,12 +14,12 @@ namespace Periturf.Web.Configuration
     class WebConfiguration : IWebConfiguration
     {
         private readonly Func<IWebRequestEvent, bool> _criteria;
-        private readonly Func<IWebResponse, Task> _responseFactory;
+        private readonly Func<IWebResponse, CancellationToken, ValueTask> _responseFactory;
         private readonly IEventHandler<IWebRequestEvent> _handlers;
 
         public WebConfiguration(
             Func<IWebRequestEvent, bool> criteria,
-            Func<IWebResponse, Task> responseFactory,
+            Func<IWebResponse, CancellationToken, ValueTask> responseFactory,
             IEventHandler<IWebRequestEvent> handlers)
         {
             Debug.Assert(criteria != null, "criteria != null");
@@ -31,26 +31,26 @@ namespace Periturf.Web.Configuration
             _handlers = handlers;
         }
 
-        public bool Matches(IWebRequestEvent request) => _criteria(request);
+        public ValueTask<bool> MatchesAsync(IWebRequestEvent @event, CancellationToken ct) => new ValueTask<bool>(_criteria(@event));
 
-        public async Task WriteResponse(IWebResponse response)
+        public async ValueTask WriteResponseAsync(IWebResponse response, CancellationToken ct)
         {
-            await _responseFactory(response);
+            await _responseFactory(response, ct);
         }
 
-        public Task ExecuteHandlers(IWebRequestEvent request) => _handlers.ExecuteHandlersAsync(request, CancellationToken.None);
+        public ValueTask ExecuteHandlersAsync(IWebRequestEvent @event, CancellationToken ct) => new ValueTask(_handlers.ExecuteHandlersAsync(@event, ct));
     }
 
     class WebConfiguration<TBody> : IWebConfiguration
     {
         private readonly Func<IWebRequestEvent<TBody>, bool> _criteria;
-        private readonly Func<IWebResponse, Task> _responseFactory;
+        private readonly Func<IWebResponse, CancellationToken, ValueTask> _responseFactory;
         private readonly IEventHandler<IWebRequestEvent<TBody>> _handlers;
         private readonly IBodyInterprettor<TBody> _bodyInterprettor;
 
         public WebConfiguration(
             Func<IWebRequestEvent<TBody>, bool> criteria,
-            Func<IWebResponse, Task> responseFactory,
+            Func<IWebResponse, CancellationToken, ValueTask> responseFactory,
             IEventHandler<IWebRequestEvent<TBody>> handlers,
             IBodyInterprettor<TBody> bodyInterprettor)
         {
@@ -60,13 +60,29 @@ namespace Periturf.Web.Configuration
             _bodyInterprettor = bodyInterprettor;
         }
 
-        public bool Matches(IWebRequestEvent request) => _criteria(request.ToWithBody(_bodyInterprettor));
-
-        public async Task WriteResponse(IWebResponse response)
+        public async ValueTask<bool> MatchesAsync(IWebRequestEvent @event, CancellationToken ct)
         {
-            await _responseFactory(response);
+            try
+            {
+
+            var withBody = await @event.ToWithBodyAsync(_bodyInterprettor, ct);
+            return _criteria(withBody);
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
         }
 
-        public Task ExecuteHandlers(IWebRequestEvent request) => _handlers.ExecuteHandlersAsync(request.ToWithBody<TBody>(_bodyInterprettor), CancellationToken.None);
+        public async ValueTask WriteResponseAsync(IWebResponse response, CancellationToken ct)
+        {
+            await _responseFactory(response, ct);
+        }
+
+        public async ValueTask ExecuteHandlersAsync(IWebRequestEvent @event, CancellationToken ct)
+        {
+            var newEvent = await @event.ToWithBodyAsync(_bodyInterprettor, ct);
+            await _handlers.ExecuteHandlersAsync(newEvent, ct);
+        }
     }
 }

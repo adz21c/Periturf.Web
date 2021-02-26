@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Periturf.Web
 {
@@ -27,16 +28,23 @@ namespace Periturf.Web
 
         public IWebRequest Request => _request;
 
-        public IWebRequestEvent<TBody> ToWithBody<TBody>(IBodyInterprettor<TBody> bodyinterprettor)
+        public async ValueTask<IWebRequestEvent<TNewBody>> ToWithBodyAsync<TNewBody>(IBodyInterprettor<TNewBody> bodyInterprettor, CancellationToken ct)
         {
-            if (!_bodyInterpretations.TryGetValue(typeof(TBody), out var interpettedValues))
+            if (!_bodyInterpretations.TryGetValue(typeof(TNewBody), out var interpettedValues))
+            {
                 interpettedValues = new List<(object Deserializer, object Output)>();
+                _bodyInterpretations.Add(typeof(TNewBody), interpettedValues);
+            }
 
-            var cachedOutput = interpettedValues.SingleOrDefault(x => x.Deserializer.Equals(bodyinterprettor));
+            var cachedOutput = interpettedValues.SingleOrDefault(x => x.Deserializer.Equals(bodyInterprettor));
             if (cachedOutput == default)
-                cachedOutput = (bodyinterprettor, bodyinterprettor.InterpretAsync(Request, _request.Body, CancellationToken.None).Result);    // TODO: Async
-                
-            return new WebRequestEvent<TBody>(this, (TBody)cachedOutput.Output);
+            {
+                var body = await bodyInterprettor.InterpretAsync(Request, _request.Body, ct);
+                cachedOutput = (bodyInterprettor, body);
+                interpettedValues.Add(cachedOutput);
+            }
+
+            return new WebRequestEvent<TNewBody>(this, (TNewBody)cachedOutput.Output);
         }
     }
 
@@ -57,9 +65,9 @@ namespace Periturf.Web
 
         public TBody Body { get; }
 
-        public IWebRequestEvent<TNewBody> ToWithBody<TNewBody>(IBodyInterprettor<TNewBody> bodyinterprettor)
+        public ValueTask<IWebRequestEvent<TNewBody>> ToWithBodyAsync<TNewBody>(IBodyInterprettor<TNewBody> bodyInterprettor, CancellationToken ct)
         {
-            return _webRequestEvent.ToWithBody(bodyinterprettor);
+            return _webRequestEvent.ToWithBodyAsync(bodyInterprettor, ct);
         }
     }
 }

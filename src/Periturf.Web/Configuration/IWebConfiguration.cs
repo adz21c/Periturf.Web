@@ -1,11 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Periturf.Web.Configuration
 {
     interface IWebConfiguration
     {
-        Task ExecuteHandlers(IWebRequestEvent request);
-        bool Matches(IWebRequestEvent request);
-        Task WriteResponse(IWebResponse response);
+        ValueTask<bool> MatchesAsync(IWebRequestEvent @event, CancellationToken ct);
+        ValueTask WriteResponseAsync(IWebResponse response, CancellationToken ct);
+        ValueTask ExecuteHandlersAsync(IWebRequestEvent @event, CancellationToken ct);
     }
 }

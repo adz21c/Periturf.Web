@@ -7,6 +7,7 @@ using Periturf.Web.Configuration.Requests.Responses;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Periturf.Web.Tests.Configuration
@@ -19,7 +20,7 @@ namespace Periturf.Web.Tests.Configuration
         {
             var obj = new object();
 
-            var writer = A.Dummy<Func<IWebResponse, object?, Task>>();
+            var writer = A.Dummy<Func<IWebResponse, object?, CancellationToken, ValueTask>>();
             var writerSpec = A.Fake<IWebWriterSpecification>();
             A.CallTo(() => writerSpec.Build()).Returns(writer);
 
@@ -33,9 +34,9 @@ namespace Periturf.Web.Tests.Configuration
 
             Assert.That(objectWriter, Is.Not.Null);
 
-            await objectWriter(response);
+            await objectWriter(response, CancellationToken.None);
 
-            A.CallTo(() => writer.Invoke(response, obj)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => writer.Invoke(response, obj, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         }
 
         [Test]

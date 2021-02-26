@@ -10,6 +10,7 @@ using System.IO;
 using System.Net;
 using System.Text.Json;
 using System.Text.Unicode;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Periturf.Web.Tests.Configuration
@@ -29,7 +30,7 @@ namespace Periturf.Web.Tests.Configuration
                 var sut = new XmlWebWriterSpecification();
                 var xmlWriter = sut.Build();
 
-                await xmlWriter(response, obj);
+                await xmlWriter(response, obj, CancellationToken.None);
                 stream.Flush();
 
                 var resultBytes = stream.ToArray();

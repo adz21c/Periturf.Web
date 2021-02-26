@@ -17,7 +17,7 @@ namespace Periturf.Web.RequestCriteria.Logical
 
         public Func<TWebRequestEvent, bool> Build()
         {
-            var criterias = _criteriaSpecs.Select(x => x.Build());
+            var criterias = _criteriaSpecs.Select(x => x.Build()).ToList();
             return request => criterias.All(x => x(request));
         }
     }

@@ -17,8 +17,8 @@ namespace Periturf.Web.Tests
     class WebConfigurationTests
     {
         private Func<IWebRequestEvent, bool> _criteria;
-        private readonly Func<IWebResponse, Task> _responseFactory = A.Fake<Func<IWebResponse, Task>>();
-        private readonly IEventHandler<IWebRequest> _handler = A.Fake<IEventHandler<IWebRequest>>();
+        private readonly Func<IWebResponse, CancellationToken, ValueTask> _responseFactory = A.Fake<Func<IWebResponse, CancellationToken, ValueTask>>();
+        private readonly IEventHandler<IWebRequestEvent> _handler = A.Fake<IEventHandler<IWebRequestEvent>>();
         private WebConfiguration _sut;
         private readonly IWebRequestEvent _request = A.Dummy<IWebRequestEvent>();
 
@@ -73,17 +73,17 @@ namespace Periturf.Web.Tests
         [Test]
         public async Task Given_ResponseFactory_When_WriteResponse_Then_Executed()
         {
-            await _sut.WriteResponse(A.Dummy<IWebResponse>());
+            await _sut.WriteResponseAsync(A.Dummy<IWebResponse>(), CancellationToken.None);
 
-            A.CallTo(() => _responseFactory.Invoke(A<IWebResponse>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _responseFactory.Invoke(A<IWebResponse>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         }
 
         [Test]
         public async Task Given_EventHandler_When_ExecuteHandler_Then_Executed()
         {
-            await _sut.ExecuteHandlers(_request.Request);
+            await _sut.ExecuteHandlersAsync(_request, CancellationToken.None);
 
-            A.CallTo(() => _handler.ExecuteHandlersAsync(A<IWebRequest>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _handler.ExecuteHandlersAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         }
     }
 }

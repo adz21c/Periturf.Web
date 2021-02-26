@@ -19,30 +19,30 @@ namespace Periturf.Web.Tests
     class WebComponentTests
     {
         private WebComponent _sut;
-        private Func<IEventContext<IWebRequest>, CancellationToken, Task> _handler;
-        private IEventHandlerSpecification<IWebRequest> _handlerSpec;
-        private Func<IWebResponse, Task> _responseFactory;
+        private Func<IEventContext<IWebRequestEvent>, CancellationToken, Task> _handler;
+        private IEventHandlerSpecification<IWebRequestEvent> _handlerSpec;
+        private Func<IWebResponse, CancellationToken, ValueTask> _responseFactory;
         private Func<IWebRequestEvent, bool> _criteria;
-        private IEventHandler<IWebRequest> _eventHandler;
+        private IEventHandler<IWebRequestEvent> _eventHandler;
         private IEventHandlerFactory _eventHandlerFactory;
 
         [SetUp]
         public async Task SetupAsync()
         {
-            _eventHandler = A.Fake<IEventHandler<IWebRequest>>();
+            _eventHandler = A.Fake<IEventHandler<IWebRequestEvent>>();
             _eventHandlerFactory = A.Fake<IEventHandlerFactory>();
-            A.CallTo(() => _eventHandlerFactory.Create(A<IEnumerable<IEventHandlerSpecification<IWebRequest>>>._)).Returns(_eventHandler);
+            A.CallTo(() => _eventHandlerFactory.Create(A<IEnumerable<IEventHandlerSpecification<IWebRequestEvent>>>._)).Returns(_eventHandler);
 
             _criteria = A.Fake<Func<IWebRequestEvent, bool>>();
-            var criteriaSpec = A.Fake<IWebRequestCriteriaSpecification>();
+            var criteriaSpec = A.Fake<IWebRequestCriteriaSpecification<IWebRequestEvent>>();
             A.CallTo(() => criteriaSpec.Build()).Returns(_criteria);
 
-            _responseFactory = A.Fake<Func<IWebResponse, Task>>();
+            _responseFactory = A.Fake<Func<IWebResponse, CancellationToken, ValueTask>>();
             var responseSpec = A.Fake<IWebRequestResponseSpecification>();
             A.CallTo(() => responseSpec.BuildFactory()).Returns(_responseFactory);
 
-            _handler = A.Dummy<Func<IEventContext<IWebRequest>, CancellationToken, Task>>();
-            _handlerSpec = A.Fake<IEventHandlerSpecification<IWebRequest>>();
+            _handler = A.Dummy<Func<IEventContext<IWebRequestEvent>, CancellationToken, Task>>();
+            _handlerSpec = A.Fake<IEventHandlerSpecification<IWebRequestEvent>>();
             A.CallTo(() => _handlerSpec.Build()).Returns(_handler);
 
             _sut = new WebComponent();
@@ -64,13 +64,13 @@ namespace Periturf.Web.Tests
 
             await _sut.ProcessAsync(context);
 
-            A.CallTo(() => _eventHandlerFactory.Create(A<IEnumerable<IEventHandlerSpecification<IWebRequest>>>.That.Contains(_handlerSpec))).MustHaveHappened();
+            A.CallTo(() => _eventHandlerFactory.Create(A<IEnumerable<IEventHandlerSpecification<IWebRequestEvent>>>.That.Contains(_handlerSpec))).MustHaveHappened();
 
             A.CallTo(() => _criteria.Invoke(A<IWebRequestEvent>._)).MustHaveHappened().Then(
-                A.CallTo(() => _responseFactory.Invoke(A<IWebResponse>._)).MustHaveHappened());
+                A.CallTo(() => _responseFactory.Invoke(A<IWebResponse>._, A<CancellationToken>._)).MustHaveHappened());
 
             A.CallTo(() => _criteria.Invoke(A<IWebRequestEvent>._)).MustHaveHappened().Then(
-                A.CallTo(() => _eventHandler.ExecuteHandlersAsync(A<IWebRequest>._, A<CancellationToken>._)).MustHaveHappened());
+                A.CallTo(() => _eventHandler.ExecuteHandlersAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappened());
         }
 
         [Test]
@@ -81,13 +81,13 @@ namespace Periturf.Web.Tests
 
             await _sut.ProcessAsync(context);
 
-            A.CallTo(() => _eventHandlerFactory.Create(A<IEnumerable<IEventHandlerSpecification<IWebRequest>>>.That.Contains(_handlerSpec))).MustHaveHappened();
+            A.CallTo(() => _eventHandlerFactory.Create(A<IEnumerable<IEventHandlerSpecification<IWebRequestEvent>>>.That.Contains(_handlerSpec))).MustHaveHappened();
 
             Assert.That(context.Response.StatusCode, Is.EqualTo(404));
 
             A.CallTo(() => _criteria.Invoke(A<IWebRequestEvent>._)).MustHaveHappened();
-            A.CallTo(() => _responseFactory.Invoke(A<IWebResponse>._)).MustNotHaveHappened();
-            A.CallTo(() => _eventHandler.ExecuteHandlersAsync(A<IWebRequest>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => _responseFactory.Invoke(A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => _eventHandler.ExecuteHandlersAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustNotHaveHappened();
         }
     }
 }

@@ -35,7 +35,7 @@ namespace Periturf.Web.Tests.RequestCriteria.FieldLocation
             const string TestValue = "GET";
             A.CallTo(() => _webRequest.Method).Returns(TestValue);
 
-            var sut = new SimplePropertyWebRequestCriteriaSpecification<string>(r => r.Request.Method);
+            var sut = new SimplePropertyWebRequestCriteriaSpecification<IWebRequestEvent, string>(r => r.Request.Method);
             sut.AddNextValueEvaluatorSpecification(_evaluatorSpec);
             var criteria = sut.Build();
 

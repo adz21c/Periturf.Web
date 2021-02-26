@@ -44,9 +44,13 @@ namespace Periturf.Web.Tests.Integration
                 {
                     c.Web(w =>
                     {
-                        w.OnRequest<int>(r =>
+                        w.OnRequest<TestClass>(r =>
                         {
-                            r.Criteria(c => c.Method().EqualTo("GET"));
+                            r.Criteria(c =>
+                            {
+                                c.Method().EqualTo("POST");
+                                c.Body(x => x.Test).EqualTo("job");
+                            });
                             r.Response(rs =>
                             {
                                 rs.StatusCode = HttpStatusCode.OK;
@@ -61,12 +65,12 @@ namespace Periturf.Web.Tests.Integration
                     });
                 }))
                 {
-                    var testResponse = await client.PostAsync(WebHostUrl + WebAppUrl, new StringContent(""));
-                    Assert.That(testResponse.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+                    var testResponse = await client.PostAsync(WebHostUrl + WebAppUrl, new StringContent("{ \"Test\": \"job\" }"));
+                    Assert.That(testResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
-                    var testResponse2 = await client.GetAsync(WebHostUrl + WebAppUrl);
-                    var testText2 = await testResponse2.Content.ReadAsStringAsync();
-                    Assert.That(testResponse2.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+                    //var testResponse2 = await client.GetAsync(WebHostUrl + WebAppUrl);
+                    //var testText2 = await testResponse2.Content.ReadAsStringAsync();
+                    //Assert.That(testResponse2.StatusCode, Is.EqualTo(HttpStatusCode.OK));
                 }
             }
             finally
@@ -74,5 +78,10 @@ namespace Periturf.Web.Tests.Integration
                 await env.StopAsync();
             }
         }
+    }
+
+    public class TestClass
+    {
+        public string Test { get; set; }
     }
 }

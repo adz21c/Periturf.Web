@@ -37,21 +37,23 @@ namespace Periturf.Web
             var @event = new WebRequestEvent(
                 context.TraceIdentifier,
                 new WebRequest(context.Request));
-            var config = ((IEnumerable<WebConfiguration>)_configurations)
-                .Reverse()
-                .FirstOrDefault(x => x.Matches(@event));
-            if (config == null)
+
+            foreach (var config in ((IEnumerable<IWebConfiguration>)_configurations).Reverse())
             {
-                context.Response.StatusCode = 404;
-                await context.Response.CompleteAsync();
-                return;
+                var match = await config.MatchesAsync(@event, context.RequestAborted);
+                if (match)
+                {
+                    var response = new WebResponse(context.Response);
+                    await config.WriteResponseAsync(response, context.RequestAborted);
+                    await context.Response.CompleteAsync();
+
+                    await config.ExecuteHandlersAsync(@event, context.RequestAborted);
+                    return;
+                }
             }
-
-            var response = new WebResponse(context.Response);
-            await config.WriteResponse(response);
+            
+            context.Response.StatusCode = 404;
             await context.Response.CompleteAsync();
-
-            await config.ExecuteHandlers(@event);
         }
     }
 }

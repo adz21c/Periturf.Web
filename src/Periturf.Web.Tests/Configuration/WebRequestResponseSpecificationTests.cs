@@ -7,6 +7,7 @@ using Periturf.Web.Configuration.Requests.Responses;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Periturf.Web.Tests.Configuration
@@ -47,7 +48,7 @@ namespace Periturf.Web.Tests.Configuration
             var cookie2Value = "Value2";
             var cookie2Options = new CookieOptions();
 
-            var bodyWriter = A.Dummy<Func<IWebResponse, Task>>();
+            var bodyWriter = A.Dummy<Func<IWebResponse, CancellationToken, ValueTask>>();
             var bodySpec = A.Fake<IWebRequestResponseBodySpecification>();
             A.CallTo(() => bodySpec.Build()).Returns(bodyWriter);
 
@@ -66,7 +67,7 @@ namespace Periturf.Web.Tests.Configuration
 
             Assert.That(responseFactory, Is.Not.Null);
 
-            await responseFactory(response);
+            await responseFactory(response, CancellationToken.None);
 
             A.CallToSet(() => response.StatusCode).To(statusCode).MustHaveHappened();
             A.CallToSet(() => response.ContentType).To(contentType).MustHaveHappened();
@@ -92,7 +93,7 @@ namespace Periturf.Web.Tests.Configuration
                     A<string>.That.IsEqualTo(cookie2Value),
                     cookie2Options))
                 .MustHaveHappenedOnceExactly();
-            A.CallTo(() => bodyWriter.Invoke(response)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => bodyWriter.Invoke(response, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         }
     }
 }

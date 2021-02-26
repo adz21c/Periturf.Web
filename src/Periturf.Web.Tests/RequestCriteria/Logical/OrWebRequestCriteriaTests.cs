@@ -19,15 +19,15 @@ namespace Periturf.Web.Tests.RequestCriteria.Logical
         {
             var criteriaOne = A.Fake<Func<IWebRequestEvent, bool>>();
             A.CallTo(() => criteriaOne.Invoke(A<IWebRequestEvent>._)).Returns(criteriaOneResult);
-            var criteriaOneSpec = A.Fake<IWebRequestCriteriaSpecification>();
+            var criteriaOneSpec = A.Fake<IWebRequestCriteriaSpecification<IWebRequestEvent>>();
             A.CallTo(() => criteriaOneSpec.Build()).Returns(criteriaOne);
 
             var criteriaTwo = A.Fake<Func<IWebRequestEvent, bool>>();
             A.CallTo(() => criteriaTwo.Invoke(A<IWebRequestEvent>._)).Returns(criteriaTwoResult);
-            var criteriaTwoSpec = A.Fake<IWebRequestCriteriaSpecification>();
+            var criteriaTwoSpec = A.Fake<IWebRequestCriteriaSpecification<IWebRequestEvent>>();
             A.CallTo(() => criteriaTwoSpec.Build()).Returns(criteriaTwo);
 
-            var spec = new OrWebRequestCriteriaSpecification();
+            var spec = new OrWebRequestCriteriaSpecification<IWebRequestEvent>();
             spec.AddCriteriaSpecification(criteriaOneSpec);
             spec.AddCriteriaSpecification(criteriaTwoSpec);
 
