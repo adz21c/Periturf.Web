@@ -13,38 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+using System;
+using System.Diagnostics.CodeAnalysis;
 using Periturf.Configuration;
 using Periturf.Web;
 using Periturf.Web.Configuration;
 using Periturf.Web.Configuration.Requests;
-using Periturf.Web.Configuration.Requests.Predicates;
 using Periturf.Web.Configuration.Requests.Responses;
-using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Periturf
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ExcludeFromCodeCoverage]
     public static class ConfigurationExtensions
     {
-        public static void Web(this IConfigurationContext builder, Action<IWebComponentConfigurator> config)
+        /// <summary>
+        /// Configure a WebApp component.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        /// <param name="config">The configuration.</param>
+        public static void WebApp(this IConfigurationContext builder, Action<IWebComponentConfigurator> config)
         {
-            builder.Web("WebApp", config);
+            builder.WebApp("WebApp", config);
         }
 
-        public static void Web(this IConfigurationContext builder, string name, Action<IWebComponentConfigurator> config)
+        /// <summary>
+        /// Configure a WebApp component.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        /// <param name="name">The component name.</param>
+        /// <param name="config">The configuration.</param>
+        public static void WebApp(this IConfigurationContext builder, string name, Action<IWebComponentConfigurator> config)
         {
             var spec = builder.CreateComponentConfigSpecification<WebComponentSpecification>(name);
             config(spec);
             builder.AddSpecification(spec);
         }
 
-        public static void Predicate(this IWebRequestEventConfigurator configurator, Func<IWebRequestEvent, bool> predicate)
-        {
-            configurator.AddPredicateSpecification(new WebRequestPredicateSpecification(predicate));
-        }
-
-        public static void Response(this IWebRequestEventConfigurator configurator, Action<IWebRequestResponseConfigurator> config)
+        public static void Response<TWebRequestEvent>(this IWebRequestEventConfigurator<TWebRequestEvent> configurator, Action<IWebRequestResponseConfigurator> config)
+            where TWebRequestEvent : IWebRequestEvent
         {
             var spec = new WebRequestResponseSpecification();
             config?.Invoke(spec);

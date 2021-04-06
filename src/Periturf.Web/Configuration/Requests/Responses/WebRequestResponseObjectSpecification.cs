@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Periturf.Web.Configuration.Requests.Responses
@@ -21,14 +22,14 @@ namespace Periturf.Web.Configuration.Requests.Responses
             _writerSpecification = writerSpecification ?? throw new ArgumentNullException(nameof(writerSpecification));
         }
 
-        public Func<IWebResponse, Task> Build()
+        public Func<IWebResponse, CancellationToken, ValueTask> Build()
         {
             Debug.Assert(_writerSpecification != null, "_writerSpecification != null");
             var writer = _writerSpecification.Build();
 
-            return response =>
+            return (response, ct) =>
             {
-                return writer(response, _object);
+                return writer(response, _object, ct);
             };
         }
     }

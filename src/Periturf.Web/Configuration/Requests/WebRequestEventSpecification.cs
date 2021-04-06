@@ -1,39 +1,53 @@
-﻿using Periturf.Events;
-using Periturf.Web.Configuration.Requests.Predicates;
-using Periturf.Web.Configuration.Requests.Responses;
-using System;
-using System.Collections.Generic;
+﻿/*
+ *     Copyright 2021 Adam Burton (adz21c@gmail.com)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 using System.Diagnostics;
-using System.Linq;
+using Periturf.Web.BodyReaders;
+using Periturf.Web.Configuration.Requests.Responses;
+using Periturf.Web.RequestCriteria;
 
 namespace Periturf.Web.Configuration.Requests
 {
-    class WebRequestEventSpecification : EventSpecification<IWebRequest>, IWebRequestEventConfigurator
+    class WebRequestEventSpecification : IWebRequestEventConfigurator<IWebRequestEvent>, IWebRequestEventSpecification
     {
-        private readonly List<IWebRequestPredicateSpecification> _predicates = new List<IWebRequestPredicateSpecification>();
+        private IWebRequestCriteriaSpecification<IWebRequestEvent>? _criteriaSpecification;
         private IWebRequestResponseSpecification? _responseSpecification;
 
-        public WebRequestEventSpecification(IEventHandlerFactory eventHandlerFactory) : base(eventHandlerFactory)
-        { }
-
-        public void AddPredicateSpecification(IWebRequestPredicateSpecification spec)
+        public void AddCriteriaSpecification(IWebRequestCriteriaSpecification<IWebRequestEvent> spec)
         {
-            _predicates.Add(spec ?? throw new ArgumentNullException(nameof(spec)));
+            _criteriaSpecification = spec;
         }
 
         public void SetResponseSpecification(IWebRequestResponseSpecification spec)
         {
-            _responseSpecification = spec ?? throw new ArgumentNullException(nameof(spec));
+            _responseSpecification = spec;
         }
 
-        public WebConfiguration Build()
+        public void AddWebBodyReaderSpecification(IWebBodyReaderSpecification spec)
         {
-            Debug.Assert(_responseSpecification != null, "ResponseSpecification != null");
+            // Method intentionally left empty. No body.
+        }
+
+        public IWebConfiguration Build(IWebBodyReaderSpecification defaultBodyReaderSpec)
+        {
+            Debug.Assert(_criteriaSpecification != null, "_criteriaSpecification != null");
+            Debug.Assert(_responseSpecification != null, "_responseSpecification != null");
 
             return new WebConfiguration(
-                _predicates.Select(x => x.Build()).ToList(),
-                _responseSpecification.BuildFactory(),
-                CreateHandler());
+                _criteriaSpecification.Build(),
+                _responseSpecification.BuildFactory());
         }
     }
 }

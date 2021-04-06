@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Periturf.Web.Configuration.Requests.Responses
@@ -15,13 +16,12 @@ namespace Periturf.Web.Configuration.Requests.Responses
             _options = options;
         }
 
-        public Func<IWebResponse, object?, Task> Build()
+        public Func<IWebResponse, object?, CancellationToken, ValueTask> Build()
         {
-            return async (response, obj) =>
+            return async (response, obj, ct) =>
             {
                 response.ContentType = "application/json";
-                var serialized = _options == null ? JsonSerializer.Serialize(obj) : JsonSerializer.Serialize(obj, _options);
-                await response.WriteBodyAsync(serialized);
+                await JsonSerializer.SerializeAsync(response.BodyStream, obj, obj.GetType(), _options, ct);
             };
         }
     }

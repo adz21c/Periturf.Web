@@ -1,17 +1,29 @@
-﻿using FakeItEasy;
+﻿/*
+ *     Copyright 2021 Adam Burton (adz21c@gmail.com)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
+using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
 using Periturf.Events;
-using Periturf.Web;
+using Periturf.Web.BodyReaders;
 using Periturf.Web.Configuration;
-using Periturf.Web.Configuration.Requests.Predicates;
-using Periturf.Web.Configuration.Requests.Responses;
-using Periturf.Web.Setup;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using Periturf.Web.Configuration.Requests;
 
 namespace Periturf.Web.Tests
 {
@@ -19,75 +31,94 @@ namespace Periturf.Web.Tests
     class WebComponentTests
     {
         private WebComponent _sut;
-        private Func<IEventContext<IWebRequest>, CancellationToken, Task> _handler;
-        private IEventHandlerSpecification<IWebRequest> _handlerSpec;
-        private Func<IWebResponse, Task> _responseFactory;
-        private Func<IWebRequestEvent, bool> _predicate;
-        private IEventHandler<IWebRequest> _eventHandler;
-        private IEventHandlerFactory _eventHandlerFactory;
+        private IWebBodyReaderSpecification _defaultBodyReaderSpec;
+        private IWebConfiguration _config1;
+        private IWebRequestEventSpecification _config1Spec;
+        private IWebConfiguration _config2;
+        private IWebRequestEventSpecification _config2Spec;
 
         [SetUp]
         public async Task SetupAsync()
         {
-            _eventHandler = A.Fake<IEventHandler<IWebRequest>>();
-            _eventHandlerFactory = A.Fake<IEventHandlerFactory>();
-            A.CallTo(() => _eventHandlerFactory.Create(A<IEnumerable<IEventHandlerSpecification<IWebRequest>>>._)).Returns(_eventHandler);
+            _config1 = A.Fake<IWebConfiguration>();
+            A.CallTo(() => _config1.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).Invokes((IWebResponse r, CancellationToken ct) => r.StatusCode = HttpStatusCode.OK);
+            _config1Spec = A.Fake<IWebRequestEventSpecification>();
+            A.CallTo(() => _config1Spec.Build(A<IWebBodyReaderSpecification>._)).Returns(_config1);
 
-            _predicate = A.Fake<Func<IWebRequestEvent, bool>>();
-            var predicateSpec = A.Fake<IWebRequestPredicateSpecification>();
-            A.CallTo(() => predicateSpec.Build()).Returns(_predicate);
+            _config2 = A.Fake<IWebConfiguration>();
+            A.CallTo(() => _config2.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).Invokes((IWebResponse r, CancellationToken ct) => r.StatusCode = HttpStatusCode.OK);
+            _config2Spec = A.Fake<IWebRequestEventSpecification>();
+            A.CallTo(() => _config2Spec.Build(A<IWebBodyReaderSpecification>._)).Returns(_config2);
 
-            _responseFactory = A.Fake<Func<IWebResponse, Task>>();
-            var responseSpec = A.Fake<IWebRequestResponseSpecification>();
-            A.CallTo(() => responseSpec.BuildFactory()).Returns(_responseFactory);
+            _defaultBodyReaderSpec = A.Dummy<IWebBodyReaderSpecification>();
 
-            _handler = A.Dummy<Func<IEventContext<IWebRequest>, CancellationToken, Task>>();
-            _handlerSpec = A.Fake<IEventHandlerSpecification<IWebRequest>>();
-            A.CallTo(() => _handlerSpec.Build()).Returns(_handler);
+            _sut = new WebComponent(_defaultBodyReaderSpec);
 
-            _sut = new WebComponent();
-            var configSpec = _sut.CreateConfigurationSpecification<Web.Configuration.WebComponentSpecification>(_eventHandlerFactory);
-            configSpec.OnRequest(r =>
-            {
-                r.AddPredicateSpecification(predicateSpec);
-                r.SetResponseSpecification(responseSpec);
-                r.AddHandlerSpecification(_handlerSpec);
-            });
+            var configSpec = _sut.CreateConfigurationSpecification<Web.Configuration.WebComponentSpecification>(A.Dummy<IEventHandlerFactory>());
+            configSpec.AddWebRequestEventSpecification(_config1Spec);
+            configSpec.AddWebRequestEventSpecification(_config2Spec);
+            
             await configSpec.ApplyAsync();
         }
 
         [Test]
-        public async Task Given_ConfiguredRequest_When_Process_Then_HandlersCalledAfterPredicate()
+        public void Given_Spec_When_Apply_Then_BodyReaderSpecProvided()
         {
-            var context = new DefaultHttpContext();
-            A.CallTo(() => _predicate.Invoke(A<IWebRequestEvent>._)).Returns(true);
-
-            await _sut.ProcessAsync(context);
-
-            A.CallTo(() => _eventHandlerFactory.Create(A<IEnumerable<IEventHandlerSpecification<IWebRequest>>>.That.Contains(_handlerSpec))).MustHaveHappened();
-
-            A.CallTo(() => _predicate.Invoke(A<IWebRequestEvent>._)).MustHaveHappened().Then(
-                A.CallTo(() => _responseFactory.Invoke(A<IWebResponse>._)).MustHaveHappened());
-
-            A.CallTo(() => _predicate.Invoke(A<IWebRequestEvent>._)).MustHaveHappened().Then(
-                A.CallTo(() => _eventHandler.ExecuteHandlersAsync(A<IWebRequest>._, A<CancellationToken>._)).MustHaveHappened());
+            A.CallTo(() => _config1Spec.Build(_defaultBodyReaderSpec)).MustHaveHappened();
+            A.CallTo(() => _config2Spec.Build(_defaultBodyReaderSpec)).MustHaveHappened();
         }
 
         [Test]
-        public async Task Given_UnusedConfiguredRequest_When_Process_Then_HandlersNotCalledAfterPredicate()
+        public async Task Given_MatchSecondRequest_When_Process_Then_SecondConfigCalledAndFirstIgnored()
         {
             var context = new DefaultHttpContext();
-            A.CallTo(() => _predicate.Invoke(A<IWebRequestEvent>._)).Returns(false);
+            A.CallTo(() => _config2.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).Returns(true);
 
             await _sut.ProcessAsync(context);
 
-            A.CallTo(() => _eventHandlerFactory.Create(A<IEnumerable<IEventHandlerSpecification<IWebRequest>>>.That.Contains(_handlerSpec))).MustHaveHappened();
+            A.CallTo(() => _config2.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappened().Then(
+                A.CallTo(() => _config2.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustHaveHappened());
+
+            A.CallTo(() => _config1.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => _config1.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
+
+            Assert.That(context.Response.StatusCode, Is.EqualTo(200));
+        }
+
+        [Test]
+        public async Task Given_MatchFirstRequest_When_Process_Then_SecondConfigCheckButIgnoredAndFirstCalled()
+        {
+            var context = new DefaultHttpContext();
+            A.CallTo(() => _config2.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).Returns(false);
+            A.CallTo(() => _config1.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).Returns(true);
+
+            await _sut.ProcessAsync(context);
+
+            A.CallTo(() => _config2.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappened().Then(
+                A.CallTo(() => _config1.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappened()).Then(
+                A.CallTo(() => _config1.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustHaveHappened());
+
+            A.CallTo(() => _config2.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
+
+            Assert.That(context.Response.StatusCode, Is.EqualTo(200));
+        }
+
+        [Test]
+        public async Task Given_MatchNone_When_Process_Then_AllCheckedButIgnoredAndResponse404()
+        {
+            var context = new DefaultHttpContext();
+            A.CallTo(() => _config2.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).Returns(false);
+            A.CallTo(() => _config1.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).Returns(false);
+
+            await _sut.ProcessAsync(context);
+
+            A.CallTo(() => _config2.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappened().Then(
+                A.CallTo(() => _config1.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappened());
+
+            A.CallTo(() => _config2.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => _config1.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
 
             Assert.That(context.Response.StatusCode, Is.EqualTo(404));
-
-            A.CallTo(() => _predicate.Invoke(A<IWebRequestEvent>._)).MustHaveHappened();
-            A.CallTo(() => _responseFactory.Invoke(A<IWebResponse>._)).MustNotHaveHappened();
-            A.CallTo(() => _eventHandler.ExecuteHandlersAsync(A<IWebRequest>._, A<CancellationToken>._)).MustNotHaveHappened();
         }
     }
 }

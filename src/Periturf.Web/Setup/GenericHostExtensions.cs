@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using Microsoft.Extensions.Hosting;
-using Periturf.Hosting.Setup;
-using Periturf.Web;
-using Periturf.Web.Setup;
 using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Periturf.Hosting.Setup;
+using Periturf.Web.Setup;
 
 namespace Periturf
 {
@@ -29,6 +26,11 @@ namespace Periturf
     [ExcludeFromCodeCoverage]
     public static class GenericHostExtensions
     {
+        /// <summary>
+        /// Configure ASP.NET into the generic host.
+        /// </summary>
+        /// <param name="configurator">The configurator.</param>
+        /// <param name="config">The configuration.</param>
         public static void Web(this IGenericHostConfigurator configurator, Action<IWebSetupConfigurator> config)
         {
             var spec = new GenericWebHostSpecification();

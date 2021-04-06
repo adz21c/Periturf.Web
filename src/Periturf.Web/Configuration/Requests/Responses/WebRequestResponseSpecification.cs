@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Periturf.Web.Configuration.Requests.Responses
@@ -21,7 +22,7 @@ namespace Periturf.Web.Configuration.Requests.Responses
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentNullException(nameof(key));
-
+            
             Cookies.Add(new WebCookie(key, value ?? string.Empty)
             {
                 Options = options
@@ -38,12 +39,12 @@ namespace Periturf.Web.Configuration.Requests.Responses
             _bodySpecification = spec ?? throw new ArgumentNullException(nameof(spec));
         }
 
-        public Func<IWebResponse, Task> BuildFactory()
+        public Func<IWebResponse, CancellationToken, ValueTask> BuildFactory()
         {
             Debug.Assert(_bodySpecification != null, "_bodySpecification != null");
             var bodyWriter = _bodySpecification.Build();
 
-            return async response =>
+            return async (response, ct) =>
             {
                 if (StatusCode.HasValue)
                     response.StatusCode = StatusCode.Value;
@@ -56,7 +57,7 @@ namespace Periturf.Web.Configuration.Requests.Responses
                 foreach (var cookie in Cookies)
                     response.AddCookie(cookie.Key, cookie.Value, cookie.Options);
 
-                await bodyWriter(response);
+                await bodyWriter(response, ct);
             };
         }
     }

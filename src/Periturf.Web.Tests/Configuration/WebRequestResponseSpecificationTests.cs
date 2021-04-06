@@ -1,13 +1,27 @@
-﻿using FakeItEasy;
-using Microsoft.AspNetCore.Http;
-using NUnit.Framework;
-using Periturf.Web;
-using Periturf.Web.Configuration;
-using Periturf.Web.Configuration.Requests.Responses;
+﻿/*
+ *     Copyright 2021 Adam Burton (adz21c@gmail.com)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
+using FakeItEasy;
+using Microsoft.AspNetCore.Http;
+using NUnit.Framework;
+using Periturf.Web.Configuration.Requests.Responses;
 
 namespace Periturf.Web.Tests.Configuration
 {
@@ -47,7 +61,7 @@ namespace Periturf.Web.Tests.Configuration
             var cookie2Value = "Value2";
             var cookie2Options = new CookieOptions();
 
-            var bodyWriter = A.Dummy<Func<IWebResponse, Task>>();
+            var bodyWriter = A.Dummy<Func<IWebResponse, CancellationToken, ValueTask>>();
             var bodySpec = A.Fake<IWebRequestResponseBodySpecification>();
             A.CallTo(() => bodySpec.Build()).Returns(bodyWriter);
 
@@ -66,7 +80,7 @@ namespace Periturf.Web.Tests.Configuration
 
             Assert.That(responseFactory, Is.Not.Null);
 
-            await responseFactory(response);
+            await responseFactory(response, CancellationToken.None);
 
             A.CallToSet(() => response.StatusCode).To(statusCode).MustHaveHappened();
             A.CallToSet(() => response.ContentType).To(contentType).MustHaveHappened();
@@ -92,7 +106,7 @@ namespace Periturf.Web.Tests.Configuration
                     A<string>.That.IsEqualTo(cookie2Value),
                     cookie2Options))
                 .MustHaveHappenedOnceExactly();
-            A.CallTo(() => bodyWriter.Invoke(response)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => bodyWriter.Invoke(response, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         }
     }
 }

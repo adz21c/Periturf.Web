@@ -1,75 +1,100 @@
-﻿using FakeItEasy;
-using NUnit.Framework;
-using Periturf.Events;
-using Periturf.Web;
-using Periturf.Web.Configuration;
-using Periturf.Web.Configuration.Requests;
-using Periturf.Web.Configuration.Requests.Predicates;
-using Periturf.Web.Configuration.Requests.Responses;
+﻿/*
+ *     Copyright 2021 Adam Burton (adz21c@gmail.com)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using FakeItEasy;
+using NUnit.Framework;
+using Periturf.Web.BodyReaders;
+using Periturf.Web.Configuration.Requests;
+using Periturf.Web.Configuration.Requests.Responses;
+using Periturf.Web.RequestCriteria;
 
 namespace Periturf.Web.Tests.Configuration
 {
     [TestFixture]
     class WebRequestEventSpecificationTests
     {
-        private IEventHandlerFactory _eventHandlerFactory;
-        private WebRequestEventSpecification _sut;
+        private Func<IWebRequestEvent, bool> _criteria;
+        private Func<IWebResponse, CancellationToken, ValueTask> _responseFactory;
+        private IWebRequestEvent _request;
+        private IWebBodyReaderSpecification _defaultBodyReaderSpec;
+        private WebRequestEventSpecification _spec;
 
         [SetUp]
         public void SetUp()
         {
-            _eventHandlerFactory = A.Fake<IEventHandlerFactory>();
+            _defaultBodyReaderSpec = A.Dummy<IWebBodyReaderSpecification>();
 
-            _sut = new WebRequestEventSpecification(_eventHandlerFactory);
-        }
-
-        [Test]
-        public void Given_Null_When_AddPredicateSpec_Then_Exception()
-        {
-            Assert.That(() => _sut.AddPredicateSpecification(null), Throws.ArgumentNullException.With.Property("ParamName").EqualTo("spec"));
-        }
-
-
-        [Test]
-        public void Given_Null_When_SetResponseSpec_Then_Exception()
-        {
-            Assert.That(() => _sut.SetResponseSpecification(null), Throws.ArgumentNullException.With.Property("ParamName").EqualTo("spec"));
-        }
-
-        [Test]
-        public async Task Given_WebRequestSpec_When_Build_Then_ConfigBuilt()
-        {
-            var predicate = A.Dummy<Func<IWebRequestEvent, bool>>();
-            var predicateSpec = A.Fake<IWebRequestPredicateSpecification>();
-            A.CallTo(() => predicateSpec.Build()).Returns(predicate);
-
-            var responseFactory = A.Dummy<Func<IWebResponse, Task>>();
-            var responseSpec = A.Fake<IWebRequestResponseSpecification>();
-            A.CallTo(() => responseSpec.BuildFactory()).Returns(responseFactory);
+            _criteria = A.Dummy<Func<IWebRequestEvent, bool>>();
+            var criteriaSpec = A.Fake<IWebRequestCriteriaSpecification<IWebRequestEvent>>();
+            A.CallTo(() => criteriaSpec.Build()).Returns(_criteria);
             
-            var handlerSpec = A.Fake<IEventHandlerSpecification<IWebRequest>>();
+            _responseFactory = A.Fake<Func<IWebResponse, CancellationToken, ValueTask>>();
+            _request = A.Dummy<IWebRequestEvent>();
+            var responseSpec = A.Fake<IWebRequestResponseSpecification>();
+            A.CallTo(() => responseSpec.BuildFactory()).Returns(_responseFactory);
 
-            _sut.AddPredicateSpecification(predicateSpec);
-            _sut.SetResponseSpecification(responseSpec);
-            _sut.AddHandlerSpecification(handlerSpec);
+            _spec = new WebRequestEventSpecification();
+            _spec.AddCriteriaSpecification(criteriaSpec);
+            _spec.SetResponseSpecification(responseSpec);
+        }
 
-            var config = _sut.Build();
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task Given_Request_When_Matches_Then_Result(bool intendedResult)
+        {
+            A.CallTo(() => _criteria.Invoke(A<IWebRequestEvent>._)).Returns(intendedResult);
 
-            var request = A.Dummy<IWebRequestEvent>();
-            var response = A.Dummy<IWebResponse>();
+            var config = _spec.Build(_defaultBodyReaderSpec);
+            var result = await config.MatchesAsync(_request, CancellationToken.None);
 
-            config.Matches(request);
-            await config.WriteResponse(response);
+            Assert.That(result, Is.EqualTo(intendedResult));
+            A.CallTo(() => _criteria.Invoke(A<IWebRequestEvent>._)).MustHaveHappened();
+        }
 
-            A.CallTo(() => predicate.Invoke(A<IWebRequestEvent>._)).MustHaveHappened();
-            A.CallTo(() => responseFactory.Invoke(A<IWebResponse>._)).MustHaveHappened();
-            A.CallTo(() => _eventHandlerFactory.Create(A<IEnumerable<IEventHandlerSpecification<IWebRequest>>>._)).MustHaveHappened();
+        [Test]
+        public async Task Given_ResponseFactory_When_WriteResponse_Then_Executed()
+        {
+            var config = _spec.Build(_defaultBodyReaderSpec);
+            await config.WriteResponseAsync(A.Dummy<IWebResponse>(), CancellationToken.None);
+
+            A.CallTo(() => _responseFactory.Invoke(A<IWebResponse>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        }
+
+        [Test]
+        public void Given_OverrideBodyReader_When_Build_Then_Ignored()
+        {
+            var newBodyReaderSpec = A.Dummy<IWebBodyReaderSpecification>();
+            _spec.AddWebBodyReaderSpecification(newBodyReaderSpec);
+
+            var config = _spec.Build(_defaultBodyReaderSpec);
 
             Assert.That(config, Is.Not.Null);
+            A.CallTo(() => newBodyReaderSpec.Build()).MustNotHaveHappened();
+            A.CallTo(() => _defaultBodyReaderSpec.Build()).MustNotHaveHappened();
+        }
+
+        [Test]
+        public void Given_NotOverrideBodyReader_When_Build_Then_Ignored()
+        {
+            var config = _spec.Build(_defaultBodyReaderSpec);
+
+            Assert.That(config, Is.Not.Null);
+            A.CallTo(() => _defaultBodyReaderSpec.Build()).MustNotHaveHappened();
         }
     }
 }

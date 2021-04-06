@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
   
   <ItemGroup>
@@ -10,8 +11,8 @@
   
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Periturf" Version="0.6.0-develop0006" />
-    <PackageReference Include="Periturf.Hosting" Version="0.6.0-develop0006" />
+    <PackageReference Include="Periturf" Version="0.6.0-develop0012" />
+    <PackageReference Include="Periturf.Hosting" Version="0.6.0-develop0012" />
   </ItemGroup>
 
 </Project>

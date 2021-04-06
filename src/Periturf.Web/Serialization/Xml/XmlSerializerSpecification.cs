@@ -1,5 +1,5 @@
 ﻿/*
- *     Copyright 2019 Adam Burton (adz21c@gmail.com)
+ *     Copyright 2021 Adam Burton (adz21c@gmail.com)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
-using System.Diagnostics.CodeAnalysis;
 
-namespace Periturf.Web.Configuration.Requests.Predicates
+namespace Periturf.Web.Serialization.Xml
 {
-    [ExcludeFromCodeCoverage]
-    class WebRequestPredicateSpecification : IWebRequestPredicateSpecification
+    class XmlSerializerSpecification : ISerializerSpecification
     {
-        private readonly Func<IWebRequestEvent, bool> _predicate;
-        
-        public WebRequestPredicateSpecification(Func<IWebRequestEvent, bool> predicate)
+        public ISerializer Build()
         {
-            _predicate = predicate;
-        }
-
-        public Func<IWebRequestEvent, bool> Build()
-        {
-            return _predicate;
+            return new XmlSerializer();
         }
     }
 }
