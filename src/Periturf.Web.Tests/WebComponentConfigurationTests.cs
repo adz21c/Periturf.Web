@@ -28,7 +28,7 @@ using Periturf.Web.Configuration.Requests;
 namespace Periturf.Web.Tests
 {
     [TestFixture]
-    class WebComponentTests
+    class WebComponentConfigurationTests
     {
         private WebComponent _sut;
         private IWebBodyReaderSpecification _defaultBodyReaderSpec;

@@ -25,12 +25,14 @@ using Periturf.Events;
 using Periturf.Verify;
 using Periturf.Web.BodyReaders;
 using Periturf.Web.Configuration;
+using Periturf.Web.Verification;
 
 namespace Periturf.Web
 {
-    class WebComponent : IComponent
+    class WebComponent : IComponent, IWebVerificationManager
     {
         private readonly List<IWebConfiguration> _configurations = new List<IWebConfiguration>();
+        private readonly List<IWebVerification> _verifications = new List<IWebVerification>();
         private readonly IWebBodyReaderSpecification _defaultBodyReaderSpec;
 
         public WebComponent(IWebBodyReaderSpecification defaultBodyReaderSpec)
@@ -45,7 +47,7 @@ namespace Periturf.Web
 
         public IConditionBuilder CreateConditionBuilder()
         {
-            throw new NotImplementedException();
+            return new ConditionBuilder("", this);
         }
 
         public TSpecification CreateConfigurationSpecification<TSpecification>(IEventHandlerFactory eventHandlerFactory) where TSpecification : IConfigurationSpecification
@@ -59,6 +61,9 @@ namespace Periturf.Web
             var @event = new WebRequestEvent(
                 context.TraceIdentifier,
                 new WebRequest(context.Request));
+
+            foreach (var verifier in _verifications)
+                await verifier.EvaluateInstanceAsync(@event, context.RequestAborted);
 
             foreach (var config in ((IEnumerable<IWebConfiguration>)_configurations).Reverse())
             {
@@ -74,6 +79,16 @@ namespace Periturf.Web
             
             context.Response.StatusCode = 404;
             await context.Response.CompleteAsync();
+        }
+
+        void IWebVerificationManager.Register(IWebVerification webVerification)
+        {
+            _verifications.Add(webVerification);
+        }
+
+        void IWebVerificationManager.UnRegister(IWebVerification webVerification)
+        {
+            _verifications.Remove(webVerification);
         }
     }
 }
