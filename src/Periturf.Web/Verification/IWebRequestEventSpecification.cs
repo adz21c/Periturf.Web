@@ -15,11 +15,12 @@
  */
 using System;
 using System.Threading.Tasks;
+using Periturf.Web.BodyReaders;
 
 namespace Periturf.Web.Verification
 {
     public interface IWebRequestEventSpecification
     {
-        Func<IWebRequestEvent, ValueTask<bool>> Build();
+        Func<IWebRequestEvent, ValueTask<bool>> Build(IWebBodyReaderSpecification defaultBodyReaderSpecification);
     }
 }

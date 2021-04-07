@@ -16,6 +16,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Periturf.Verify;
+using Periturf.Web.BodyReaders;
 
 namespace Periturf.Web.Verification
 {
@@ -23,13 +24,15 @@ namespace Periturf.Web.Verification
     {
         private readonly IWebVerificationManager _webVerificationManager;
         private readonly IWebRequestEventSpecification _webRequestEventSpecification;
+        private readonly IWebBodyReaderSpecification _defaultBodyReaderSpecification;
 
-        public WebConditionSpecification(string componentName, string conditionDescription, IWebVerificationManager webVerificationManager, IWebRequestEventSpecification webRequestEventSpecification)
+        public WebConditionSpecification(string componentName, string conditionDescription, IWebVerificationManager webVerificationManager, IWebRequestEventSpecification webRequestEventSpecification, IWebBodyReaderSpecification defaultBodyReaderSpecification)
         {
             ComponentName = componentName;
             ConditionDescription = conditionDescription;
             _webVerificationManager = webVerificationManager;
             _webRequestEventSpecification = webRequestEventSpecification;
+            _defaultBodyReaderSpecification = defaultBodyReaderSpecification;
         }
 
         public string ComponentName { get; }
@@ -38,7 +41,7 @@ namespace Periturf.Web.Verification
 
         public Task<IConditionFeed> BuildAsync(IConditionInstanceFactory conditionInstanceFactory, CancellationToken ct)
         {
-            var matcher = _webRequestEventSpecification.Build();
+            var matcher = _webRequestEventSpecification.Build(_defaultBodyReaderSpecification);
 
             var verifier = new WebVerifier(matcher, _webVerificationManager, conditionInstanceFactory);
 

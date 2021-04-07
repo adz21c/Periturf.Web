@@ -16,6 +16,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Periturf.Web.BodyReaders;
 using Periturf.Web.RequestCriteria;
 
 namespace Periturf.Web.Verification
@@ -29,7 +30,7 @@ namespace Periturf.Web.Verification
             _criteriaSpecification = spec;
         }
 
-        public Func<IWebRequestEvent, ValueTask<bool>> Build()
+        public Func<IWebRequestEvent, ValueTask<bool>> Build(IWebBodyReaderSpecification defaultBodyReaderSpecification)
         {
             Debug.Assert(_criteriaSpecification != null);
             var matcher = _criteriaSpecification.Build();

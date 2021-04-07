@@ -41,11 +41,11 @@ namespace Periturf.Web.Tests
         {
             _verification1 = A.Fake<Func<IWebRequestEvent, ValueTask<bool>>>();
             var verification1Spec = A.Fake<IWebRequestEventSpecification>();
-            A.CallTo(() => verification1Spec.Build()).Returns(_verification1);
+            A.CallTo(() => verification1Spec.Build(A<IWebBodyReaderSpecification>._)).Returns(_verification1);
 
             _verification2 = A.Fake<Func<IWebRequestEvent, ValueTask<bool>>>();
             var verification2Spec = A.Fake<IWebRequestEventSpecification>();
-            A.CallTo(() => verification2Spec.Build()).Returns(_verification2);
+            A.CallTo(() => verification2Spec.Build(A<IWebBodyReaderSpecification>._)).Returns(_verification2);
 
             var conditionInstanceFactory = A.Fake<IConditionInstanceFactory>();
 

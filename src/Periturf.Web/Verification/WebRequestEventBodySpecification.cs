@@ -38,12 +38,11 @@ namespace Periturf.Web.Verification
             _bodyReaderSpecification = spec;
         }
 
-        public Func<IWebRequestEvent, ValueTask<bool>> Build()
+        public Func<IWebRequestEvent, ValueTask<bool>> Build(IWebBodyReaderSpecification defaultBodyReaderSpecification)
         {
             Debug.Assert(_criteriaSpecification != null);
-            Debug.Assert(_bodyReaderSpecification != null);
 
-            var bodyReader = _bodyReaderSpecification.Build();
+            var bodyReader = (_bodyReaderSpecification ?? defaultBodyReaderSpecification).Build();
             var matcher = _criteriaSpecification.Build();
 
             return async @event =>

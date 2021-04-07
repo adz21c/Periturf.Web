@@ -47,7 +47,7 @@ namespace Periturf.Web
 
         public IConditionBuilder CreateConditionBuilder()
         {
-            return new ConditionBuilder("", this);
+            return new ConditionBuilder("", this, _defaultBodyReaderSpec);
         }
 
         public TSpecification CreateConfigurationSpecification<TSpecification>(IEventHandlerFactory eventHandlerFactory) where TSpecification : IConfigurationSpecification

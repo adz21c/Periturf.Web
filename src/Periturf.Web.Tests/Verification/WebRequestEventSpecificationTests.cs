@@ -17,6 +17,7 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NUnit.Framework;
+using Periturf.Web.BodyReaders;
 using Periturf.Web.RequestCriteria;
 using Periturf.Web.Verification;
 
@@ -38,7 +39,7 @@ namespace Periturf.Web.Tests.Verification
 
             _spec = new WebRequestEventSpecification();
             _spec.AddCriteriaSpecification(criteriaSpec);
-            _matcher = _spec.Build();
+            _matcher = _spec.Build(A.Dummy<IWebBodyReaderSpecification>());
         }
 
         [TestCase(false)]

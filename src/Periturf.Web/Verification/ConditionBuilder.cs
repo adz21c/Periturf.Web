@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 using Periturf.Verify;
+using Periturf.Web.BodyReaders;
 
 namespace Periturf.Web.Verification
 {
@@ -21,16 +22,18 @@ namespace Periturf.Web.Verification
     {
         private readonly string _componentName;
         private readonly IWebVerificationManager _verificationManager;
+        private readonly IWebBodyReaderSpecification _defaultBodyReaderSpecification;
 
-        internal ConditionBuilder(string componentName, IWebVerificationManager verificationManager)
+        internal ConditionBuilder(string componentName, IWebVerificationManager verificationManager, IWebBodyReaderSpecification defaultBodyReaderSpecification)
         {
             _componentName = componentName;
             _verificationManager = verificationManager;
+            _defaultBodyReaderSpecification = defaultBodyReaderSpecification;
         }
 
         public IConditionSpecification CreateWebRequestEventConditionSpecification(IWebRequestEventSpecification spec)
         {
-            return new WebConditionSpecification(_componentName, "", _verificationManager, spec);
+            return new WebConditionSpecification(_componentName, "", _verificationManager, spec, _defaultBodyReaderSpecification);
         }
     }
 }

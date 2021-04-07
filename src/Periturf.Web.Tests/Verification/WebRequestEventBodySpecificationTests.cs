@@ -31,6 +31,7 @@ namespace Periturf.Web.Tests.Verification
         private IWebRequestEvent<BodyType> _eventWithBody;
         private IWebRequestEvent _event;
         private IBodyReader _defaultBodyReader;
+        private IWebBodyReaderSpecification _defaultBodyReaderSpec;
 
         [SetUp]
         public void SetUp()
@@ -48,11 +49,9 @@ namespace Periturf.Web.Tests.Verification
             _event = A.Dummy<IWebRequestEvent>();
             A.CallTo(() => _event.ToWithBodyAsync<BodyType>(A<IBodyReader>._, A<CancellationToken>._)).Returns(_eventWithBody);
 
-            // Temporary
             _defaultBodyReader = A.Fake<IBodyReader>();
-            var bodyReaderSpec = A.Fake<IWebBodyReaderSpecification>();
-            A.CallTo(() => bodyReaderSpec.Build()).Returns(_defaultBodyReader);
-            _spec.AddWebBodyReaderSpecification(bodyReaderSpec);
+            _defaultBodyReaderSpec = A.Fake<IWebBodyReaderSpecification>();
+            A.CallTo(() => _defaultBodyReaderSpec.Build()).Returns(_defaultBodyReader);
         }
 
         [TestCase(false)]
@@ -61,7 +60,7 @@ namespace Periturf.Web.Tests.Verification
         {
             A.CallTo(() => _criteria.Invoke(A<IWebRequestEvent<BodyType>>._)).Returns(expectedResult);
 
-            var matcher = _spec.Build();
+            var matcher = _spec.Build(_defaultBodyReaderSpec);
             var result = await matcher(_event);
 
             A.CallTo(() => _criteria.Invoke(A<IWebRequestEvent<BodyType>>._)).MustHaveHappened();
@@ -79,7 +78,7 @@ namespace Periturf.Web.Tests.Verification
 
             _spec.AddWebBodyReaderSpecification(bodyReaderSpec);
 
-            var matcher = _spec.Build();
+            var matcher = _spec.Build(_defaultBodyReaderSpec);
             var result = await matcher(_event);
 
             Assert.That(result, Is.True);

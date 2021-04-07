@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using NUnit.Framework;
 using Periturf.Verify;
+using Periturf.Web.BodyReaders;
 using Periturf.Web.Verification;
 
 namespace Periturf.Web.Tests.Verification
@@ -48,13 +49,14 @@ namespace Periturf.Web.Tests.Verification
             _eventMatcher = A.Fake<Func<IWebRequestEvent, ValueTask<bool>>>();
             A.CallTo(() => _eventMatcher.Invoke(A<IWebRequestEvent>._)).Returns(true);
             _eventSpec = A.Fake<IWebRequestEventSpecification>();
-            A.CallTo(() => _eventSpec.Build()).Returns(_eventMatcher);
+            A.CallTo(() => _eventSpec.Build(A<IWebBodyReaderSpecification>._)).Returns(_eventMatcher);
 
             _spec = new WebConditionSpecification(
                 ComponentName,
                 ConditionDescription,
                 _verificationManager,
-                _eventSpec);
+                _eventSpec,
+                A.Dummy<IWebBodyReaderSpecification>());
             _feed = await _spec.BuildAsync(_conditionInstanceFactory, CancellationToken.None);
         }
 
