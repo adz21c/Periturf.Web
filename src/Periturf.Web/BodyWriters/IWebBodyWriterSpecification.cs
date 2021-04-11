@@ -13,26 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Periturf.Web.Serialization
+namespace Periturf.Web.BodyWriters
 {
     /// <summary>
-    /// 
+    /// Creates a body writer from a specification.
     /// </summary>
-    public interface ISerializer
+    public interface IWebBodyWriterSpecification
     {
         /// <summary>
-        /// Deserializes the stream.
+        /// Body writer factory method.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="body">The body stream.</param>
-        /// <param name="ct">The ct.</param>
         /// <returns></returns>
-        ValueTask<T> Deserialize<T>(Stream body, CancellationToken ct);
-        
-        Task Serialize<TBody>(TBody body, Stream bodyStream, CancellationToken ct) where TBody : class;
+        IBodyWriter Build();
     }
 }

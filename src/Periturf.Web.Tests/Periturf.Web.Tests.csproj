@@ -12,6 +12,10 @@
   <PropertyGroup>
     <CodeAnalysisRuleSet />
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="BodyWriters\ConditionalBodyReaderTests.cs" />
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="1.3.0">

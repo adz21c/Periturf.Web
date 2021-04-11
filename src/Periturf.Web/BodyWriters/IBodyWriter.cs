@@ -13,26 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Periturf.Web.Serialization
+namespace Periturf.Web.BodyWriters
 {
     /// <summary>
-    /// 
+    /// Writes the request body into the response.
     /// </summary>
-    public interface ISerializer
+    public interface IBodyWriter
     {
         /// <summary>
-        /// Deserializes the stream.
+        /// Writes the request body into the response.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="body">The body stream.</param>
+        /// <typeparam name="TBody">The type of the body.</typeparam>
+        /// <param name="event">The web request event.</param>
+        /// <param name="response">The web response.</param>
+        /// <param name="body">The web response body object.</param>
         /// <param name="ct">The ct.</param>
         /// <returns></returns>
-        ValueTask<T> Deserialize<T>(Stream body, CancellationToken ct);
-        
-        Task Serialize<TBody>(TBody body, Stream bodyStream, CancellationToken ct) where TBody : class;
+        ValueTask WriteAsync<TBody>(IWebRequestEvent @event, IWebResponse response, TBody body, CancellationToken ct) where TBody : class;
     }
 }
