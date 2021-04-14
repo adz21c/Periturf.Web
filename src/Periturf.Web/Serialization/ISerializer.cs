@@ -33,6 +33,6 @@ namespace Periturf.Web.Serialization
         /// <returns></returns>
         ValueTask<T> Deserialize<T>(Stream body, CancellationToken ct);
         
-        Task Serialize<TBody>(TBody body, Stream bodyStream, CancellationToken ct) where TBody : class;
+        ValueTask Serialize<T>(T @object, Stream stream, CancellationToken ct) where T : class;
     }
 }

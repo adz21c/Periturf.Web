@@ -29,5 +29,12 @@ namespace Periturf.Web.Serialization.Xml
             var serializer = _factory.CreateSerializer(typeof(T));
             return new ValueTask<T>((T)serializer.Deserialize(body));
         }
+
+        public ValueTask Serialize<T>(T @object, Stream stream, CancellationToken ct) where T : class
+        {
+            var serializer = _factory.CreateSerializer(typeof(T));
+            serializer.Serialize(stream, @object);
+            return new ValueTask();
+        }
     }
 }
