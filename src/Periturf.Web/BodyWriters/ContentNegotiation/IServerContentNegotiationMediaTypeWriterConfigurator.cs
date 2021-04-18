@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-namespace Periturf.Web.BodyWriters.Conditional
+namespace Periturf.Web.BodyWriters.ContentNegotiation
 {
     public interface IServerContentNegotiationMediaTypeWriterConfigurator : IWebBodyWritableConfigurator
     {
 
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
-        public string SubType { get; set; }
+        public string? SubType { get; set; }
+
+        public string? Suffix { get; set; }
     }
 }

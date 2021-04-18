@@ -13,12 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
 
 namespace Periturf.Web.BodyWriters.ContentNegotiation
 {
-    public interface IServerContentNegotiationConfigurator
+    class MediaTypeServerContentNegotiationSpecification : IServerContentNegotiationMediaTypeWriterConfigurator
     {
-        void MediaTypeWriter(Action<IServerContentNegotiationMediaTypeWriterConfigurator> config);
+        private IWebBodyWriterSpecification? _writerSpecification;
+
+        public string? Type { get; set; }
+        public string? SubType { get; set; }
+        public string? Suffix { get; set; }
+
+        public void AddWebBodyWriterSpecification(IWebBodyWriterSpecification spec)
+        {
+            _writerSpecification = spec;
+        }
+
+        public (MediaType, IBodyWriter) Build()
+        {
+            return (
+                new MediaType { Type = Type, SubType = SubType, Suffix = Suffix },
+                _writerSpecification.Build());
+        }
     }
 }
