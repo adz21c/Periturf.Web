@@ -15,6 +15,7 @@
  */
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Primitives;
@@ -37,8 +38,7 @@ namespace Periturf.Web.BodyWriters.ContentNegotiation
             var weightedAcceptValues = GetWeightedAcceptValues(acceptValues);
             foreach (var mediaType in weightedAcceptValues)
             {
-                var target = ToMediaType(mediaType);
-                var writer = GetMediaTypeWriter(target);
+                var writer = GetMediaTypeWriter(mediaType);
                 if (writer != null)
                 {
                     await writer.WriteAsync(@event, response, body, ct);
@@ -49,38 +49,38 @@ namespace Periturf.Web.BodyWriters.ContentNegotiation
             response.StatusCode = System.Net.HttpStatusCode.NotAcceptable;
         }
 
-        private MediaType ToMediaType(string value)
-        {
-            var typeSplit = value.Split('/');
-            var subTypeSplit = typeSplit[1].Split('+');
-            var type = typeSplit.First();
-            var subType = subTypeSplit.FirstOrDefault();
-            return new MediaType
-            {
-                Type = type == "*" ? null : type,
-                SubType = subType == "*" ? null : subType,
-                Suffix = subTypeSplit.Count() > 1 ? subTypeSplit.LastOrDefault() : null
-            };
-        }
-        
-        private IEnumerable<string> GetWeightedAcceptValues(StringValues acceptValues)
+        private static readonly Regex mediaTypeRegex = new Regex(@"(?<Type>[a-zA-z0-9\-\.]+|\*)/(?<SubType>[a-zA-z0-9\.\-]+|\*)(\+(?<Suffix>[a-zA-Z0-9\.\-]*))?(\s*;\s*q\s*=\s*(?<QFactor>\d+(\.\d+)?))?", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
+        private IEnumerable<MediaType> GetWeightedAcceptValues(StringValues acceptValues)
         {
             return acceptValues
                 .Select(x =>
                 {
-                    var split = x.Split(";");
+                    var match = mediaTypeRegex.Match(x);
+                    if (!match.Success)
+                        return null;
+
+                    var type = match.Groups["Type"].Value;
+                    var subType = match.Groups["SubType"].Value;
+                    
                     double qfactor = 1;
-                    if (split.Length == 2 && split[1] != null)
-                        double.TryParse(split[1].Split("=")[1].Trim(), out qfactor);
+                    if (match.Groups["QFactor"].Success)
+                        qfactor = double.Parse(match.Groups["QFactor"].Value);
+                    
                     return new
                     {
-                        MediaType = split[0],
+                        MediaType = new MediaType
+                        {
+                            Type = type == "*" ? null : type,
+                            SubType = subType == "*" ? null : subType,
+                            Suffix = match.Groups["Suffix"].Value
+                        },
                         QFactor = qfactor
                     };
                 })
                 .Zip(
                     Enumerable.Range(0, acceptValues.Count),
                     (x, y) => new { x.MediaType, x.QFactor, ProvidedOrder = y })
+                .Where(x => x.MediaType != null)
                 .OrderByDescending(x => x.QFactor).ThenBy(x => x.ProvidedOrder)
                 .Select(x => x.MediaType);
         }
