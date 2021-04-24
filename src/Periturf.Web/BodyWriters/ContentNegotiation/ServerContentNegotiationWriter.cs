@@ -77,10 +77,10 @@ namespace Periturf.Web.BodyWriters.ContentNegotiation
                         QFactor = qfactor
                     };
                 })
+                .Where(x => x != null)
                 .Zip(
                     Enumerable.Range(0, acceptValues.Count),
                     (x, y) => new { x.MediaType, x.QFactor, ProvidedOrder = y })
-                .Where(x => x.MediaType != null)
                 .OrderByDescending(x => x.QFactor).ThenBy(x => x.ProvidedOrder)
                 .Select(x => x.MediaType);
         }
