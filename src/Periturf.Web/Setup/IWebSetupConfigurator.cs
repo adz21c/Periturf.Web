@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+using Microsoft.AspNetCore.Http;
+using System;
+
 namespace Periturf.Web.Setup
 {
     /// <summary>
@@ -26,5 +29,11 @@ namespace Periturf.Web.Setup
         /// </summary>
         /// <param name="spec">The spec.</param>
         void AddWebComponentSpecification(IWebComponentSetupSpecification spec);
+
+        /// <summary>
+        /// Bind the webhost to the provided URL.
+        /// </summary>
+        /// <param name="url">URL to bind too.</param>
+        void BindToUrl(string url);
     }
 }

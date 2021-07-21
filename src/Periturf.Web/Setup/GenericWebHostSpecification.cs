@@ -27,10 +27,17 @@ namespace Periturf.Web.Setup
     class GenericWebHostSpecification : IGenericHostMultipleComponentSpecification, IWebSetupConfigurator
     {
         private readonly List<IWebComponentSetupSpecification> _webComponentSpecifications = new List<IWebComponentSetupSpecification>();
+        private readonly List<string> _urls = new List<string>();
 
         public void AddWebComponentSpecification(IWebComponentSetupSpecification spec)
         {
             _webComponentSpecifications.Add(spec ?? throw new ArgumentNullException(nameof(spec)));
+        }
+
+        public void BindToUrl(string url)
+        {
+            if (!string.IsNullOrWhiteSpace(url))
+                _urls.Add(url);
         }
 
         public Dictionary<string, IComponent> Apply(IHostBuilder hostBuilder)
@@ -51,6 +58,9 @@ namespace Periturf.Web.Setup
 
             hostBuilder.ConfigureWebHostDefaults(w =>
             {
+                if (_urls.Any())
+                    w.UseUrls(_urls.ToArray());
+
                 w.ConfigureServices(s =>
                 {
                     foreach (var config in componentsAndConfig)
