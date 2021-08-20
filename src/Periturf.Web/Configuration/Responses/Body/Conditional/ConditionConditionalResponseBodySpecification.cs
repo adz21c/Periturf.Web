@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using Periturf.Web.RequestCriteria;
 using Periturf.Web.RequestCriteria.Logical;
 
-namespace Periturf.Web.Configuration.Responses.Conditional
+namespace Periturf.Web.Configuration.Responses.Body.Conditional
 {
     class ConditionConditionalResponseBodySpecification<TWebRequestEvent> : IConditionConditionalResponseBodyConfigurator<TWebRequestEvent> where TWebRequestEvent : IWebRequestEvent
     {

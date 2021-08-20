@@ -3,8 +3,9 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using NUnit.Framework;
 using Periturf.Web.Configuration.Responses;
+using Periturf.Web.Configuration.Responses.Body.Raw;
 
-namespace Periturf.Web.Tests.Configuration.Responses
+namespace Periturf.Web.Tests.Configuration.Responses.Body
 {
     class WebResponseRawStringBodyTests
     {

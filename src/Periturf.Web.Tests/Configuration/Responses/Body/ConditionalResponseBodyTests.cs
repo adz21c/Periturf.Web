@@ -19,12 +19,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NUnit.Framework;
-using Periturf.Web.BodyWriters;
-using Periturf.Web.BodyWriters.Conditional;
 using Periturf.Web.Configuration.Responses;
-using Periturf.Web.Configuration.Responses.Conditional;
+using Periturf.Web.Configuration.Responses.Body.Conditional;
 
-namespace Periturf.Web.Tests.Configuration.Responses
+namespace Periturf.Web.Tests.Configuration.Responses.Body
 {
     class ConditionalResponseBodyTests
     {

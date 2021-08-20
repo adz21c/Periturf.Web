@@ -5,7 +5,7 @@ using NUnit.Framework;
 using Periturf.Web.BodyWriters;
 using Periturf.Web.Configuration.Responses;
 
-namespace Periturf.Web.Tests.Configuration.Responses
+namespace Periturf.Web.Tests.Configuration.Responses.Body
 {
     class WebResponseBodyTests
     {

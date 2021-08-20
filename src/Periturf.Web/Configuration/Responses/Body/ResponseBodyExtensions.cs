@@ -1,5 +1,6 @@
 ﻿using Periturf.Web.Configuration.Responses;
-using Periturf.Web.Configuration.Responses.Conditional;
+using Periturf.Web.Configuration.Responses.Body.Conditional;
+using Periturf.Web.Configuration.Responses.Body.Raw;
 using System;
 using System.Diagnostics.CodeAnalysis;
 

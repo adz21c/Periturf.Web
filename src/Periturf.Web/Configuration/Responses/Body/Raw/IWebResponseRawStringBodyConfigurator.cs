@@ -1,4 +1,4 @@
-﻿namespace Periturf.Web.Configuration.Responses
+﻿namespace Periturf.Web.Configuration.Responses.Body.Raw
 {
     public interface IWebResponseRawStringBodyConfigurator
     {

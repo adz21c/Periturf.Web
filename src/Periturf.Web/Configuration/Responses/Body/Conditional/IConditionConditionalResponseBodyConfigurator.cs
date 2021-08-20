@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 using System;
+using Periturf.Web.RequestCriteria;
 
-namespace Periturf.Web.Configuration.Responses.Conditional
+namespace Periturf.Web.Configuration.Responses.Body.Conditional
 {
-    public interface IConditionalResponseBodyConfigurator<TWebRequestEvent> where TWebRequestEvent : IWebRequestEvent
+    public interface IConditionConditionalResponseBodyConfigurator<TWebRequestEvent> : IWebResponseBodyConfigurable<TWebRequestEvent> where TWebRequestEvent : IWebRequestEvent
     {
-        void Condition(Action<IConditionConditionalResponseBodyConfigurator<TWebRequestEvent>> config);
+        void Criteria(Action<IWebRequestCriteriaConfigurator<TWebRequestEvent>> config);
     }
 }
