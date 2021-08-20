@@ -24,7 +24,7 @@ namespace Periturf.Web.Configuration.Responses
     {
         void StatusCode(int code);
 
-        void AddHeader(string name, StringValues value);
+        void AddHeader(string name, StringValues values);
 
         void AddCookie(string name, string value, CookieOptions? options = null);
 
