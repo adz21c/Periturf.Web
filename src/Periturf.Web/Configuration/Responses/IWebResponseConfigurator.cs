@@ -3,7 +3,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace Periturf.Web.Configuration.Responses
 {
-    interface IWebResponseConfigurator<TWebRequestEvent> where TWebRequestEvent : IWebRequestEvent
+    public interface IWebResponseConfigurator<TWebRequestEvent> where TWebRequestEvent : IWebRequestEvent
     {
         void StatusCode(int code);
 
