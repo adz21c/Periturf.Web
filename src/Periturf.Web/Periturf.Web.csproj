@@ -14,9 +14,5 @@
     <PackageReference Include="Periturf" Version="0.6.0-develop0012" />
     <PackageReference Include="Periturf.Hosting" Version="0.6.0-develop0012" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Configuration\Responses\Conditional\" />
-  </ItemGroup>
 
 </Project>
