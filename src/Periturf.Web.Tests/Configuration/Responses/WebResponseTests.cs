@@ -153,5 +153,23 @@ namespace Periturf.Web.Tests.Configuration.Responses
             A.CallTo(() => response.AddHeader(A<string>._, A<IEnumerable<object>>._)).MustNotHaveHappened();
             A.CallToSet(() => response.ContentType).MustNotHaveHappened();
         }
+
+        [TestCase(null, "attachment", Description = "Without filename")]
+        [TestCase("Filename.jpg", "attachment; filename=Filename.jpg", Description = "With filename")]
+        public async Task Given_IsAttachment_When_Execute_Then_AddContentDispositionHeader(string filename, string headerValue)
+        {
+            var @event = A.Fake<IWebRequestEvent>();
+            var response = A.Fake<IWebResponse>();
+
+            var spec = new WebResponseSpecification<IWebRequestEvent>();
+            spec.StatusCode(200);
+            spec.IsAttachement(filename);
+
+            var sut = spec.BuildResponseWriter();
+            await sut(@event, response, CancellationToken.None);
+
+            A.CallTo(() => response.AddHeader("Content-Disposition", new StringValues(headerValue))).MustHaveHappened();
+            A.CallToSet(() => response.StatusCode).To(HttpStatusCode.OK).MustHaveHappened();
+        }
     }
 }
