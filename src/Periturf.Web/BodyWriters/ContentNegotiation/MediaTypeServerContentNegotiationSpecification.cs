@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+using System.Diagnostics;
+
 namespace Periturf.Web.BodyWriters.ContentNegotiation
 {
     class MediaTypeServerContentNegotiationSpecification : IServerContentNegotiationMediaTypeWriterConfigurator
@@ -31,6 +33,8 @@ namespace Periturf.Web.BodyWriters.ContentNegotiation
 
         public (MediaType, IBodyWriter) Build()
         {
+            Debug.Assert(_writerSpecification != null);
+
             return (
                 new MediaType { Type = Type, SubType = SubType, Suffix = Suffix },
                 _writerSpecification.Build());

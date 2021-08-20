@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Periturf.Web.BodyWriters;
@@ -22,6 +23,7 @@ namespace Periturf.Web.Configuration.Responses
 
         public Func<TWebRequestEvent, IWebResponse, CancellationToken, ValueTask> BuildResponseBodyWriter()
         {
+            Debug.Assert(_writerSpec != null);
             var writer = _writerSpec.Build();
             return (@event, response, ct) => writer.WriteAsync(@event, response, _content, ct);
         }

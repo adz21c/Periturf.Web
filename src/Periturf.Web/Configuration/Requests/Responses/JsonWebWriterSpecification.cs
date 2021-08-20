@@ -20,6 +20,9 @@ namespace Periturf.Web.Configuration.Requests.Responses
         {
             return async (response, obj, ct) =>
             {
+                if (obj == null)
+                    return;
+                
                 response.ContentType = "application/json";
                 await JsonSerializer.SerializeAsync(response.BodyStream, obj, obj.GetType(), _options, ct);
             };
