@@ -17,6 +17,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using Periturf.Web.BodyWriters;
 using Periturf.Web.BodyWriters.Conditional;
+using Periturf.Web.BodyWriters.ContentNegotiation;
 using Periturf.Web.BodyWriters.Serializer;
 using Periturf.Web.Serialization;
 
@@ -36,6 +37,18 @@ namespace Periturf
         public static void ConditionalBodyWriter(this IWebBodyWritableConfigurator configurator, Action<IConditionalBodyWriterConfigurator> config)
         {
             var spec = new ConditionalBodyWriterSpecification();
+            config(spec);
+            configurator.AddWebBodyWriterSpecification(spec);
+        }
+
+        /// <summary>
+        /// Simple implementation of HTTPs server content negotiation. You can specify your own media types and corresponding writer.
+        /// </summary>
+        /// <param name="configurator">The configurator.</param>
+        /// <param name="config">The configuration.</param>
+        public static void ServerContentNegotiationWriter(this IWebBodyWritableConfigurator configurator, Action<IServerContentNegotiationConfigurator> config)
+        {
+            var spec = new ServerContentNegotiationSpecification();
             config(spec);
             configurator.AddWebBodyWriterSpecification(spec);
         }

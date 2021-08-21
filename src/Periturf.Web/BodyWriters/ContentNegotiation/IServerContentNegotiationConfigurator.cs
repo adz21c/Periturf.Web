@@ -14,11 +14,48 @@
  * limitations under the License.
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Periturf.Web.BodyWriters.ContentNegotiation
 {
     public interface IServerContentNegotiationConfigurator
     {
+        /// <summary>
+        /// Initializes the negotiator with a standard set of media types.
+        /// <list type="">
+        ///     <item><c>application/xml</c> - XmlSerializer</item>
+        ///     <item><c>*/*+xml</c> - XmlSerializer</item>
+        ///     <item><c>application/json</c> - JsonSerializer</item>
+        ///     <item><c>*/*+json</c> - JsonSerializer</item>
+        /// </list>
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        void InitializeDefaultMediaTypes()
+        {
+            MediaTypeWriter(c =>
+            {
+                c.Type = "application";
+                c.SubType = "xml";
+                c.XmlBodyWriter();
+            });
+            MediaTypeWriter(c =>
+            {
+                c.Suffix = "xml";
+                c.XmlBodyWriter();
+            });
+            MediaTypeWriter(c =>
+            {
+                c.Type = "application";
+                c.SubType = "json";
+                c.JsonBodyWriter();
+            });
+            MediaTypeWriter(c =>
+            {
+                c.Suffix = "json";
+                c.JsonBodyWriter();
+            });
+        }
+
         void MediaTypeWriter(Action<IServerContentNegotiationMediaTypeWriterConfigurator> config);
     }
 }
