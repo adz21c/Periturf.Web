@@ -41,12 +41,12 @@ namespace Periturf.Web.Tests
         public async Task SetupAsync()
         {
             _config1 = A.Fake<IWebConfiguration>();
-            A.CallTo(() => _config1.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).Invokes((IWebResponse r, CancellationToken ct) => r.StatusCode = HttpStatusCode.OK);
+            A.CallTo(() => _config1.WriteResponseAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).Invokes((IWebRequestEvent e, IWebResponse r, CancellationToken ct) => r.StatusCode = HttpStatusCode.OK);
             _config1Spec = A.Fake<IWebRequestEventSpecification>();
             A.CallTo(() => _config1Spec.Build(A<IWebBodyReaderSpecification>._)).Returns(_config1);
 
             _config2 = A.Fake<IWebConfiguration>();
-            A.CallTo(() => _config2.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).Invokes((IWebResponse r, CancellationToken ct) => r.StatusCode = HttpStatusCode.OK);
+            A.CallTo(() => _config2.WriteResponseAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).Invokes((IWebRequestEvent e, IWebResponse r, CancellationToken ct) => r.StatusCode = HttpStatusCode.OK);
             _config2Spec = A.Fake<IWebRequestEventSpecification>();
             A.CallTo(() => _config2Spec.Build(A<IWebBodyReaderSpecification>._)).Returns(_config2);
 
@@ -77,10 +77,10 @@ namespace Periturf.Web.Tests
             await _sut.ProcessAsync(context);
 
             A.CallTo(() => _config2.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappened().Then(
-                A.CallTo(() => _config2.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustHaveHappened());
+                A.CallTo(() => _config2.WriteResponseAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).MustHaveHappened());
 
             A.CallTo(() => _config1.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustNotHaveHappened();
-            A.CallTo(() => _config1.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => _config1.WriteResponseAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
 
             Assert.That(context.Response.StatusCode, Is.EqualTo(200));
         }
@@ -96,9 +96,9 @@ namespace Periturf.Web.Tests
 
             A.CallTo(() => _config2.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappened().Then(
                 A.CallTo(() => _config1.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappened()).Then(
-                A.CallTo(() => _config1.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustHaveHappened());
+                A.CallTo(() => _config1.WriteResponseAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).MustHaveHappened());
 
-            A.CallTo(() => _config2.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => _config2.WriteResponseAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
 
             Assert.That(context.Response.StatusCode, Is.EqualTo(200));
         }
@@ -115,8 +115,8 @@ namespace Periturf.Web.Tests
             A.CallTo(() => _config2.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappened().Then(
                 A.CallTo(() => _config1.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappened());
 
-            A.CallTo(() => _config2.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
-            A.CallTo(() => _config1.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => _config2.WriteResponseAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => _config1.WriteResponseAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
 
             Assert.That(context.Response.StatusCode, Is.EqualTo(404));
         }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 using Periturf.Web.BodyReaders;
-using Periturf.Web.Configuration.Requests.Responses;
+using Periturf.Web.Configuration.Responses;
 using Periturf.Web.RequestCriteria;
 
 namespace Periturf.Web.Configuration.Requests
@@ -37,6 +37,6 @@ namespace Periturf.Web.Configuration.Requests
         /// Adds a web response specification.
         /// </summary>
         /// <param name="spec">The spec.</param>
-        void SetResponseSpecification(IWebRequestResponseSpecification spec);
+        void AddWebResponseSpecification(IWebResponseSpecification<TWebRequestEvent> spec);
     }
 }

@@ -15,7 +15,7 @@
  */
 using System.Diagnostics;
 using Periturf.Web.BodyReaders;
-using Periturf.Web.Configuration.Requests.Responses;
+using Periturf.Web.Configuration.Responses;
 using Periturf.Web.RequestCriteria;
 
 namespace Periturf.Web.Configuration.Requests
@@ -24,7 +24,7 @@ namespace Periturf.Web.Configuration.Requests
         where TBody : class
     {
         private IWebRequestCriteriaSpecification<IWebRequestEvent<TBody>>? _criteriaSpecification;
-        private IWebRequestResponseSpecification? _responseSpecification;
+        private IWebResponseSpecification<IWebRequestEvent<TBody>>? _responseSpecification;
         private IWebBodyReaderSpecification? _bodyReaderSpecification;
 
         public void AddCriteriaSpecification(IWebRequestCriteriaSpecification<IWebRequestEvent<TBody>> spec)
@@ -32,7 +32,7 @@ namespace Periturf.Web.Configuration.Requests
             _criteriaSpecification = spec;
         }
 
-        public void SetResponseSpecification(IWebRequestResponseSpecification spec)
+        public void AddWebResponseSpecification(IWebResponseSpecification<IWebRequestEvent<TBody>> spec)
         {
             _responseSpecification = spec;
         }
@@ -49,7 +49,7 @@ namespace Periturf.Web.Configuration.Requests
 
             return new WebConfigurationBody<TBody>(
                 _criteriaSpecification.Build(),
-                _responseSpecification.BuildFactory(),
+                _responseSpecification.BuildResponseWriter(),
                 (_bodyReaderSpecification ?? defaultBodyReaderSpec).Build());
         }
     }

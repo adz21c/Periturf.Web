@@ -37,6 +37,6 @@ namespace Periturf.Web.Configuration
         /// <param name="response">The response.</param>
         /// <param name="ct">The ct.</param>
         /// <returns></returns>
-        ValueTask WriteResponseAsync(IWebResponse response, CancellationToken ct);
+        ValueTask WriteResponseAsync(IWebRequestEvent @event, IWebResponse response, CancellationToken ct);
     }
 }

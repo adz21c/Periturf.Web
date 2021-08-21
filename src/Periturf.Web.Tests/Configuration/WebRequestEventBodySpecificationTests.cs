@@ -20,7 +20,7 @@ using FakeItEasy;
 using NUnit.Framework;
 using Periturf.Web.BodyReaders;
 using Periturf.Web.Configuration.Requests;
-using Periturf.Web.Configuration.Requests.Responses;
+using Periturf.Web.Configuration.Responses;
 using Periturf.Web.RequestCriteria;
 
 namespace Periturf.Web.Tests.Configuration
@@ -30,7 +30,7 @@ namespace Periturf.Web.Tests.Configuration
     {
         private IWebBodyReaderSpecification _defaultBodyReaderSpec;
         private Func<IWebRequestEvent<RequestBody>, bool> _criteria;
-        private Func<IWebResponse, CancellationToken, ValueTask> _responseFactory;
+        private Func<IWebRequestEvent<RequestBody>, IWebResponse, CancellationToken, ValueTask> _responseFactory;
         private IWebRequestEvent _request;
         private IWebRequestEvent<RequestBody> _requestWithBody;
         private WebRequestEventBodySpecification<RequestBody> _spec;
@@ -44,17 +44,17 @@ namespace Periturf.Web.Tests.Configuration
             var criteriaSpec = A.Fake<IWebRequestCriteriaSpecification<IWebRequestEvent<RequestBody>>>();
             A.CallTo(() => criteriaSpec.Build()).Returns(_criteria);
 
-            _responseFactory = A.Fake<Func<IWebResponse, CancellationToken, ValueTask>>();
+            _responseFactory = A.Fake<Func<IWebRequestEvent<RequestBody>, IWebResponse, CancellationToken, ValueTask>>();
             _request = A.Dummy<IWebRequestEvent>();
             _requestWithBody = A.Dummy<IWebRequestEvent<RequestBody>>();
             A.CallTo(() => _request.ToWithBodyAsync<RequestBody>(A<IBodyReader>._, A<CancellationToken>._)).Returns(_requestWithBody);
 
-            var responseSpec = A.Fake<IWebRequestResponseSpecification>();
-            A.CallTo(() => responseSpec.BuildFactory()).Returns(_responseFactory);
+            var responseSpec = A.Fake<IWebResponseSpecification<IWebRequestEvent<RequestBody>>>();
+            A.CallTo(() => responseSpec.BuildResponseWriter()).Returns(_responseFactory);
 
             _spec = new WebRequestEventBodySpecification<RequestBody>();
             _spec.AddCriteriaSpecification(criteriaSpec);
-            _spec.SetResponseSpecification(responseSpec);
+            _spec.AddWebResponseSpecification(responseSpec);
         }
 
         [TestCase(true)]
@@ -75,9 +75,9 @@ namespace Periturf.Web.Tests.Configuration
         public async Task Given_ResponseFactory_When_WriteResponse_Then_Executed()
         {
             var config = _spec.Build(_defaultBodyReaderSpec);
-            await config.WriteResponseAsync(A.Dummy<IWebResponse>(), CancellationToken.None);
+            await config.WriteResponseAsync(_requestWithBody, A.Dummy<IWebResponse>(), CancellationToken.None);
 
-            A.CallTo(() => _responseFactory.Invoke(A<IWebResponse>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _responseFactory.Invoke(A<IWebRequestEvent<RequestBody>>._, A<IWebResponse>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         }
 
         [Test]

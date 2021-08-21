@@ -71,7 +71,7 @@ namespace Periturf.Web
                 if (match)
                 {
                     var response = new WebResponse(context.Response);
-                    await config.WriteResponseAsync(response, context.RequestAborted);
+                    await config.WriteResponseAsync(@event, response, context.RequestAborted);
                     await context.Response.CompleteAsync();
                     return;
                 }
