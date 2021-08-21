@@ -26,6 +26,14 @@ namespace Periturf.Web
             configurator.AddWebResponseBodySpecification(spec);
         }
 
+        public static void RawByteBody<TWebRequestEvent>(this IWebResponseBodyConfigurable<TWebRequestEvent> configurator, Action<IWebResponseRawByteBodyConfigurator> config)
+            where TWebRequestEvent : IWebRequestEvent
+        {
+            var spec = new WebResponseRawByteBodySpecification<TWebRequestEvent>();
+            config(spec);
+            configurator.AddWebResponseBodySpecification(spec);
+        }
+
         public static void ConditionalBody<TWebRequestEvent>(this IWebResponseBodyConfigurable<TWebRequestEvent> configurator, Action<IConditionalResponseBodyConfigurator<TWebRequestEvent>> config)
             where TWebRequestEvent : IWebRequestEvent
         {
