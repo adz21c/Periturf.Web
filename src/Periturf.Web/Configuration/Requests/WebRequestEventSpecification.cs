@@ -15,6 +15,7 @@
  */
 using System.Diagnostics;
 using Periturf.Web.BodyReaders;
+using Periturf.Web.BodyWriters;
 using Periturf.Web.Configuration.Responses;
 using Periturf.Web.RequestCriteria;
 
@@ -40,14 +41,14 @@ namespace Periturf.Web.Configuration.Requests
             // Method intentionally left empty. No body.
         }
 
-        public IWebConfiguration Build(IWebBodyReaderSpecification defaultBodyReaderSpec)
+        public IWebConfiguration Build(IWebBodyReaderSpecification defaultBodyReaderSpec, IWebBodyWriterSpecification defaultBodyWriterSpec)
         {
             Debug.Assert(_criteriaSpecification != null, "_criteriaSpecification != null");
             Debug.Assert(_responseSpecification != null, "_responseSpecification != null");
 
             return new WebConfiguration(
                 _criteriaSpecification.Build(),
-                _responseSpecification.BuildResponseWriter());
+                _responseSpecification.BuildResponseWriter(defaultBodyWriterSpec));
         }
     }
 }

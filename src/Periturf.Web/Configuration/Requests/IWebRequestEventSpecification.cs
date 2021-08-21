@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 using Periturf.Web.BodyReaders;
+using Periturf.Web.BodyWriters;
 
 namespace Periturf.Web.Configuration.Requests
 {
@@ -26,7 +27,8 @@ namespace Periturf.Web.Configuration.Requests
         /// Factory method for a <see cref="IWebConfiguration"/>.
         /// </summary>
         /// <param name="defaultBodyReaderSpec">The default body reader specification for the web component.</param>
+        /// <param name="defaultBodyWriterSpec">The default body writer specification for the web component.</param>
         /// <returns></returns>
-        IWebConfiguration Build(IWebBodyReaderSpecification defaultBodyReaderSpec);
+        IWebConfiguration Build(IWebBodyReaderSpecification defaultBodyReaderSpec, IWebBodyWriterSpecification defaultBodyWriterSpec);
     }
 }
