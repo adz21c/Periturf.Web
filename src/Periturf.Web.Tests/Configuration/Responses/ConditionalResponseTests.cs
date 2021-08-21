@@ -20,12 +20,11 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using NUnit.Framework;
 using Periturf.Web.Configuration.Responses;
-using Periturf.Web.Configuration.Responses.Body;
-using Periturf.Web.Configuration.Responses.Body.Conditional;
+using Periturf.Web.Configuration.Responses.Conditional;
 
-namespace Periturf.Web.Tests.Configuration.Responses.Body
+namespace Periturf.Web.Tests.Configuration.Responses
 {
-    class ConditionalResponseBodyTests
+    class ConditionalResponseTests
     {
         private Func<IWebRequestEvent, IWebResponse, CancellationToken, ValueTask> _writer1;
         private Func<IWebRequestEvent, IWebResponse, CancellationToken, ValueTask> _writer2;
@@ -35,26 +34,26 @@ namespace Periturf.Web.Tests.Configuration.Responses.Body
         public void SetUp()
         {
             _writer1 = A.Fake<Func<IWebRequestEvent, IWebResponse, CancellationToken, ValueTask>>();
-            var writer1Spec = A.Fake<IWebResponseBodySpecification<IWebRequestEvent>>();
-            A.CallTo(() => writer1Spec.BuildResponseBodyWriter()).Returns(_writer1);
+            var writer1Spec = A.Fake<IWebResponseSpecification<IWebRequestEvent>>();
+            A.CallTo(() => writer1Spec.BuildResponseWriter()).Returns(_writer1);
 
             _writer2 = A.Fake<Func<IWebRequestEvent, IWebResponse, CancellationToken, ValueTask>>();
-            var writer2Spec = A.Fake<IWebResponseBodySpecification<IWebRequestEvent>>();
-            A.CallTo(() => writer2Spec.BuildResponseBodyWriter()).Returns(_writer2);
+            var writer2Spec = A.Fake<IWebResponseSpecification<IWebRequestEvent>>();
+            A.CallTo(() => writer2Spec.BuildResponseWriter()).Returns(_writer2);
 
-            var spec = new ConditionalResponseBodySpecification<IWebRequestEvent>();
+            var spec = new ConditionalResponseSpecification<IWebRequestEvent>();
             spec.Condition(c =>
             {
                 c.Criteria(cr => cr.Method().EqualTo("GET"));
-                c.AddWebResponseBodySpecification(writer1Spec);
+                c.AddWebResponseSpecification(writer1Spec);
             });
             spec.Condition(c =>
             {
                 c.Criteria(cr => cr.Method().EqualTo("POST"));
-                c.AddWebResponseBodySpecification(writer2Spec);
+                c.AddWebResponseSpecification(writer2Spec);
             });
 
-            _sut = spec.BuildResponseBodyWriter();
+            _sut = spec.BuildResponseWriter();
         }
 
         [TearDown]

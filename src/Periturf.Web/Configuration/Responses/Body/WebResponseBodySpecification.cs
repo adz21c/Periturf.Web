@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Periturf.Web.BodyWriters;
+using Periturf.Web.Configuration.Responses.Body;
 
 namespace Periturf.Web.Configuration.Responses
 {

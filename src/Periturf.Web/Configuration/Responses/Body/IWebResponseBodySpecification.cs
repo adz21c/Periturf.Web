@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Periturf.Web.Configuration.Responses
+namespace Periturf.Web.Configuration.Responses.Body
 {
     public interface IWebResponseBodySpecification<TWebRequestEvent> where TWebRequestEvent : IWebRequestEvent
     {
