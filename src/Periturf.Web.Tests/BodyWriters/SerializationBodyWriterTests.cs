@@ -34,7 +34,7 @@ namespace Periturf.Web.Tests.BodyWriters
 
             var spec = new SerializationBodyWriterSpecification();
             const string contentType = "application/json";
-            spec.ContentType = contentType;
+            spec.ContentType(contentType);
             spec.AddSerializerSpecification(serializerSpec);
 
             var sut = spec.Build();
@@ -48,7 +48,7 @@ namespace Periturf.Web.Tests.BodyWriters
             await sut.WriteAsync<BodyType>(@event, response, dummyBody, CancellationToken.None);
 
             A.CallTo(() => serializer.Serialize<BodyType>(dummyBody, bodyStream, A<CancellationToken>._)).MustHaveHappened();
-            A.CallToSet(() => response.ContentType).To(spec.ContentType).MustHaveHappened();
+            A.CallToSet(() => response.ContentType).To(contentType).MustHaveHappened();
         }
     }
 }

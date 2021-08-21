@@ -45,7 +45,7 @@ namespace Periturf
         /// </summary>
         /// <param name="configurator">The configurator.</param>
         /// <param name="config">The configuration.</param>
-        public static void SerializeBodyWriter(this IWebBodyWritableConfigurator configurator, Action<ISerializerConfigurator> config)
+        public static void SerializeBodyWriter(this IWebBodyWritableConfigurator configurator, Action<IWebBodyWriterConfigurator> config)
         {
             var spec = new SerializationBodyWriterSpecification();
             config(spec);
@@ -58,7 +58,11 @@ namespace Periturf
         /// <param name="configurator">The configurator.</param>
         public static void JsonBodyWriter(this IWebBodyWritableConfigurator configurator)
         {
-            configurator.SerializeBodyWriter(s => s.JsonSerializer());
+            configurator.SerializeBodyWriter(s =>
+            {
+                s.ContentType("application/json");
+                s.JsonSerializer();
+            });
         }
 
         /// <summary>
@@ -67,7 +71,11 @@ namespace Periturf
         /// <param name="configurator">The configurator.</param>
         public static void XmlBodyWriter(this IWebBodyWritableConfigurator configurator)
         {
-            configurator.SerializeBodyWriter(s => s.XmlSerializer());
+            configurator.SerializeBodyWriter(s =>
+            {
+                s.ContentType("application/xml");
+                s.XmlSerializer();
+            });
         }
     }
 }

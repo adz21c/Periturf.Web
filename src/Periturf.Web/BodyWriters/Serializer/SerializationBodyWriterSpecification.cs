@@ -21,19 +21,23 @@ namespace Periturf.Web.BodyWriters.Serializer
     class SerializationBodyWriterSpecification : IWebBodyWriterSpecification, IWebBodyWriterConfigurator
     {
         private ISerializerSpecification? _serializerSpecification;
+        private string? _contentType;
 
         public void AddSerializerSpecification(ISerializerSpecification spec)
         {
             _serializerSpecification = spec;
         }
 
-        public string? ContentType { get; set; }
+        public void ContentType(string contentType)
+        {
+            _contentType = contentType;
+        }
 
         public IBodyWriter Build()
         {
             Debug.Assert(_serializerSpecification != null);
-            Debug.Assert(!string.IsNullOrWhiteSpace(ContentType));
-            return new SerializationBodyWriter(_serializerSpecification.Build(), ContentType);
+            Debug.Assert(!string.IsNullOrWhiteSpace(_contentType));
+            return new SerializationBodyWriter(_serializerSpecification.Build(), _contentType);
         }
     }
 }

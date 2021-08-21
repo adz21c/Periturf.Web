@@ -30,7 +30,7 @@ namespace Periturf.Web.Tests.Integration
         public async Task Given_IdSvr_When_ConfigureAndRemoveConfiguration_Then_ClientAuthsAndFailsAuth()
         {
             // Arrange
-            const string WebHostUrl = "http://localhost:3510";
+            const string WebHostUrl = "http://localhost:5000";
             const string WebAppUrl = "/WebApp";
 
             var env = Environment.Setup(e =>
@@ -64,11 +64,11 @@ namespace Periturf.Web.Tests.Integration
                             });
                             r.Response(rs =>
                             {
-                                rs.StatusCode = HttpStatusCode.OK;
-                                rs.ObjectBody(ob =>
+                                rs.StatusCode(200);
+                                rs.Body(ob =>
                                 {
-                                    ob.Object(new { Test = "Value" });
-                                    ob.JsonSerializer();
+                                    ob.Content(new { Test = "Value" });
+                                    ob.JsonBodyWriter();
                                 });
                             });
                         });

@@ -24,11 +24,9 @@ namespace Periturf.Web.BodyWriters
     public interface IWebBodyWriterConfigurator : ISerializerConfigurator
     {
         /// <summary>
-        /// Gets or sets the type of the content.
+        /// Set the Content-Type header value for the serializer.
         /// </summary>
-        /// <value>
-        /// The type of the content.
-        /// </value>
-        string? ContentType { get; set; }
+        /// <param name="contentType">Type of the content.</param>
+        void ContentType(string contentType);
     }
 }
