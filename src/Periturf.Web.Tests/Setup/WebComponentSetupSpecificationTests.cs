@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
 using Periturf.Events;
 using Periturf.Web.BodyReaders;
+using Periturf.Web.BodyWriters;
 using Periturf.Web.Configuration;
 using Periturf.Web.Configuration.Requests;
 using Periturf.Web.Setup;
@@ -50,6 +51,7 @@ namespace Periturf.Web.Tests.Setup
             const string name = "Name";
             const string path = "/Path";
 
+            var bodyWriterSpec = A.Dummy<IWebBodyWriterSpecification>();
             var bodyReaderSpec = A.Dummy<IWebBodyReaderSpecification>();
 
             var sut = new WebComponentSetupSpecification(name, path);
@@ -63,7 +65,7 @@ namespace Periturf.Web.Tests.Setup
             configSpec.AddWebRequestEventSpecification(reqBodySpec);
             await configSpec.ApplyAsync();
 
-            A.CallTo(() => reqBodySpec.Build(bodyReaderSpec)).MustHaveHappened();
+            A.CallTo(() => reqBodySpec.Build(bodyReaderSpec, bodyWriterSpec)).MustHaveHappened();
         }
     }
 }

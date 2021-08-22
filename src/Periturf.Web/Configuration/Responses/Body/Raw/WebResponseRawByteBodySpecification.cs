@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Periturf.Web.BodyWriters;
 
 namespace Periturf.Web.Configuration.Responses.Body.Raw
 {
@@ -19,7 +20,7 @@ namespace Periturf.Web.Configuration.Responses.Body.Raw
             _contentType = contentType;
         }
 
-        public Func<TWebRequestEvent, IWebResponse, CancellationToken, ValueTask> BuildResponseBodyWriter()
+        public Func<TWebRequestEvent, IWebResponse, CancellationToken, ValueTask> BuildResponseBodyWriter(IWebBodyWriterSpecification defaultBodyWriterSpec)
         {
             return async (@event, response, ct) =>
             {

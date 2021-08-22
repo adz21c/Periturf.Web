@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using NUnit.Framework;
 using Periturf.Web.BodyReaders;
+using Periturf.Web.BodyWriters;
 using Periturf.Web.Configuration.Requests;
 using Periturf.Web.Configuration.Responses;
 using Periturf.Web.RequestCriteria;
@@ -28,16 +29,19 @@ namespace Periturf.Web.Tests.Configuration
     [TestFixture]
     class WebRequestEventBodySpecificationTests
     {
+        private IWebBodyWriterSpecification _defaultBodyWriterSpec;
         private IWebBodyReaderSpecification _defaultBodyReaderSpec;
         private Func<IWebRequestEvent<RequestBody>, bool> _criteria;
         private Func<IWebRequestEvent<RequestBody>, IWebResponse, CancellationToken, ValueTask> _responseFactory;
         private IWebRequestEvent _request;
         private IWebRequestEvent<RequestBody> _requestWithBody;
         private WebRequestEventBodySpecification<RequestBody> _spec;
+        private IWebResponseSpecification<IWebRequestEvent<RequestBody>> _responseSpec;
 
         [SetUp]
         public void SetUp()
         {
+            _defaultBodyWriterSpec = A.Dummy<IWebBodyWriterSpecification>();
             _defaultBodyReaderSpec = A.Dummy<IWebBodyReaderSpecification>();
 
             _criteria = A.Dummy<Func<IWebRequestEvent<RequestBody>, bool>>();
@@ -49,12 +53,12 @@ namespace Periturf.Web.Tests.Configuration
             _requestWithBody = A.Dummy<IWebRequestEvent<RequestBody>>();
             A.CallTo(() => _request.ToWithBodyAsync<RequestBody>(A<IBodyReader>._, A<CancellationToken>._)).Returns(_requestWithBody);
 
-            var responseSpec = A.Fake<IWebResponseSpecification<IWebRequestEvent<RequestBody>>>();
-            A.CallTo(() => responseSpec.BuildResponseWriter()).Returns(_responseFactory);
+            _responseSpec = A.Fake<IWebResponseSpecification<IWebRequestEvent<RequestBody>>>();
+            A.CallTo(() => _responseSpec.BuildResponseWriter(A<IWebBodyWriterSpecification>._)).Returns(_responseFactory);
 
             _spec = new WebRequestEventBodySpecification<RequestBody>();
             _spec.AddCriteriaSpecification(criteriaSpec);
-            _spec.AddWebResponseSpecification(responseSpec);
+            _spec.AddWebResponseSpecification(_responseSpec);
         }
 
         [TestCase(true)]
@@ -63,7 +67,7 @@ namespace Periturf.Web.Tests.Configuration
         {
             A.CallTo(() => _criteria.Invoke(A<IWebRequestEvent<RequestBody>>._)).Returns(intendedResult);
 
-            var config = _spec.Build(_defaultBodyReaderSpec);
+            var config = _spec.Build(_defaultBodyReaderSpec, _defaultBodyWriterSpec);
             var result = await config.MatchesAsync(_request, CancellationToken.None);
 
             Assert.That(result, Is.EqualTo(intendedResult));
@@ -74,10 +78,16 @@ namespace Periturf.Web.Tests.Configuration
         [Test]
         public async Task Given_ResponseFactory_When_WriteResponse_Then_Executed()
         {
-            var config = _spec.Build(_defaultBodyReaderSpec);
+            var config = _spec.Build(_defaultBodyReaderSpec, _defaultBodyWriterSpec);
             await config.WriteResponseAsync(_requestWithBody, A.Dummy<IWebResponse>(), CancellationToken.None);
 
             A.CallTo(() => _responseFactory.Invoke(A<IWebRequestEvent<RequestBody>>._, A<IWebResponse>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        }
+
+        [Test]
+        public void Given_ResponseSpec_When_Build_Then_DefaultBodyWriterProvided()
+        {
+            A.CallTo(() => _responseSpec.BuildResponseWriter(_defaultBodyWriterSpec)).MustHaveHappened();
         }
 
         [Test]
@@ -86,7 +96,7 @@ namespace Periturf.Web.Tests.Configuration
             var newBodyReaderSpec = A.Dummy<IWebBodyReaderSpecification>();
             _spec.AddWebBodyReaderSpecification(newBodyReaderSpec);
 
-            var config = _spec.Build(_defaultBodyReaderSpec);
+            var config = _spec.Build(_defaultBodyReaderSpec, _defaultBodyWriterSpec);
 
             Assert.That(config, Is.Not.Null);
             A.CallTo(() => newBodyReaderSpec.Build()).MustHaveHappened();
@@ -96,7 +106,7 @@ namespace Periturf.Web.Tests.Configuration
         [Test]
         public void Given_NotOverrideBodyReader_When_Build_Then_DefaultSpecBuilt()
         {
-            var config = _spec.Build(_defaultBodyReaderSpec);
+            var config = _spec.Build(_defaultBodyReaderSpec, _defaultBodyWriterSpec);
 
             Assert.That(config, Is.Not.Null);
             A.CallTo(() => _defaultBodyReaderSpec.Build()).MustHaveHappened();

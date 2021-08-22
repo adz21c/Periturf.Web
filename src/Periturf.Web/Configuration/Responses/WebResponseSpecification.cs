@@ -23,6 +23,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Periturf.Web.BodyWriters;
 using Periturf.Web.Configuration.Responses.Body;
 
 namespace Periturf.Web.Configuration.Responses
@@ -68,11 +69,11 @@ namespace Periturf.Web.Configuration.Responses
             _bodySpec = spec;
         }
 
-        public Func<TWebRequestEvent, IWebResponse, CancellationToken, ValueTask> BuildResponseWriter()
+        public Func<TWebRequestEvent, IWebResponse, CancellationToken, ValueTask> BuildResponseWriter(IWebBodyWriterSpecification defaultBodyWriterSpec)
         {
             Debug.Assert(_statusCode != null);
 
-            var bodyWriter = _bodySpec?.BuildResponseBodyWriter();
+            var bodyWriter = _bodySpec?.BuildResponseBodyWriter(defaultBodyWriterSpec);
             return async (@event, response, ct) =>
             {
                 foreach (var cookie in _cookies)

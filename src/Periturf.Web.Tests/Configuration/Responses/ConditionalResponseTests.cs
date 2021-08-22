@@ -19,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NUnit.Framework;
+using Periturf.Web.BodyWriters;
 using Periturf.Web.Configuration.Responses;
 using Periturf.Web.Configuration.Responses.Conditional;
 
@@ -26,34 +27,39 @@ namespace Periturf.Web.Tests.Configuration.Responses
 {
     class ConditionalResponseTests
     {
+        private IWebBodyWriterSpecification _defBodyWriterSpec;
         private Func<IWebRequestEvent, IWebResponse, CancellationToken, ValueTask> _writer1;
+        private IWebResponseSpecification<IWebRequestEvent> _writer1Spec;
         private Func<IWebRequestEvent, IWebResponse, CancellationToken, ValueTask> _writer2;
+        private IWebResponseSpecification<IWebRequestEvent> _writer2Spec;
         private Func<IWebRequestEvent, IWebResponse, CancellationToken, ValueTask> _sut;
 
         [OneTimeSetUp]
         public void SetUp()
         {
+            _defBodyWriterSpec = A.Fake<IWebBodyWriterSpecification>();
+
             _writer1 = A.Fake<Func<IWebRequestEvent, IWebResponse, CancellationToken, ValueTask>>();
-            var writer1Spec = A.Fake<IWebResponseSpecification<IWebRequestEvent>>();
-            A.CallTo(() => writer1Spec.BuildResponseWriter()).Returns(_writer1);
+            _writer1Spec = A.Fake<IWebResponseSpecification<IWebRequestEvent>>();
+            A.CallTo(() => _writer1Spec.BuildResponseWriter(A<IWebBodyWriterSpecification>._)).Returns(_writer1);
 
             _writer2 = A.Fake<Func<IWebRequestEvent, IWebResponse, CancellationToken, ValueTask>>();
-            var writer2Spec = A.Fake<IWebResponseSpecification<IWebRequestEvent>>();
-            A.CallTo(() => writer2Spec.BuildResponseWriter()).Returns(_writer2);
+            _writer2Spec = A.Fake<IWebResponseSpecification<IWebRequestEvent>>();
+            A.CallTo(() => _writer2Spec.BuildResponseWriter(A<IWebBodyWriterSpecification>._)).Returns(_writer2);
 
             var spec = new ConditionalResponseSpecification<IWebRequestEvent>();
             spec.Condition(c =>
             {
                 c.Criteria(cr => cr.Method().EqualTo("GET"));
-                c.AddWebResponseSpecification(writer1Spec);
+                c.AddWebResponseSpecification(_writer1Spec);
             });
             spec.Condition(c =>
             {
                 c.Criteria(cr => cr.Method().EqualTo("POST"));
-                c.AddWebResponseSpecification(writer2Spec);
+                c.AddWebResponseSpecification(_writer2Spec);
             });
 
-            _sut = spec.BuildResponseWriter();
+            _sut = spec.BuildResponseWriter(_defBodyWriterSpec);
         }
 
         [TearDown]
@@ -106,6 +112,13 @@ namespace Periturf.Web.Tests.Configuration.Responses
             A.CallTo(() => _writer1(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
             A.CallTo(() => _writer2(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
             A.CallToSet(() => response.StatusCode).To(HttpStatusCode.InternalServerError).MustHaveHappened();
+        }
+
+        [Test]
+        public void Given_DefaultBodyWriter_When_Build_Then_PassToBodySpecFactory()
+        {
+            A.CallTo(() => _writer1Spec.BuildResponseWriter(_defBodyWriterSpec)).MustHaveHappened();
+            A.CallTo(() => _writer2Spec.BuildResponseWriter(_defBodyWriterSpec)).MustHaveHappened();
         }
     }
 }

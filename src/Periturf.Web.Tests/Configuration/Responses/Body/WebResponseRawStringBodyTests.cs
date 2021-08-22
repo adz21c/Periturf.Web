@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using FakeItEasy;
 using NUnit.Framework;
+using Periturf.Web.BodyWriters;
 using Periturf.Web.Configuration.Responses;
 using Periturf.Web.Configuration.Responses.Body.Raw;
 
@@ -13,7 +14,7 @@ namespace Periturf.Web.Tests.Configuration.Responses.Body
         public async Task Given_NoConfig_When_ExecuteWriter_Then_EmptyResponse()
         {
             var spec = new WebResponseRawStringBodySpecification<IWebRequestEvent>();
-            var sut = spec.BuildResponseBodyWriter();
+            var sut = spec.BuildResponseBodyWriter(A.Dummy<IWebBodyWriterSpecification>());
 
             var response = A.Dummy<IWebResponse>();
 
@@ -34,7 +35,7 @@ namespace Periturf.Web.Tests.Configuration.Responses.Body
             spec.ContentType(ContentType);
             spec.Body(Content);
 
-            var sut = spec.BuildResponseBodyWriter();
+            var sut = spec.BuildResponseBodyWriter(A.Dummy<IWebBodyWriterSpecification>());
 
             var response = A.Dummy<IWebResponse>();
 
@@ -55,7 +56,7 @@ namespace Periturf.Web.Tests.Configuration.Responses.Body
             spec.ContentType(ContentType);
             spec.Body(null);
 
-            var sut = spec.BuildResponseBodyWriter();
+            var sut = spec.BuildResponseBodyWriter(A.Dummy<IWebBodyWriterSpecification>());
 
             var response = A.Dummy<IWebResponse>();
 

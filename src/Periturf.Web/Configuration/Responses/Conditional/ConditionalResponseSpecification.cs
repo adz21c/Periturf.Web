@@ -19,6 +19,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Periturf.Web.BodyWriters;
 
 namespace Periturf.Web.Configuration.Responses.Conditional
 {
@@ -33,9 +34,9 @@ namespace Periturf.Web.Configuration.Responses.Conditional
             _conditionSpecifications.Add(spec);
         }
 
-        public Func<TWebRequestEvent, IWebResponse, CancellationToken, ValueTask> BuildResponseWriter()
+        public Func<TWebRequestEvent, IWebResponse, CancellationToken, ValueTask> BuildResponseWriter(IWebBodyWriterSpecification defaultBodyWriterSpec)
         {
-            var conditions = _conditionSpecifications.Select(x => x.Build()).ToList();
+            var conditions = _conditionSpecifications.Select(x => x.Build(defaultBodyWriterSpec)).ToList();
 
             return async (@event, response, ct) =>
             {

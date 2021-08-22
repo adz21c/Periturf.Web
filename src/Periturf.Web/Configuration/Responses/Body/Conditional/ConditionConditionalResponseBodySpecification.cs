@@ -17,6 +17,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Periturf.Web.BodyWriters;
 using Periturf.Web.RequestCriteria;
 using Periturf.Web.RequestCriteria.Logical;
 
@@ -39,13 +40,13 @@ namespace Periturf.Web.Configuration.Responses.Body.Conditional
             _responseBodySpecification = spec;
         }
 
-        public (Func<TWebRequestEvent, bool> Condition, Func<TWebRequestEvent, IWebResponse, CancellationToken, ValueTask> ResponseWriter) Build()
+        public (Func<TWebRequestEvent, bool> Condition, Func<TWebRequestEvent, IWebResponse, CancellationToken, ValueTask> ResponseWriter) Build(IWebBodyWriterSpecification defaultBodyWriterSpec)
         {
             Debug.Assert(_criteriaSpecification != null);
             Debug.Assert(_responseBodySpecification != null);
             return (
                 _criteriaSpecification.Build(),
-                _responseBodySpecification.BuildResponseBodyWriter());
+                _responseBodySpecification.BuildResponseBodyWriter(defaultBodyWriterSpec));
         }
     }
 }

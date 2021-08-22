@@ -22,10 +22,9 @@ namespace Periturf.Web.Configuration.Responses
             _writerSpec = spec;
         }
 
-        public Func<TWebRequestEvent, IWebResponse, CancellationToken, ValueTask> BuildResponseBodyWriter()
+        public Func<TWebRequestEvent, IWebResponse, CancellationToken, ValueTask> BuildResponseBodyWriter(IWebBodyWriterSpecification defaultBodyWriterSpec)
         {
-            Debug.Assert(_writerSpec != null);
-            var writer = _writerSpec.Build();
+            var writer = (_writerSpec ?? defaultBodyWriterSpec).Build();
             return (@event, response, ct) => writer.WriteAsync(@event, response, _content, ct);
         }
     }

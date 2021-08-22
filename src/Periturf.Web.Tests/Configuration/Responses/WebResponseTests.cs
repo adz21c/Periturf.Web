@@ -25,6 +25,7 @@ using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using NUnit.Framework;
+using Periturf.Web.BodyWriters;
 using Periturf.Web.Configuration.Responses;
 using Periturf.Web.Configuration.Responses.Body;
 
@@ -40,7 +41,7 @@ namespace Periturf.Web.Tests.Configuration.Responses
 
             var bodyWriter = A.Dummy<Func<IWebRequestEvent, IWebResponse, CancellationToken, ValueTask>>();
             var bodyWriterSpec = A.Fake<IWebResponseBodySpecification<IWebRequestEvent>>();
-            A.CallTo(() => bodyWriterSpec.BuildResponseBodyWriter()).Returns(bodyWriter);
+            A.CallTo(() => bodyWriterSpec.BuildResponseBodyWriter(A<IWebBodyWriterSpecification>._)).Returns(bodyWriter);
 
             var spec = new WebResponseSpecification<IWebRequestEvent>();
             spec.StatusCode(200);
@@ -49,7 +50,7 @@ namespace Periturf.Web.Tests.Configuration.Responses
             spec.AddCookie("Name", "Value");
             spec.AddWebResponseBodySpecification(bodyWriterSpec);
 
-            var sut = spec.BuildResponseWriter();
+            var sut = spec.BuildResponseWriter(A.Dummy<IWebBodyWriterSpecification>());
             await sut(@event, response, CancellationToken.None);
 
             A.CallTo(() => response.AddCookie(A<string>._, A<string>._, A<CookieOptions>._)).MustHaveHappened().Then(
@@ -57,6 +58,24 @@ namespace Periturf.Web.Tests.Configuration.Responses
                 A.CallToSet(() => response.ContentType).MustHaveHappened()).Then(
                 A.CallToSet(() => response.StatusCode).MustHaveHappened()).Then(
                 A.CallTo(() => bodyWriter.Invoke(@event, response, A<CancellationToken>._)).MustHaveHappened());
+        }
+
+        [Test]
+        public void Given_DefaultBodyWriterSpec_When_Build_Then_ProvidedToBodyWriterSpec()
+        {
+            var bodyWriterSpec = A.Dummy<IWebBodyWriterSpecification>();
+
+            var responseBodyWriter = A.Dummy<Func<IWebRequestEvent, IWebResponse, CancellationToken, ValueTask>>();
+            var responseBodyWriterSpec = A.Fake<IWebResponseBodySpecification<IWebRequestEvent>>();
+            A.CallTo(() => responseBodyWriterSpec.BuildResponseBodyWriter(A<IWebBodyWriterSpecification>._)).Returns(responseBodyWriter);
+
+            var spec = new WebResponseSpecification<IWebRequestEvent>();
+            spec.StatusCode(200);
+
+            var sut = spec.BuildResponseWriter(bodyWriterSpec);
+
+
+            A.CallTo(() => responseBodyWriterSpec.BuildResponseBodyWriter(bodyWriterSpec)).MustHaveHappened();
         }
 
         [Test]
@@ -68,7 +87,7 @@ namespace Periturf.Web.Tests.Configuration.Responses
             var spec = new WebResponseSpecification<IWebRequestEvent>();
             spec.StatusCode(200);
 
-            var sut = spec.BuildResponseWriter();
+            var sut = spec.BuildResponseWriter(A.Dummy<IWebBodyWriterSpecification>());
             await sut(@event, response, CancellationToken.None);
 
             A.CallToSet(() => response.StatusCode).MustHaveHappened();
@@ -87,7 +106,7 @@ namespace Periturf.Web.Tests.Configuration.Responses
             spec.StatusCode(200);
             spec.ContentType(ContentType);
 
-            var sut = spec.BuildResponseWriter();
+            var sut = spec.BuildResponseWriter(A.Dummy<IWebBodyWriterSpecification>());
             await sut(@event, response, CancellationToken.None);
 
             A.CallToSet(() => response.StatusCode).MustHaveHappened();
@@ -107,7 +126,7 @@ namespace Periturf.Web.Tests.Configuration.Responses
             spec.StatusCode(200);
             spec.AddHeader(HeaderName, HeaderValue);
 
-            var sut = spec.BuildResponseWriter();
+            var sut = spec.BuildResponseWriter(A.Dummy<IWebBodyWriterSpecification>());
             await sut(@event, response, CancellationToken.None);
 
             A.CallToSet(() => response.StatusCode).MustHaveHappened();
@@ -128,7 +147,7 @@ namespace Periturf.Web.Tests.Configuration.Responses
             spec.StatusCode(200);
             spec.AddCookie(CookieName, CookieValue, options);
 
-            var sut = spec.BuildResponseWriter();
+            var sut = spec.BuildResponseWriter(A.Dummy<IWebBodyWriterSpecification>());
             await sut(@event, response, CancellationToken.None);
 
             A.CallToSet(() => response.StatusCode).MustHaveHappened();
@@ -144,7 +163,7 @@ namespace Periturf.Web.Tests.Configuration.Responses
             var spec = new WebResponseSpecification<IWebRequestEvent>();
             spec.StatusCode(302);
 
-            var sut = spec.BuildResponseWriter();
+            var sut = spec.BuildResponseWriter(A.Dummy<IWebBodyWriterSpecification>());
             await sut(@event, response, CancellationToken.None);
 
             A.CallToSet(() => response.StatusCode).To(HttpStatusCode.Redirect).MustHaveHappened();
@@ -166,7 +185,7 @@ namespace Periturf.Web.Tests.Configuration.Responses
             spec.StatusCode(200);
             spec.IsAttachement(filename);
 
-            var sut = spec.BuildResponseWriter();
+            var sut = spec.BuildResponseWriter(A.Dummy<IWebBodyWriterSpecification>());
             await sut(@event, response, CancellationToken.None);
 
             A.CallTo(() => response.AddHeader("Content-Disposition", new StringValues(headerValue))).MustHaveHappened();

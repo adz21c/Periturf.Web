@@ -20,6 +20,7 @@ using FakeItEasy;
 using NUnit.Framework;
 using Periturf.Events;
 using Periturf.Web.BodyReaders;
+using Periturf.Web.BodyWriters;
 using Periturf.Web.Configuration;
 using Periturf.Web.Configuration.Requests;
 using Periturf.Web.Setup;
@@ -41,7 +42,7 @@ namespace Periturf.Web.Tests.Setup
             var component = sut.Configure();
             
             var reqBodySpec = A.Fake<IWebRequestEventSpecification>();
-            A.CallTo(() => reqBodySpec.Build(A<IWebBodyReaderSpecification>._)).Invokes((IWebBodyReaderSpecification s) => _bodyReader = s.Build());
+            A.CallTo(() => reqBodySpec.Build(A<IWebBodyReaderSpecification>._, A<IWebBodyWriterSpecification>._)).Invokes((IWebBodyReaderSpecification s) => _bodyReader = s.Build());
 
             var configSpec = component.Component.CreateConfigurationSpecification<WebComponentSpecification>(A.Dummy<IEventHandlerFactory>());
             configSpec.AddWebRequestEventSpecification(reqBodySpec);
