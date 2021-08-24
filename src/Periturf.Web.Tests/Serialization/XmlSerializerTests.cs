@@ -25,10 +25,7 @@ namespace Periturf.Web.Tests.Serialization
 {
     class XmlSerializerTests
     {
-        const string xml = @"<?xml version=""1.0""?>
-<BodyType xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-  <Test>6</Test>
-</BodyType>";
+        const string xml = "<?xml version=\"1.0\"?>\r\n<BodyType xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <Test>6</Test>\r\n</BodyType>";
         private ISerializer _sut;
 
         [OneTimeSetUp]
@@ -62,7 +59,7 @@ namespace Periturf.Web.Tests.Serialization
             stream.Position = 0;
 
             var result = Encoding.UTF8.GetString(stream.ToArray());
-            Assert.That(result, Is.EqualTo(xml));
+            Assert.That(result, Is.EqualTo(xml.Replace("\r\n", System.Environment.NewLine)));
         }
     }
 }
