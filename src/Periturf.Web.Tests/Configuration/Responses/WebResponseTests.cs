@@ -71,6 +71,7 @@ namespace Periturf.Web.Tests.Configuration.Responses
 
             var spec = new WebResponseSpecification<IWebRequestEvent>();
             spec.StatusCode(200);
+            spec.AddWebResponseBodySpecification(responseBodyWriterSpec);
 
             var sut = spec.BuildResponseWriter(bodyWriterSpec);
 

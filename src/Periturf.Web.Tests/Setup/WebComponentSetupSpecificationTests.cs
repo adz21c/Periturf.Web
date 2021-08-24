@@ -46,7 +46,7 @@ namespace Periturf.Web.Tests.Setup
         }
 
         [Test]
-        public async Task Given_OverrideBuiltinDefaultBodyReader_When_Apply_Then_NewBodyReaderProvided()
+        public async Task Given_OverrideBuiltinDefaultBodyReaderAndWriter_When_Apply_Then_NewBodyReaderAndWriterProvided()
         {
             const string name = "Name";
             const string path = "/Path";
@@ -56,6 +56,7 @@ namespace Periturf.Web.Tests.Setup
 
             var sut = new WebComponentSetupSpecification(name, path);
             sut.DefaultBodyReader(c => c.AddWebBodyReaderSpecification(bodyReaderSpec));
+            sut.DefaultBodyWriter(c => c.AddWebBodyWriterSpecification(bodyWriterSpec));
 
             var component = sut.Configure();
 

@@ -87,6 +87,7 @@ namespace Periturf.Web.Tests.Configuration
         [Test]
         public void Given_ResponseSpec_When_Build_Then_DefaultBodyWriterProvided()
         {
+            var config = _spec.Build(_defaultBodyReaderSpec, _defaultBodyWriterSpec);
             A.CallTo(() => _responseSpec.BuildResponseWriter(_defaultBodyWriterSpec)).MustHaveHappened();
         }
 

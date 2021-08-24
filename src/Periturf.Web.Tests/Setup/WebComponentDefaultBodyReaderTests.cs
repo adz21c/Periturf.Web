@@ -42,7 +42,7 @@ namespace Periturf.Web.Tests.Setup
             var component = sut.Configure();
             
             var reqBodySpec = A.Fake<IWebRequestEventSpecification>();
-            A.CallTo(() => reqBodySpec.Build(A<IWebBodyReaderSpecification>._, A<IWebBodyWriterSpecification>._)).Invokes((IWebBodyReaderSpecification s) => _bodyReader = s.Build());
+            A.CallTo(() => reqBodySpec.Build(A<IWebBodyReaderSpecification>._, A<IWebBodyWriterSpecification>._)).Invokes((IWebBodyReaderSpecification s, IWebBodyWriterSpecification w) => _bodyReader = s.Build());
 
             var configSpec = component.Component.CreateConfigurationSpecification<WebComponentSpecification>(A.Dummy<IEventHandlerFactory>());
             configSpec.AddWebRequestEventSpecification(reqBodySpec);
