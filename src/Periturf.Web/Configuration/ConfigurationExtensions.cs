@@ -19,7 +19,8 @@ using Periturf.Configuration;
 using Periturf.Web;
 using Periturf.Web.Configuration;
 using Periturf.Web.Configuration.Requests;
-using Periturf.Web.Configuration.Requests.Responses;
+using Periturf.Web.Configuration.Responses;
+using Periturf.Web.Configuration.Responses.Conditional;
 
 namespace Periturf
 {
@@ -52,12 +53,20 @@ namespace Periturf
             builder.AddSpecification(spec);
         }
 
-        public static void Response<TWebRequestEvent>(this IWebRequestEventConfigurator<TWebRequestEvent> configurator, Action<IWebRequestResponseConfigurator> config)
+        public static void Response<TWebRequestEvent>(this IWebResponseConfigurable<TWebRequestEvent> configurator, Action<IWebResponseConfigurator<TWebRequestEvent>> config)
             where TWebRequestEvent : IWebRequestEvent
         {
-            var spec = new WebRequestResponseSpecification();
+            var spec = new WebResponseSpecification<TWebRequestEvent>();
             config?.Invoke(spec);
-            configurator.SetResponseSpecification(spec);
+            configurator.AddWebResponseSpecification(spec);
+        }
+
+        public static void ConditionalResponse<TWebRequestEvent>(this IWebResponseConfigurable<TWebRequestEvent> configurator, Action<IConditionalResponseConfigurator<TWebRequestEvent>> config)
+            where TWebRequestEvent : IWebRequestEvent
+        {
+            var spec = new ConditionalResponseSpecification<TWebRequestEvent>();
+            config?.Invoke(spec);
+            configurator.AddWebResponseSpecification(spec);
         }
     }
 }

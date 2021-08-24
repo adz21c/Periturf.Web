@@ -25,5 +25,10 @@ namespace Periturf.Web.Serialization.Json
         {
             return System.Text.Json.JsonSerializer.DeserializeAsync<T>(body, null, ct);
         }
+
+        public async ValueTask Serialize<T>(T @object, Stream stream, CancellationToken ct) where T : class
+        {
+            await System.Text.Json.JsonSerializer.SerializeAsync<T>(stream, @object, null, ct);
+        }
     }
 }

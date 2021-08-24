@@ -23,11 +23,11 @@ namespace Periturf.Web.Configuration
     class WebConfiguration : IWebConfiguration
     {
         private readonly Func<IWebRequestEvent, bool> _criteria;
-        private readonly Func<IWebResponse, CancellationToken, ValueTask> _responseFactory;
+        private readonly Func<IWebRequestEvent, IWebResponse, CancellationToken, ValueTask> _responseFactory;
 
         public WebConfiguration(
             Func<IWebRequestEvent, bool> criteria,
-            Func<IWebResponse, CancellationToken, ValueTask> responseFactory)
+            Func<IWebRequestEvent, IWebResponse, CancellationToken, ValueTask> responseFactory)
         {
             Debug.Assert(criteria != null, "criteria != null");
             Debug.Assert(responseFactory != null, "responseFactory != null");
@@ -38,9 +38,9 @@ namespace Periturf.Web.Configuration
 
         public ValueTask<bool> MatchesAsync(IWebRequestEvent @event, CancellationToken ct) => new ValueTask<bool>(_criteria(@event));
 
-        public async ValueTask WriteResponseAsync(IWebResponse response, CancellationToken ct)
+        public async ValueTask WriteResponseAsync(IWebRequestEvent @event, IWebResponse response, CancellationToken ct)
         {
-            await _responseFactory(response, ct);
+            await _responseFactory(@event, response, ct);
         }
     }
 }

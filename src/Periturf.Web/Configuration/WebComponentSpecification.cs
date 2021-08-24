@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using Periturf.Configuration;
 using Periturf.Events;
 using Periturf.Web.BodyReaders;
+using Periturf.Web.BodyWriters;
 using Periturf.Web.Configuration.Requests;
 
 namespace Periturf.Web.Configuration
@@ -29,11 +30,13 @@ namespace Periturf.Web.Configuration
         private readonly List<IWebConfiguration> _configurations;
         private readonly List<IWebRequestEventSpecification> _webRequestSpecifications = new List<IWebRequestEventSpecification>();
         private readonly IWebBodyReaderSpecification _defaultBodyReaderSpec;
+        private readonly IWebBodyWriterSpecification _defaultBodyWriterSpec;
 
-        public WebComponentSpecification(List<IWebConfiguration> configurations, IWebBodyReaderSpecification defaultBodyReaderSpec, IEventHandlerFactory eventHandlerFactory)
+        public WebComponentSpecification(List<IWebConfiguration> configurations, IWebBodyReaderSpecification defaultBodyReaderSpec, BodyWriters.IWebBodyWriterSpecification defaultBodyWriterSpec, IEventHandlerFactory eventHandlerFactory)
         {
             _configurations = configurations;
             _defaultBodyReaderSpec = defaultBodyReaderSpec;
+            _defaultBodyWriterSpec = defaultBodyWriterSpec;
         }
 
         public void AddWebRequestEventSpecification(IWebRequestEventSpecification spec)
@@ -44,7 +47,7 @@ namespace Periturf.Web.Configuration
 
         public Task<IConfigurationHandle> ApplyAsync(CancellationToken ct = default)
         {
-            var newConfig = _webRequestSpecifications.Select(x => x.Build(_defaultBodyReaderSpec)).ToList();
+            var newConfig = _webRequestSpecifications.Select(x => x.Build(_defaultBodyReaderSpec, _defaultBodyWriterSpec)).ToList();
             _configurations.AddRange(newConfig);
             
             return Task.FromResult<IConfigurationHandle>(new ConfigurationHandle(newConfig, _configurations));

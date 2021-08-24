@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
 using Periturf.Verify;
 using Periturf.Web.BodyReaders;
+using Periturf.Web.BodyWriters;
 using Periturf.Web.Verification;
 
 namespace Periturf.Web.Tests
@@ -33,6 +34,7 @@ namespace Periturf.Web.Tests
         private Func<IWebRequestEvent, ValueTask<bool>> _verification1;
         private Func<IWebRequestEvent, ValueTask<bool>> _verification2;
         private IWebBodyReaderSpecification _defaultBodyReaderSpec;
+        private IWebBodyWriterSpecification _defaultWriterReaderSpec;
         private IConditionFeed _feed1;
         private IConditionFeed _feed2;
 
@@ -50,8 +52,9 @@ namespace Periturf.Web.Tests
             var conditionInstanceFactory = A.Fake<IConditionInstanceFactory>();
 
             _defaultBodyReaderSpec = A.Dummy<IWebBodyReaderSpecification>();
+            _defaultWriterReaderSpec = A.Dummy<IWebBodyWriterSpecification>();
 
-            _sut = new WebComponent(_defaultBodyReaderSpec);
+            _sut = new WebComponent(_defaultBodyReaderSpec, _defaultWriterReaderSpec);
 
             var builder = (ConditionBuilder)_sut.CreateConditionBuilder();
             var ver1Spec = builder.CreateWebRequestEventConditionSpecification(verification1Spec);

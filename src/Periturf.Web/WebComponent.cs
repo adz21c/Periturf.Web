@@ -24,6 +24,7 @@ using Periturf.Configuration;
 using Periturf.Events;
 using Periturf.Verify;
 using Periturf.Web.BodyReaders;
+using Periturf.Web.BodyWriters;
 using Periturf.Web.Configuration;
 using Periturf.Web.Verification;
 
@@ -34,10 +35,12 @@ namespace Periturf.Web
         private readonly List<IWebConfiguration> _configurations = new List<IWebConfiguration>();
         private readonly List<IWebVerification> _verifications = new List<IWebVerification>();
         private readonly IWebBodyReaderSpecification _defaultBodyReaderSpec;
+        private readonly IWebBodyWriterSpecification _defaultBodyWriterSpec;
 
-        public WebComponent(IWebBodyReaderSpecification defaultBodyReaderSpec)
+        public WebComponent(IWebBodyReaderSpecification defaultBodyReaderSpec, BodyWriters.IWebBodyWriterSpecification defaultBodyWriterSpec)
         {
             _defaultBodyReaderSpec = defaultBodyReaderSpec;
+            _defaultBodyWriterSpec = defaultBodyWriterSpec;
         }
 
         public IComponentClient CreateClient()
@@ -52,7 +55,7 @@ namespace Periturf.Web
 
         public TSpecification CreateConfigurationSpecification<TSpecification>(IEventHandlerFactory eventHandlerFactory) where TSpecification : IConfigurationSpecification
         {
-            return (TSpecification)(object)new WebComponentSpecification(_configurations, _defaultBodyReaderSpec, eventHandlerFactory);
+            return (TSpecification)(object)new WebComponentSpecification(_configurations, _defaultBodyReaderSpec, _defaultBodyWriterSpec, eventHandlerFactory);
         }
         
         public async Task ProcessAsync(HttpContext context)
@@ -71,7 +74,7 @@ namespace Periturf.Web
                 if (match)
                 {
                     var response = new WebResponse(context.Response);
-                    await config.WriteResponseAsync(response, context.RequestAborted);
+                    await config.WriteResponseAsync(@event, response, context.RequestAborted);
                     await context.Response.CompleteAsync();
                     return;
                 }

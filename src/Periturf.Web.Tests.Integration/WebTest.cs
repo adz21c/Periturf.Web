@@ -40,6 +40,7 @@ namespace Periturf.Web.Tests.Integration
                     h.Web(w =>
                     {
                         w.WebApp();
+                        w.BindToUrl(WebHostUrl);
                     });
                 });
             });
@@ -64,11 +65,11 @@ namespace Periturf.Web.Tests.Integration
                             });
                             r.Response(rs =>
                             {
-                                rs.StatusCode = HttpStatusCode.OK;
-                                rs.ObjectBody(ob =>
+                                rs.StatusCode(200);
+                                rs.Body(ob =>
                                 {
-                                    ob.Object(new { Test = "Value" });
-                                    ob.JsonSerializer();
+                                    ob.Content(new { Test = "Value" });
+                                    ob.JsonBodyWriter();
                                 });
                             });
                         });

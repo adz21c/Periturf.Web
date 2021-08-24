@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
 using Periturf.Events;
 using Periturf.Web.BodyReaders;
+using Periturf.Web.BodyWriters;
 using Periturf.Web.Configuration;
 using Periturf.Web.Configuration.Requests;
 using Periturf.Web.Setup;
@@ -45,15 +46,17 @@ namespace Periturf.Web.Tests.Setup
         }
 
         [Test]
-        public async Task Given_OverrideBuiltinDefaultBodyReader_When_Apply_Then_NewBodyReaderProvided()
+        public async Task Given_OverrideBuiltinDefaultBodyReaderAndWriter_When_Apply_Then_NewBodyReaderAndWriterProvided()
         {
             const string name = "Name";
             const string path = "/Path";
 
+            var bodyWriterSpec = A.Dummy<IWebBodyWriterSpecification>();
             var bodyReaderSpec = A.Dummy<IWebBodyReaderSpecification>();
 
             var sut = new WebComponentSetupSpecification(name, path);
             sut.DefaultBodyReader(c => c.AddWebBodyReaderSpecification(bodyReaderSpec));
+            sut.DefaultBodyWriter(c => c.AddWebBodyWriterSpecification(bodyWriterSpec));
 
             var component = sut.Configure();
 
@@ -63,7 +66,7 @@ namespace Periturf.Web.Tests.Setup
             configSpec.AddWebRequestEventSpecification(reqBodySpec);
             await configSpec.ApplyAsync();
 
-            A.CallTo(() => reqBodySpec.Build(bodyReaderSpec)).MustHaveHappened();
+            A.CallTo(() => reqBodySpec.Build(bodyReaderSpec, bodyWriterSpec)).MustHaveHappened();
         }
     }
 }

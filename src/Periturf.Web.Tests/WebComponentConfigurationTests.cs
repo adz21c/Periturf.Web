@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
 using Periturf.Events;
 using Periturf.Web.BodyReaders;
+using Periturf.Web.BodyWriters;
 using Periturf.Web.Configuration;
 using Periturf.Web.Configuration.Requests;
 
@@ -32,6 +33,7 @@ namespace Periturf.Web.Tests
     {
         private WebComponent _sut;
         private IWebBodyReaderSpecification _defaultBodyReaderSpec;
+        private IWebBodyWriterSpecification _defaultBodyWriterSpec;
         private IWebConfiguration _config1;
         private IWebRequestEventSpecification _config1Spec;
         private IWebConfiguration _config2;
@@ -41,18 +43,19 @@ namespace Periturf.Web.Tests
         public async Task SetupAsync()
         {
             _config1 = A.Fake<IWebConfiguration>();
-            A.CallTo(() => _config1.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).Invokes((IWebResponse r, CancellationToken ct) => r.StatusCode = HttpStatusCode.OK);
+            A.CallTo(() => _config1.WriteResponseAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).Invokes((IWebRequestEvent e, IWebResponse r, CancellationToken ct) => r.StatusCode = HttpStatusCode.OK);
             _config1Spec = A.Fake<IWebRequestEventSpecification>();
-            A.CallTo(() => _config1Spec.Build(A<IWebBodyReaderSpecification>._)).Returns(_config1);
+            A.CallTo(() => _config1Spec.Build(A<IWebBodyReaderSpecification>._, A<IWebBodyWriterSpecification>._)).Returns(_config1);
 
             _config2 = A.Fake<IWebConfiguration>();
-            A.CallTo(() => _config2.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).Invokes((IWebResponse r, CancellationToken ct) => r.StatusCode = HttpStatusCode.OK);
+            A.CallTo(() => _config2.WriteResponseAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).Invokes((IWebRequestEvent e, IWebResponse r, CancellationToken ct) => r.StatusCode = HttpStatusCode.OK);
             _config2Spec = A.Fake<IWebRequestEventSpecification>();
-            A.CallTo(() => _config2Spec.Build(A<IWebBodyReaderSpecification>._)).Returns(_config2);
+            A.CallTo(() => _config2Spec.Build(A<IWebBodyReaderSpecification>._, A<IWebBodyWriterSpecification>._)).Returns(_config2);
 
             _defaultBodyReaderSpec = A.Dummy<IWebBodyReaderSpecification>();
+            _defaultBodyWriterSpec = A.Dummy<IWebBodyWriterSpecification>();
 
-            _sut = new WebComponent(_defaultBodyReaderSpec);
+            _sut = new WebComponent(_defaultBodyReaderSpec, _defaultBodyWriterSpec);
 
             var configSpec = _sut.CreateConfigurationSpecification<Web.Configuration.WebComponentSpecification>(A.Dummy<IEventHandlerFactory>());
             configSpec.AddWebRequestEventSpecification(_config1Spec);
@@ -62,10 +65,10 @@ namespace Periturf.Web.Tests
         }
 
         [Test]
-        public void Given_Spec_When_Apply_Then_BodyReaderSpecProvided()
+        public void Given_Spec_When_Apply_Then_BodyReaderAndWriterSpecProvided()
         {
-            A.CallTo(() => _config1Spec.Build(_defaultBodyReaderSpec)).MustHaveHappened();
-            A.CallTo(() => _config2Spec.Build(_defaultBodyReaderSpec)).MustHaveHappened();
+            A.CallTo(() => _config1Spec.Build(_defaultBodyReaderSpec, _defaultBodyWriterSpec)).MustHaveHappened();
+            A.CallTo(() => _config2Spec.Build(_defaultBodyReaderSpec, _defaultBodyWriterSpec)).MustHaveHappened();
         }
 
         [Test]
@@ -77,10 +80,10 @@ namespace Periturf.Web.Tests
             await _sut.ProcessAsync(context);
 
             A.CallTo(() => _config2.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappened().Then(
-                A.CallTo(() => _config2.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustHaveHappened());
+                A.CallTo(() => _config2.WriteResponseAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).MustHaveHappened());
 
             A.CallTo(() => _config1.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustNotHaveHappened();
-            A.CallTo(() => _config1.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => _config1.WriteResponseAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
 
             Assert.That(context.Response.StatusCode, Is.EqualTo(200));
         }
@@ -96,9 +99,9 @@ namespace Periturf.Web.Tests
 
             A.CallTo(() => _config2.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappened().Then(
                 A.CallTo(() => _config1.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappened()).Then(
-                A.CallTo(() => _config1.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustHaveHappened());
+                A.CallTo(() => _config1.WriteResponseAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).MustHaveHappened());
 
-            A.CallTo(() => _config2.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => _config2.WriteResponseAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
 
             Assert.That(context.Response.StatusCode, Is.EqualTo(200));
         }
@@ -115,8 +118,8 @@ namespace Periturf.Web.Tests
             A.CallTo(() => _config2.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappened().Then(
                 A.CallTo(() => _config1.MatchesAsync(A<IWebRequestEvent>._, A<CancellationToken>._)).MustHaveHappened());
 
-            A.CallTo(() => _config2.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
-            A.CallTo(() => _config1.WriteResponseAsync(A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => _config2.WriteResponseAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => _config1.WriteResponseAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<CancellationToken>._)).MustNotHaveHappened();
 
             Assert.That(context.Response.StatusCode, Is.EqualTo(404));
         }

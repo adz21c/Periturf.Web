@@ -19,12 +19,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Periturf.Web.BodyReaders;
 using Periturf.Web.BodyReaders.Conditional;
+using Periturf.Web.BodyWriters;
+using Periturf.Web.BodyWriters.ContentNegotiation;
 
 namespace Periturf.Web.Setup
 {
     class WebComponentSetupSpecification : IWebComponentSetupSpecification
     {
         private IWebBodyReaderSpecification _defaultBodyReaderSpec;
+        private IWebBodyWriterSpecification _defaultBodyWriterSpec;
 
         public WebComponentSetupSpecification(string name, PathString path)
         {
@@ -54,6 +57,10 @@ namespace Periturf.Web.Setup
             });
 
             _defaultBodyReaderSpec = defaultBodyReader;
+
+            var defaultBodyWriterSpec = new ServerContentNegotiationSpecification();
+            ((IServerContentNegotiationConfigurator)defaultBodyWriterSpec).InitializeDefaultMediaTypes();
+            _defaultBodyWriterSpec = defaultBodyWriterSpec;
         }
 
         public string Name { get; }
@@ -68,10 +75,19 @@ namespace Periturf.Web.Setup
             if (spec.Spec != null)
                 _defaultBodyReaderSpec = spec.Spec;
         }
-        
+
+        public void DefaultBodyWriter(Action<IWebBodyWritableConfigurator> config)
+        {
+            var spec = new WebComponentBodyWriterConfigurator();
+            config(spec);
+
+            if (spec.Spec != null)
+                _defaultBodyWriterSpec = spec.Spec;
+        }
+
         public ConfigureWebAppDto Configure()
         {
-            var component = new WebComponent(_defaultBodyReaderSpec);
+            var component = new WebComponent(_defaultBodyReaderSpec, _defaultBodyWriterSpec);
 
             return new ConfigureWebAppDto(
                 component,

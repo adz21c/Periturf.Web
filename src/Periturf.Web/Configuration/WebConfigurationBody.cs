@@ -24,12 +24,12 @@ namespace Periturf.Web.Configuration
         where TBody : class
     {
         private readonly Func<IWebRequestEvent<TBody>, bool> _criteria;
-        private readonly Func<IWebResponse, CancellationToken, ValueTask> _responseFactory;
+        private readonly Func<IWebRequestEvent<TBody>, IWebResponse, CancellationToken, ValueTask> _responseFactory;
         private readonly IBodyReader _bodyReader;
 
         public WebConfigurationBody(
             Func<IWebRequestEvent<TBody>, bool> criteria,
-            Func<IWebResponse, CancellationToken, ValueTask> responseFactory,
+            Func<IWebRequestEvent<TBody>, IWebResponse, CancellationToken, ValueTask> responseFactory,
             IBodyReader bodyReader)
         {
             _criteria = criteria;
@@ -43,9 +43,10 @@ namespace Periturf.Web.Configuration
             return _criteria(withBody);
         }
 
-        public async ValueTask WriteResponseAsync(IWebResponse response, CancellationToken ct)
+        public async ValueTask WriteResponseAsync(IWebRequestEvent @event, IWebResponse response, CancellationToken ct)
         {
-            await _responseFactory(response, ct);
+            var eventWithBody = await @event.ToWithBodyAsync<TBody>(_bodyReader, ct);
+            await _responseFactory(eventWithBody, response, ct);
         }
     }
 }

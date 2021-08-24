@@ -15,7 +15,8 @@
  */
 using System.Diagnostics;
 using Periturf.Web.BodyReaders;
-using Periturf.Web.Configuration.Requests.Responses;
+using Periturf.Web.BodyWriters;
+using Periturf.Web.Configuration.Responses;
 using Periturf.Web.RequestCriteria;
 
 namespace Periturf.Web.Configuration.Requests
@@ -23,14 +24,14 @@ namespace Periturf.Web.Configuration.Requests
     class WebRequestEventSpecification : IWebRequestEventConfigurator<IWebRequestEvent>, IWebRequestEventSpecification
     {
         private IWebRequestCriteriaSpecification<IWebRequestEvent>? _criteriaSpecification;
-        private IWebRequestResponseSpecification? _responseSpecification;
+        private IWebResponseSpecification<IWebRequestEvent>? _responseSpecification;
 
         public void AddCriteriaSpecification(IWebRequestCriteriaSpecification<IWebRequestEvent> spec)
         {
             _criteriaSpecification = spec;
         }
 
-        public void SetResponseSpecification(IWebRequestResponseSpecification spec)
+        public void AddWebResponseSpecification(IWebResponseSpecification<IWebRequestEvent> spec)
         {
             _responseSpecification = spec;
         }
@@ -40,14 +41,14 @@ namespace Periturf.Web.Configuration.Requests
             // Method intentionally left empty. No body.
         }
 
-        public IWebConfiguration Build(IWebBodyReaderSpecification defaultBodyReaderSpec)
+        public IWebConfiguration Build(IWebBodyReaderSpecification defaultBodyReaderSpec, IWebBodyWriterSpecification defaultBodyWriterSpec)
         {
             Debug.Assert(_criteriaSpecification != null, "_criteriaSpecification != null");
             Debug.Assert(_responseSpecification != null, "_responseSpecification != null");
 
             return new WebConfiguration(
                 _criteriaSpecification.Build(),
-                _responseSpecification.BuildFactory());
+                _responseSpecification.BuildResponseWriter(defaultBodyWriterSpec));
         }
     }
 }

@@ -32,5 +32,7 @@ namespace Periturf.Web.Serialization
         /// <param name="ct">The ct.</param>
         /// <returns></returns>
         ValueTask<T> Deserialize<T>(Stream body, CancellationToken ct);
+        
+        ValueTask Serialize<T>(T @object, Stream stream, CancellationToken ct) where T : class;
     }
 }

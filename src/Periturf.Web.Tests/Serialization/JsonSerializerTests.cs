@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -24,6 +25,7 @@ namespace Periturf.Web.Tests.Serialization
 {
     class JsonSerializerTests
     {
+        const string json = "{\"Test\":6}";
         private ISerializer _sut;
 
         [OneTimeSetUp]
@@ -35,10 +37,9 @@ namespace Periturf.Web.Tests.Serialization
         [Test]
         public async Task Given_Stream_When_Deserialize_Then_Object()
         {
-            const string text = "{ \"Test\": 6 }";
             using var stream = new MemoryStream();
             using var streamWriter = new StreamWriter(stream);
-            streamWriter.Write(text);
+            streamWriter.Write(json);
             streamWriter.Flush();
             stream.Position = 0;
 
@@ -46,6 +47,19 @@ namespace Periturf.Web.Tests.Serialization
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Test, Is.EqualTo(6));
+        }
+
+        [Test]
+        public async Task Given_Object_When_Deserialize_Then_SerializedString()
+        {
+            using var stream = new MemoryStream();
+
+            await _sut.Serialize(new BodyType { Test = 6 }, stream, CancellationToken.None);
+            stream.Flush();
+            stream.Position = 0;
+
+            var result = Encoding.UTF8.GetString(stream.ToArray());
+            Assert.That(result, Is.EqualTo(json));
         }
     }
 }

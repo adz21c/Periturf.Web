@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 using Periturf.Web.BodyReaders;
-using Periturf.Web.Configuration.Requests.Responses;
+using Periturf.Web.Configuration.Responses;
 using Periturf.Web.RequestCriteria;
 
 namespace Periturf.Web.Configuration.Requests
@@ -24,7 +24,7 @@ namespace Periturf.Web.Configuration.Requests
     /// </summary>
     /// <typeparam name="TWebRequestEvent">The type of the web request event.</typeparam>
     /// <seealso cref="Periturf.Web.BodyReaders.IWebBodyReaderConfigurator" />
-    public interface IWebRequestEventConfigurator<TWebRequestEvent> : IWebBodyReaderConfigurator
+    public interface IWebRequestEventConfigurator<TWebRequestEvent> : IWebBodyReaderConfigurator, IWebResponseConfigurable<TWebRequestEvent>
         where TWebRequestEvent : IWebRequestEvent
     {
         /// <summary>
@@ -32,11 +32,5 @@ namespace Periturf.Web.Configuration.Requests
         /// </summary>
         /// <param name="spec">The spec.</param>
         void AddCriteriaSpecification(IWebRequestCriteriaSpecification<TWebRequestEvent> spec);
-
-        /// <summary>
-        /// Adds a web response specification.
-        /// </summary>
-        /// <param name="spec">The spec.</param>
-        void SetResponseSpecification(IWebRequestResponseSpecification spec);
     }
 }

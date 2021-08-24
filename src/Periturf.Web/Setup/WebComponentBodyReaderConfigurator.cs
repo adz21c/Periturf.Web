@@ -15,6 +15,7 @@
  */
 using System.Diagnostics.CodeAnalysis;
 using Periturf.Web.BodyReaders;
+using Periturf.Web.BodyWriters;
 
 namespace Periturf.Web.Setup
 {
@@ -24,6 +25,17 @@ namespace Periturf.Web.Setup
         public IWebBodyReaderSpecification? Spec { get; private set; }
 
         public void AddWebBodyReaderSpecification(IWebBodyReaderSpecification spec)
+        {
+            Spec = spec;
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    class WebComponentBodyWriterConfigurator : IWebBodyWritableConfigurator
+    {
+        public IWebBodyWriterSpecification? Spec { get; private set; }
+
+        public void AddWebBodyWriterSpecification(IWebBodyWriterSpecification spec)
         {
             Spec = spec;
         }
