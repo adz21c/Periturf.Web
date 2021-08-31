@@ -15,14 +15,18 @@
 //  
 //
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Periturf.Web.Configuration.Responses.Body
 {
+    /// <summary>
+    /// Allows the configuration of a response body.
+    /// </summary>
+    /// <typeparam name="TWebRequestEvent">The type of the web request event.</typeparam>
     public interface IWebResponseBodyConfigurable<TWebRequestEvent> where TWebRequestEvent : IWebRequestEvent
     {
+        /// <summary>
+        /// Adds the web response body specification.
+        /// </summary>
+        /// <param name="spec">The spec.</param>
         void AddWebResponseBodySpecification(IWebResponseBodySpecification<TWebRequestEvent> spec);
     }
 }

@@ -36,6 +36,7 @@ namespace Periturf.Web.Configuration
         /// <summary>
         /// Writes the web response as per the configuration.
         /// </summary>
+        /// <param name="event">The event.</param>
         /// <param name="response">The response.</param>
         /// <param name="ct">The ct.</param>
         /// <returns></returns>

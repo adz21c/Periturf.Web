@@ -20,6 +20,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Periturf.Web.BodyWriters.ContentNegotiation
 {
+    /// <summary>
+    /// Configures a server content negotiated body writer.
+    /// </summary>
     public interface IServerContentNegotiationConfigurator
     {
         /// <summary>
@@ -58,6 +61,10 @@ namespace Periturf.Web.BodyWriters.ContentNegotiation
             });
         }
 
+        /// <summary>
+        /// Define a media type criteria and a corresponding writer.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
         void MediaTypeWriter(Action<IServerContentNegotiationMediaTypeWriterConfigurator> config);
     }
 }

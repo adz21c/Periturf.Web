@@ -19,8 +19,16 @@ using System;
 
 namespace Periturf.Web.Configuration.Responses.Conditional
 {
+    /// <summary>
+    /// Configures a response based on conditions
+    /// </summary>
+    /// <typeparam name="TWebRequestEvent">The type of the web request event.</typeparam>
     public interface IConditionalResponseConfigurator<TWebRequestEvent> where TWebRequestEvent : IWebRequestEvent
     {
+        /// <summary>
+        /// Define a condition and its response.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
         void Condition(Action<IConditionConditionalResponseConfigurator<TWebRequestEvent>> config);
     }
 }

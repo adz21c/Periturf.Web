@@ -14,6 +14,7 @@
 //   limitations under the License.
 //  
 //
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 using Periturf.Verify;
 using Periturf.Web.BodyReaders;

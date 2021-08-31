@@ -19,8 +19,16 @@ using Periturf.Web.BodyWriters;
 
 namespace Periturf.Web.Configuration.Responses
 {
+    /// <summary>
+    /// Defines a response body that sends some content through a <see cref="IBodyWriter"/>.
+    /// </summary>
+    /// <seealso cref="Periturf.Web.BodyWriters.IWebBodyWritableConfigurator" />
     public interface IWebResponseBodyConfigurator : IWebBodyWritableConfigurator
     {
+        /// <summary>
+        /// The content.
+        /// </summary>
+        /// <param name="content">The content.</param>
         void Content(object content);
     }
 }

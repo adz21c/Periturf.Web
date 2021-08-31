@@ -17,13 +17,34 @@
 
 namespace Periturf.Web.BodyWriters.ContentNegotiation
 {
+    /// <summary>
+    /// Defines a <see cref="IBodyWriter"/> to associate with a media type definition.
+    /// </summary>
+    /// <seealso cref="Periturf.Web.BodyWriters.IWebBodyWritableConfigurator" />
     public interface IServerContentNegotiationMediaTypeWriterConfigurator : IWebBodyWritableConfigurator
     {
-
+        /// <summary>
+        /// The media type.
+        /// </summary>
+        /// <value>
+        /// The media type.
+        /// </value>
         public string? Type { get; set; }
 
+        /// <summary>
+        /// The media sub type.
+        /// </summary>
+        /// <value>
+        /// The media sub type.
+        /// </value>
         public string? SubType { get; set; }
 
+        /// <summary>
+        /// The media type suffix.
+        /// </summary>
+        /// <value>
+        /// The media type suffix.
+        /// </value>
         public string? Suffix { get; set; }
     }
 }

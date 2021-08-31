@@ -15,18 +15,27 @@
 //  
 //
 
+using System;
+using System.Diagnostics.CodeAnalysis;
 using Periturf.Web.Configuration.Responses;
 using Periturf.Web.Configuration.Responses.Body;
 using Periturf.Web.Configuration.Responses.Body.Conditional;
 using Periturf.Web.Configuration.Responses.Body.Raw;
-using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Periturf.Web
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ExcludeFromCodeCoverage]
     public static class ResponseBodyExtensions
     {
+        /// <summary>
+        /// Define a body that sends content through a writer.
+        /// </summary>
+        /// <typeparam name="TWebRequestEvent">The type of the web request event.</typeparam>
+        /// <param name="configurator">The configurator.</param>
+        /// <param name="config">The configuration.</param>
         public static void Body<TWebRequestEvent>(this IWebResponseBodyConfigurable<TWebRequestEvent> configurator, Action<IWebResponseBodyConfigurator> config)
             where TWebRequestEvent : IWebRequestEvent
         {
@@ -35,6 +44,12 @@ namespace Periturf.Web
             configurator.AddWebResponseBodySpecification(spec);
         }
 
+        /// <summary>
+        /// Define a string body content.
+        /// </summary>
+        /// <typeparam name="TWebRequestEvent">The type of the web request event.</typeparam>
+        /// <param name="configurator">The configurator.</param>
+        /// <param name="config">The configuration.</param>
         public static void RawStringBody<TWebRequestEvent>(this IWebResponseBodyConfigurable<TWebRequestEvent> configurator, Action<IWebResponseRawStringBodyConfigurator> config)
             where TWebRequestEvent : IWebRequestEvent
         {
@@ -43,6 +58,12 @@ namespace Periturf.Web
             configurator.AddWebResponseBodySpecification(spec);
         }
 
+        /// <summary>
+        /// Define a binary content response.
+        /// </summary>
+        /// <typeparam name="TWebRequestEvent">The type of the web request event.</typeparam>
+        /// <param name="configurator">The configurator.</param>
+        /// <param name="config">The configuration.</param>
         public static void RawByteBody<TWebRequestEvent>(this IWebResponseBodyConfigurable<TWebRequestEvent> configurator, Action<IWebResponseRawByteBodyConfigurator> config)
             where TWebRequestEvent : IWebRequestEvent
         {
@@ -51,6 +72,12 @@ namespace Periturf.Web
             configurator.AddWebResponseBodySpecification(spec);
         }
 
+        /// <summary>
+        /// Define different response bodies based on different criterias.
+        /// </summary>
+        /// <typeparam name="TWebRequestEvent">The type of the web request event.</typeparam>
+        /// <param name="configurator">The configurator.</param>
+        /// <param name="config">The configuration.</param>
         public static void ConditionalBody<TWebRequestEvent>(this IWebResponseBodyConfigurable<TWebRequestEvent> configurator, Action<IConditionalResponseBodyConfigurator<TWebRequestEvent>> config)
             where TWebRequestEvent : IWebRequestEvent
         {

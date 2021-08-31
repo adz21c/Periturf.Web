@@ -20,7 +20,6 @@ using System.Diagnostics.CodeAnalysis;
 using Periturf.Configuration;
 using Periturf.Web;
 using Periturf.Web.Configuration;
-using Periturf.Web.Configuration.Requests;
 using Periturf.Web.Configuration.Responses;
 using Periturf.Web.Configuration.Responses.Conditional;
 
@@ -55,6 +54,12 @@ namespace Periturf
             builder.AddSpecification(spec);
         }
 
+        /// <summary>
+        /// Configure a response.
+        /// </summary>
+        /// <typeparam name="TWebRequestEvent">The type of the web request event.</typeparam>
+        /// <param name="configurator">The configurator.</param>
+        /// <param name="config">The configuration.</param>
         public static void Response<TWebRequestEvent>(this IWebResponseConfigurable<TWebRequestEvent> configurator, Action<IWebResponseConfigurator<TWebRequestEvent>> config)
             where TWebRequestEvent : IWebRequestEvent
         {
@@ -63,6 +68,12 @@ namespace Periturf
             configurator.AddWebResponseSpecification(spec);
         }
 
+        /// <summary>
+        /// Configure responses for different conditions.
+        /// </summary>
+        /// <typeparam name="TWebRequestEvent">The type of the web request event.</typeparam>
+        /// <param name="configurator">The configurator.</param>
+        /// <param name="config">The configuration.</param>
         public static void ConditionalResponse<TWebRequestEvent>(this IWebResponseConfigurable<TWebRequestEvent> configurator, Action<IConditionalResponseConfigurator<TWebRequestEvent>> config)
             where TWebRequestEvent : IWebRequestEvent
         {

@@ -17,13 +17,26 @@
 
 using Periturf.Web.BodyReaders;
 using Periturf.Web.RequestCriteria;
+#pragma warning disable CS1584 // XML comment has syntactically incorrect cref attribute
+#pragma warning disable CS1658 // Warning is overriding an error
 
 namespace Periturf.Web.Verification
 {
+
+
+    /// <summary>
+    /// Define a web request criteria and how to respond.
+    /// </summary>
+    /// <seealso cref="Periturf.Web.RequestCriteria.IWebRequestCriteriaConfigurator{Periturf.Web.IWebRequestEvent}" />
     public interface IWebRequestEventConfigurator : IWebRequestCriteriaConfigurator<IWebRequestEvent>
     {
     }
 
+    /// <summary>
+    /// Define a web request criteria and how to respond.
+    /// </summary>
+    /// <typeparam name="TBody">The type of the body.</typeparam>
+    /// <seealso cref="Periturf.Web.RequestCriteria.IWebRequestCriteriaConfigurator{Periturf.Web.IWebRequestEvent}" />
     public interface IWebRequestEventConfigurator<TBody> : IWebRequestCriteriaConfigurator<IWebRequestEvent<TBody>>, IWebBodyReaderConfigurator
     {
     }

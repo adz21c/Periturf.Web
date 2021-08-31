@@ -21,16 +21,44 @@ using Periturf.Web.Configuration.Responses.Body;
 
 namespace Periturf.Web.Configuration.Responses
 {
+    /// <summary>
+    /// Define a web response.
+    /// </summary>
+    /// <typeparam name="TWebRequestEvent">The type of the web request event.</typeparam>
+    /// <seealso cref="Periturf.Web.Configuration.Responses.Body.IWebResponseBodyConfigurable{TWebRequestEvent}" />
     public interface IWebResponseConfigurator<TWebRequestEvent> : IWebResponseBodyConfigurable<TWebRequestEvent> where TWebRequestEvent : IWebRequestEvent
     {
+        /// <summary>
+        /// Set the status code.
+        /// </summary>
+        /// <param name="code">The code.</param>
         void StatusCode(int code);
 
+        /// <summary>
+        /// Adds a header to the response.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="values">The values.</param>
         void AddHeader(string name, StringValues values);
 
+        /// <summary>
+        /// Adds a cookie header to the response.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="options">The options.</param>
         void AddCookie(string name, string value, CookieOptions? options = null);
 
+        /// <summary>
+        /// Sets the content-disposition header for an attachment.
+        /// </summary>
+        /// <param name="filename">The filename.</param>
         void IsAttachement(string? filename = null);
 
+        /// <summary>
+        /// Set the response content type.
+        /// </summary>
+        /// <param name="contentType">Type of the content.</param>
         void ContentType(string contentType);
     }
 }

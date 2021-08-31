@@ -28,7 +28,6 @@ namespace Periturf.Web.BodyWriters
         /// <summary>
         /// Writes the request body into the response.
         /// </summary>
-        /// <typeparam name="TBody">The type of the body.</typeparam>
         /// <param name="event">The web request event.</param>
         /// <param name="response">The web response.</param>
         /// <param name="body">The web response body object.</param>

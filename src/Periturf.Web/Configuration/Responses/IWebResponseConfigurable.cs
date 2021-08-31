@@ -15,12 +15,12 @@
 //  
 //
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Periturf.Web.Configuration.Responses
 {
+    /// <summary>
+    /// Allows the configuration of a response.
+    /// </summary>
+    /// <typeparam name="TWebRequestEvent">The type of the web request event.</typeparam>
     public interface IWebResponseConfigurable<TWebRequestEvent> where TWebRequestEvent : IWebRequestEvent
     {
         /// <summary>

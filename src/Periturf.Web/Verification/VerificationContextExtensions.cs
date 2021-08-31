@@ -20,14 +20,28 @@ using Periturf.Verify;
 
 namespace Periturf.Web.Verification
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ExcludeFromCodeCoverage]
     public static class VerificationContextExtensions
     {
+        /// <summary>
+        /// Define a verification for a web application.
+        /// </summary>
+        /// <param name="configurator">The configurator.</param>
+        /// <returns></returns>
         public static ConditionBuilder WebApp(this IConditionConfigurator configurator)
         {
             return (ConditionBuilder)configurator.GetConditionBuilder("WebApp");
         }
 
+        /// <summary>
+        /// Define a verification for a web application.
+        /// </summary>
+        /// <param name="configurator">The configurator.</param>
+        /// <param name="componentName">Name of the component.</param>
+        /// <returns></returns>
         public static ConditionBuilder WebApp(this IConditionConfigurator configurator, string componentName)
         {
             return (ConditionBuilder)configurator.GetConditionBuilder(componentName);

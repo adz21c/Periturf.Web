@@ -22,8 +22,17 @@ using Periturf.Web.BodyWriters;
 
 namespace Periturf.Web.Configuration.Responses.Body
 {
+    /// <summary>
+    /// Specificies a handler for a response body.
+    /// </summary>
+    /// <typeparam name="TWebRequestEvent">The type of the web request event.</typeparam>
     public interface IWebResponseBodySpecification<TWebRequestEvent> where TWebRequestEvent : IWebRequestEvent
     {
+        /// <summary>
+        /// Builds the response body writer.
+        /// </summary>
+        /// <param name="defaultBodyWriterSpec">The default specification for a <see cref="IBodyWriter"/>.</param>
+        /// <returns></returns>
         Func<TWebRequestEvent, IWebResponse, CancellationToken, ValueTask> BuildResponseBodyWriter(IWebBodyWriterSpecification defaultBodyWriterSpec);
     }
 }

@@ -20,8 +20,16 @@ using Periturf.Web.RequestCriteria;
 
 namespace Periturf.Web.Configuration.Responses.Conditional
 {
+    /// <summary>
+    /// Configures a response condition.
+    /// </summary>
+    /// <typeparam name="TWebRequestEvent">The type of the web request event.</typeparam>
     public interface IConditionConditionalResponseConfigurator<TWebRequestEvent> : IWebResponseConfigurable<TWebRequestEvent> where TWebRequestEvent : IWebRequestEvent
     {
+        /// <summary>
+        /// The criteria a request must meet to trigger this condition's response.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
         void Criteria(Action<IWebRequestCriteriaConfigurator<TWebRequestEvent>> config);
     }
 }

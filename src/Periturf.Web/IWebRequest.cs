@@ -21,6 +21,9 @@ using Microsoft.Extensions.Primitives;
 
 namespace Periturf.Web
 {
+    /// <summary>
+    /// HTTP Web Request
+    /// </summary>
     public interface IWebRequest
     {
         /// <summary>

@@ -21,8 +21,16 @@ using Periturf.Web.BodyReaders;
 
 namespace Periturf.Web.Verification
 {
+    /// <summary>
+    /// Specifies how to process a web request.
+    /// </summary>
     public interface IWebRequestEventSpecification
     {
+        /// <summary>
+        /// Builds the web request handler.
+        /// </summary>
+        /// <param name="defaultBodyReaderSpecification">The default specification for a body reader.</param>
+        /// <returns></returns>
         Func<IWebRequestEvent, ValueTask<bool>> Build(IWebBodyReaderSpecification defaultBodyReaderSpecification);
     }
 }

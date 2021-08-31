@@ -22,6 +22,10 @@ namespace Periturf.Web.Configuration
     /// </summary>
     public interface IWebConfigurationSpecification
     {
+        /// <summary>
+        /// Create the web configuration.
+        /// </summary>
+        /// <returns></returns>
         IWebConfiguration Configure();
     }
 }

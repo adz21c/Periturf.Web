@@ -22,9 +22,18 @@ using Periturf.Web.Verification;
 
 namespace Periturf
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ExcludeFromCodeCoverage]
     public static class ConditionBuilderExtensions
     {
+        /// <summary>
+        /// Create a condition for a request.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        /// <param name="config">The configuration.</param>
+        /// <returns></returns>
         public static IConditionSpecification OnRequest(this ConditionBuilder builder, Action<IWebRequestEventConfigurator> config)
         {
             var eventSpec = new WebRequestEventSpecification();
@@ -32,6 +41,13 @@ namespace Periturf
             return builder.CreateWebRequestEventConditionSpecification(eventSpec);
         }
 
+        /// <summary>
+        /// Create a condition for a request with a body.
+        /// </summary>
+        /// <typeparam name="TBody">The type of the body.</typeparam>
+        /// <param name="builder">The builder.</param>
+        /// <param name="config">The configuration.</param>
+        /// <returns></returns>
         public static IConditionSpecification OnRequest<TBody>(this ConditionBuilder builder, Action<IWebRequestEventConfigurator<TBody>> config) where TBody : class
         {
             var eventSpec = new WebRequestEventBodySpecification<TBody>();

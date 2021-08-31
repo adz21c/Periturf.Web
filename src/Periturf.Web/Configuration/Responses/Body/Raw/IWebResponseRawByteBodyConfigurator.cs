@@ -17,10 +17,21 @@
 
 namespace Periturf.Web.Configuration.Responses.Body.Raw
 {
+    /// <summary>
+    /// Define a response body of bytes
+    /// </summary>
     public interface IWebResponseRawByteBodyConfigurator
     {
+        /// <summary>
+        /// Set the response content type.
+        /// </summary>
+        /// <param name="contentType">Type of the content.</param>
         void ContentType(string contentType);
 
+        /// <summary>
+        /// Set the response content.
+        /// </summary>
+        /// <param name="content">The content.</param>
         void Body(byte[] content);
     }
 }
