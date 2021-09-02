@@ -24,6 +24,7 @@ namespace Periturf.Web.BodyWriters.ContentNegotiation
     class ServerContentNegotiationSpecification : IWebBodyWriterSpecification, IServerContentNegotiationConfigurator
     {
         private readonly List<MediaTypeServerContentNegotiationSpecification> _mediaTypes = new List<MediaTypeServerContentNegotiationSpecification>();
+        private IWebBodyWriterSpecification? _noNegotiationWriterSpec;
 
         public void MediaTypeWriter(Action<IServerContentNegotiationMediaTypeWriterConfigurator> config)
         {
@@ -32,10 +33,28 @@ namespace Periturf.Web.BodyWriters.ContentNegotiation
             _mediaTypes.Add(spec);
         }
 
+        public void NoNegotiationWriter(Action<IWebBodyWritableConfigurator> config)
+        {
+            var spec = new WriterSpecification();
+            config(spec);
+            _noNegotiationWriterSpec = spec.Spec;
+        }
+
         public IBodyWriter Build()
         {
             var mediaWriters = _mediaTypes.Select(x => x.Build()).ToList();
-            return new ServerContentNegotiationWriter(mediaWriters);
+            var noNegotiationWriter = _noNegotiationWriterSpec?.Build();
+            return new ServerContentNegotiationWriter(mediaWriters, noNegotiationWriter);
+        }
+
+        private class WriterSpecification : IWebBodyWritableConfigurator
+        {
+            public IWebBodyWriterSpecification? Spec { get; private set; }
+
+            public void AddWebBodyWriterSpecification(IWebBodyWriterSpecification spec)
+            {
+                Spec = spec;
+            }
         }
     }
 }

@@ -15,6 +15,7 @@
 //  
 //
 
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,6 +32,13 @@ namespace Periturf.Web.Serialization.Json
         public async ValueTask Serialize<T>(T @object, Stream stream, CancellationToken ct) where T : class
         {
             await System.Text.Json.JsonSerializer.SerializeAsync<T>(stream, @object, null, ct);
+        }
+
+        public async ValueTask Serialize(object? @object, Type? type, Stream stream, CancellationToken ct)
+        {
+            if (type == null)
+                return;
+            await System.Text.Json.JsonSerializer.SerializeAsync(stream, @object, type, null, ct);
         }
     }
 }

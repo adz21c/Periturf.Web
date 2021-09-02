@@ -15,6 +15,7 @@
 //  
 //
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,8 +32,9 @@ namespace Periturf.Web.BodyWriters
         /// <param name="event">The web request event.</param>
         /// <param name="response">The web response.</param>
         /// <param name="body">The web response body object.</param>
+        /// <param name="bodyType">The web response body object type.</param>
         /// <param name="ct">The ct.</param>
         /// <returns></returns>
-        ValueTask WriteAsync<TBody>(IWebRequestEvent @event, IWebResponse response, TBody body, CancellationToken ct) where TBody : class;
+        ValueTask WriteAsync(IWebRequestEvent @event, IWebResponse response, object? body, Type? bodyType, CancellationToken ct);
     }
 }

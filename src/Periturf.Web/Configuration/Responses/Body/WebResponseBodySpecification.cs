@@ -27,11 +27,13 @@ namespace Periturf.Web.Configuration.Responses
     class WebResponseBodySpecification<TWebRequestEvent> : IWebResponseBodyConfigurator, IWebResponseBodySpecification<TWebRequestEvent> where TWebRequestEvent : IWebRequestEvent
     {
         private object? _content;
+        private Type? _contentType;
         private IWebBodyWriterSpecification? _writerSpec;
 
-        public void Content(object content)
+        public void Content<TContent>(TContent content)
         {
             _content = content;
+            _contentType = typeof(TContent);
         }
 
         public void AddWebBodyWriterSpecification(IWebBodyWriterSpecification spec)
@@ -42,7 +44,7 @@ namespace Periturf.Web.Configuration.Responses
         public Func<TWebRequestEvent, IWebResponse, CancellationToken, ValueTask> BuildResponseBodyWriter(IWebBodyWriterSpecification defaultBodyWriterSpec)
         {
             var writer = (_writerSpec ?? defaultBodyWriterSpec).Build();
-            return (@event, response, ct) => writer.WriteAsync(@event, response, _content, ct);
+            return (@event, response, ct) => writer.WriteAsync(@event, response, _content, _contentType, ct);
         }
     }
 }

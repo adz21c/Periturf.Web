@@ -15,6 +15,7 @@
 //  
 //
 
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading;
@@ -84,17 +85,17 @@ namespace Periturf.Web.Tests.BodyWriters.ServerNegotiationContentWriter
             var writer2 = RegisterWriter("application", "xml");
             var sut = _spec.Build();
 
-            await sut.WriteAsync(_event, _response, _dummyBody, CancellationToken.None);
+            await sut.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), CancellationToken.None);
 
             if (mediaType == "application/json")
             {
-                A.CallTo(() => writer1.WriteAsync(_event, _response, _dummyBody, A<CancellationToken>._)).MustHaveHappened();
-                A.CallTo(() => writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
+                A.CallTo(() => writer1.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), A<CancellationToken>._)).MustHaveHappened();
+                A.CallTo(() => writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
             }
             else
             {
-                A.CallTo(() => writer2.WriteAsync(_event, _response, _dummyBody, A<CancellationToken>._)).MustHaveHappened();
-                A.CallTo(() => writer1.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
+                A.CallTo(() => writer2.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), A<CancellationToken>._)).MustHaveHappened();
+                A.CallTo(() => writer1.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
             }
         }
 
@@ -110,10 +111,10 @@ namespace Periturf.Web.Tests.BodyWriters.ServerNegotiationContentWriter
             var writer1 = RegisterWriter("application", "json");
             var writer2 = RegisterWriter("application", "xml");
             var sut = _spec.Build();
-            await sut.WriteAsync(_event, _response, _dummyBody, CancellationToken.None);
+            await sut.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), CancellationToken.None);
 
-            A.CallTo(() => writer1.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
-            A.CallTo(() => writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => writer1.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
             A.CallToSet(() => _response.StatusCode).To(System.Net.HttpStatusCode.NotAcceptable).MustHaveHappened();
         }
 
@@ -133,11 +134,11 @@ namespace Periturf.Web.Tests.BodyWriters.ServerNegotiationContentWriter
             var writer3 = RegisterWriter("image");
             var sut = _spec.Build();
 
-            await sut.WriteAsync(_event, _response, _dummyBody, CancellationToken.None);
+            await sut.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), CancellationToken.None);
 
-            A.CallTo(() => writer1.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
-            A.CallTo(() => writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
-            A.CallTo(() => writer3.WriteAsync(_event, _response, _dummyBody, A<CancellationToken>._)).MustHaveHappened();
+            A.CallTo(() => writer1.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => writer3.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), A<CancellationToken>._)).MustHaveHappened();
             A.CallToSet(() => _response.StatusCode).To(System.Net.HttpStatusCode.NotAcceptable).MustNotHaveHappened();
         }
 
@@ -154,10 +155,10 @@ namespace Periturf.Web.Tests.BodyWriters.ServerNegotiationContentWriter
             var writer2 = RegisterWriter("image");
             var sut = _spec.Build();
 
-            await sut.WriteAsync(_event, _response, _dummyBody, CancellationToken.None);
+            await sut.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), CancellationToken.None);
 
-            A.CallTo(() => writer1.WriteAsync(_event, _response, _dummyBody, A<CancellationToken>._)).MustHaveHappened();
-            A.CallTo(() => writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => writer1.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), A<CancellationToken>._)).MustHaveHappened();
+            A.CallTo(() => writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
             A.CallToSet(() => _response.StatusCode).To(System.Net.HttpStatusCode.NotAcceptable).MustNotHaveHappened();
         }
 
@@ -174,10 +175,10 @@ namespace Periturf.Web.Tests.BodyWriters.ServerNegotiationContentWriter
             var writer2 = RegisterWriter("image");
             var sut = _spec.Build();
 
-            await sut.WriteAsync(_event, _response, _dummyBody, CancellationToken.None);
+            await sut.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), CancellationToken.None);
 
-            A.CallTo(() => writer1.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
-            A.CallTo(() => writer2.WriteAsync(_event, _response, _dummyBody, A<CancellationToken>._)).MustHaveHappened();
+            A.CallTo(() => writer1.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => writer2.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), A<CancellationToken>._)).MustHaveHappened();
             A.CallToSet(() => _response.StatusCode).To(System.Net.HttpStatusCode.NotAcceptable).MustNotHaveHappened();
         }
 
@@ -194,10 +195,10 @@ namespace Periturf.Web.Tests.BodyWriters.ServerNegotiationContentWriter
             var writer2 = RegisterWriter("image");
             var sut = _spec.Build();
 
-            await sut.WriteAsync(_event, _response, _dummyBody, CancellationToken.None);
+            await sut.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), CancellationToken.None);
 
-            A.CallTo(() => writer1.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
-            A.CallTo(() => writer2.WriteAsync(_event, _response, _dummyBody, A<CancellationToken>._)).MustHaveHappened();
+            A.CallTo(() => writer1.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => writer2.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), A<CancellationToken>._)).MustHaveHappened();
             A.CallToSet(() => _response.StatusCode).To(System.Net.HttpStatusCode.NotAcceptable).MustNotHaveHappened();
         }
 
@@ -213,9 +214,9 @@ namespace Periturf.Web.Tests.BodyWriters.ServerNegotiationContentWriter
             var writer1 = RegisterWriter("image", "jpg");
             var sut = _spec.Build();
 
-            await sut.WriteAsync(_event, _response, _dummyBody, CancellationToken.None);
+            await sut.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), CancellationToken.None);
 
-            A.CallTo(() => writer1.WriteAsync(_event, _response, _dummyBody, A<CancellationToken>._)).MustHaveHappened();
+            A.CallTo(() => writer1.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), A<CancellationToken>._)).MustHaveHappened();
             A.CallToSet(() => _response.StatusCode).To(System.Net.HttpStatusCode.NotAcceptable).MustNotHaveHappened();
         }
 
@@ -232,10 +233,10 @@ namespace Periturf.Web.Tests.BodyWriters.ServerNegotiationContentWriter
             var writer2 = RegisterWriter("audio");
             var sut = _spec.Build();
 
-            await sut.WriteAsync(_event, _response, _dummyBody, CancellationToken.None);
+            await sut.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), CancellationToken.None);
 
-            A.CallTo(() => writer1.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
-            A.CallTo(() => writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => writer1.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
             A.CallToSet(() => _response.StatusCode).To(System.Net.HttpStatusCode.NotAcceptable).MustHaveHappened();
         }
 
@@ -253,10 +254,10 @@ namespace Periturf.Web.Tests.BodyWriters.ServerNegotiationContentWriter
             var writer2 = RegisterWriter(suffix: "yaml");
             var sut = _spec.Build();
 
-            await sut.WriteAsync(_event, _response, _dummyBody, CancellationToken.None);
+            await sut.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), CancellationToken.None);
 
-            A.CallTo(() => writer1.WriteAsync(_event, _response, _dummyBody, A<CancellationToken>._)).MustHaveHappened();
-            A.CallTo(() => writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => writer1.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), A<CancellationToken>._)).MustHaveHappened();
+            A.CallTo(() => writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
             A.CallToSet(() => _response.StatusCode).To(System.Net.HttpStatusCode.NotAcceptable).MustNotHaveHappened();
         }
 
@@ -273,10 +274,10 @@ namespace Periturf.Web.Tests.BodyWriters.ServerNegotiationContentWriter
             var writer2 = RegisterWriter("application", "vnd.something");
             var sut = _spec.Build();
 
-            await sut.WriteAsync(_event, _response, _dummyBody, CancellationToken.None);
+            await sut.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), CancellationToken.None);
 
-            A.CallTo(() => writer1.WriteAsync(_event, _response, _dummyBody, A<CancellationToken>._)).MustHaveHappened();
-            A.CallTo(() => writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => writer1.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), A<CancellationToken>._)).MustHaveHappened();
+            A.CallTo(() => writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
             A.CallToSet(() => _response.StatusCode).To(System.Net.HttpStatusCode.NotAcceptable).MustNotHaveHappened();
         }
 
@@ -293,10 +294,10 @@ namespace Periturf.Web.Tests.BodyWriters.ServerNegotiationContentWriter
             var writer2 = RegisterWriter("application", "vnd.something", "json");
             var sut = _spec.Build();
 
-            await sut.WriteAsync(_event, _response, _dummyBody, CancellationToken.None);
+            await sut.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), CancellationToken.None);
 
-            A.CallTo(() => writer1.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
-            A.CallTo(() => writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => writer1.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
             A.CallToSet(() => _response.StatusCode).To(System.Net.HttpStatusCode.NotAcceptable).MustHaveHappened();
         }
 
@@ -312,9 +313,9 @@ namespace Periturf.Web.Tests.BodyWriters.ServerNegotiationContentWriter
             var writer1 = RegisterWriter("application", "vnd.something", "json");
             var sut = _spec.Build();
 
-            await sut.WriteAsync(_event, _response, _dummyBody, CancellationToken.None);
+            await sut.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), CancellationToken.None);
 
-            A.CallTo(() => writer1.WriteAsync(_event, _response, _dummyBody, A<CancellationToken>._)).MustHaveHappened();
+            A.CallTo(() => writer1.WriteAsync(_event, _response, _dummyBody, _dummyBody.GetType(), A<CancellationToken>._)).MustHaveHappened();
             A.CallToSet(() => _response.StatusCode).To(System.Net.HttpStatusCode.NotAcceptable).MustNotHaveHappened();
         }
     }

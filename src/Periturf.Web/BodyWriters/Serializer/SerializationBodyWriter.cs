@@ -15,6 +15,7 @@
 //  
 //
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Periturf.Web.Serialization;
@@ -32,10 +33,10 @@ namespace Periturf.Web.BodyWriters.Serializer
             _contentType = contentType;
         }
 
-        public async ValueTask WriteAsync<TBody>(IWebRequestEvent @event, IWebResponse response, TBody body, CancellationToken ct) where TBody : class
+        public async ValueTask WriteAsync(IWebRequestEvent @event, IWebResponse response, object? body, Type? bodyType, CancellationToken ct)
         {
             response.ContentType = _contentType;
-            await _serializer.Serialize(body, response.BodyStream, ct);
+            await _serializer.Serialize(body, bodyType, response.BodyStream, ct);
         }
     }
 }

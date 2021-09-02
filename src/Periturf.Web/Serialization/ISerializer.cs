@@ -15,6 +15,7 @@
 //  
 //
 
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,7 +35,25 @@ namespace Periturf.Web.Serialization
         /// <param name="ct">The ct.</param>
         /// <returns></returns>
         ValueTask<T> Deserialize<T>(Stream body, CancellationToken ct);
-        
+
+        /// <summary>
+        /// Serializes the provided object into the provided stream.
+        /// </summary>
+        /// <typeparam name="T">The type of the object</typeparam>
+        /// <param name="object">The object.</param>
+        /// <param name="stream">The stream.</param>
+        /// <param name="ct">The cancellation token.</param>
+        /// <returns></returns>
         ValueTask Serialize<T>(T @object, Stream stream, CancellationToken ct) where T : class;
+
+        /// <summary>
+        /// Serializes the provided object into the provided stream.
+        /// </summary>
+        /// <param name="object">The object.</param>
+        /// <param name="type">The type of the object.</param>
+        /// <param name="stream">The stream.</param>
+        /// <param name="ct">The cancellation token.</param>
+        /// <returns></returns>
+        ValueTask Serialize(object? @object, Type? type, Stream stream, CancellationToken ct);
     }
 }

@@ -15,6 +15,7 @@
 //  
 //
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -58,8 +59,8 @@ namespace Periturf.Web.Tests.Configuration.Responses.Body
 
             await sut(request, response, CancellationToken.None);
 
-            A.CallTo(() => writer.WriteAsync<object>(request, response, Content, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _defaultWriter.WriteAsync<object>(A<IWebRequestEvent>._, A<IWebResponse>._, A<object>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => writer.WriteAsync(request, response, Content, Content.GetType(), A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _defaultWriter.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<object>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
         }
 
         [Test]
@@ -75,7 +76,7 @@ namespace Periturf.Web.Tests.Configuration.Responses.Body
 
             await sut(request, response, CancellationToken.None);
 
-            A.CallTo(() => _defaultWriter.WriteAsync<object>(request, response, Content, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _defaultWriter.WriteAsync(request, response, Content, Content.GetType(), A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         }
     }
 }

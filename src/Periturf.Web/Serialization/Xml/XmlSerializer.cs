@@ -15,6 +15,7 @@
 //  
 //
 
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,6 +36,16 @@ namespace Periturf.Web.Serialization.Xml
         public ValueTask Serialize<T>(T @object, Stream stream, CancellationToken ct) where T : class
         {
             var serializer = _factory.CreateSerializer(typeof(T));
+            serializer.Serialize(stream, @object);
+            return new ValueTask();
+        }
+
+        public ValueTask Serialize(object? @object, Type? type, Stream stream, CancellationToken ct)
+        {
+            if (type == null)
+                return new ValueTask();
+
+            var serializer = _factory.CreateSerializer(type);
             serializer.Serialize(stream, @object);
             return new ValueTask();
         }

@@ -27,28 +27,36 @@ namespace Periturf.Web.BodyWriters.ContentNegotiation
     class ServerContentNegotiationWriter : IBodyWriter
     {
         private readonly List<(MediaType MediaType, IBodyWriter Writer)> _writers;
+        private readonly IBodyWriter? _noNegotiationWriter;
 
-        public ServerContentNegotiationWriter(List<(MediaType, IBodyWriter)> writers)
+        public ServerContentNegotiationWriter(List<(MediaType, IBodyWriter)> writers, IBodyWriter? noNegotiationWriter)
         {
             _writers = writers;
+            _noNegotiationWriter = noNegotiationWriter;
         }
 
-        public async ValueTask WriteAsync<TBody>(IWebRequestEvent @event, IWebResponse response, TBody body, CancellationToken ct) where TBody : class
+        public async ValueTask WriteAsync(IWebRequestEvent @event, IWebResponse response, object? body, System.Type? bodyType, CancellationToken ct)
         {
-            @event.Request.Headers.TryGetValue("Accept", out var acceptValues);
-
-            var weightedAcceptValues = GetWeightedAcceptValues(acceptValues);
-            foreach (var mediaType in weightedAcceptValues)
+            if (@event.Request.Headers.TryGetValue("Accept", out var acceptValues))
             {
-                var writer = GetMediaTypeWriter(mediaType);
-                if (writer != null)
+                var weightedAcceptValues = GetWeightedAcceptValues(acceptValues);
+                foreach (var mediaType in weightedAcceptValues)
                 {
-                    await writer.WriteAsync(@event, response, body, ct);
-                    return;
+                    var writer = GetMediaTypeWriter(mediaType);
+                    if (writer != null)
+                    {
+                        await writer.WriteAsync(@event, response, body, bodyType, ct);
+                        return;
+                    }
                 }
+
+                response.StatusCode = System.Net.HttpStatusCode.NotAcceptable;
             }
-            
-            response.StatusCode = System.Net.HttpStatusCode.NotAcceptable;
+
+            if (_noNegotiationWriter == null)
+                response.StatusCode = System.Net.HttpStatusCode.NotAcceptable;
+            else
+                await _noNegotiationWriter.WriteAsync(@event, response, body, bodyType, ct);
         }
 
         private static readonly Regex mediaTypeRegex = new Regex(@"(?<Type>[a-zA-z0-9\-\.]+|\*)/(?<SubType>[a-zA-z0-9\.\-]+|\*)(\+(?<Suffix>[a-zA-Z0-9\.\-]*))?(\s*;\s*q\s*=\s*(?<QFactor>\d+(\.\d+)?))?", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
@@ -82,7 +90,9 @@ namespace Periturf.Web.BodyWriters.ContentNegotiation
                 .Where(x => x != null)
                 .Zip(
                     Enumerable.Range(0, acceptValues.Count),
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
                     (x, y) => new { x.MediaType, x.QFactor, ProvidedOrder = y })
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
                 .OrderByDescending(x => x.QFactor).ThenBy(x => x.ProvidedOrder)
                 .Select(x => x.MediaType);
         }

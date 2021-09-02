@@ -32,12 +32,12 @@ namespace Periturf.Web.BodyWriters.Conditional
             _conditionalWriters = conditionalWriters;
         }
 
-        public async ValueTask WriteAsync<TBody>(IWebRequestEvent @event, IWebResponse response, TBody body, CancellationToken ct) where TBody : class
+        public async ValueTask WriteAsync(IWebRequestEvent @event, IWebResponse response, object? body, Type? bodyType, CancellationToken ct)
         {
             foreach (var conditionalWriter in _conditionalWriters)
                 if (conditionalWriter.Condition(@event))
                 {
-                    await conditionalWriter.Writer.WriteAsync(@event, response, body, ct);
+                    await conditionalWriter.Writer.WriteAsync(@event, response, body, bodyType, ct);
                     return;
                 }
 

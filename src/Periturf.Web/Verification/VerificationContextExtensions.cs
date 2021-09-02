@@ -17,8 +17,9 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Periturf.Verify;
+using Periturf.Web.Verification;
 
-namespace Periturf.Web.Verification
+namespace Periturf
 {
     /// <summary>
     /// 

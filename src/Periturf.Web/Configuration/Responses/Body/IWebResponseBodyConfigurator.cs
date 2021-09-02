@@ -28,7 +28,8 @@ namespace Periturf.Web.Configuration.Responses
         /// <summary>
         /// The content.
         /// </summary>
+        /// <typeparam name="TContent">Type of the content.</typeparam>
         /// <param name="content">The content.</param>
-        void Content(object content);
+        void Content<TContent>(TContent content);
     }
 }

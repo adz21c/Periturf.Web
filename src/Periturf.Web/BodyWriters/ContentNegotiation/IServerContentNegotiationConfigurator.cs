@@ -59,6 +59,8 @@ namespace Periturf.Web.BodyWriters.ContentNegotiation
                 c.Suffix = "json";
                 c.JsonBodyWriter();
             });
+            
+            NoNegotiationWriter(c => c.JsonBodyWriter());
         }
 
         /// <summary>
@@ -66,5 +68,11 @@ namespace Periturf.Web.BodyWriters.ContentNegotiation
         /// </summary>
         /// <param name="config">The configuration.</param>
         void MediaTypeWriter(Action<IServerContentNegotiationMediaTypeWriterConfigurator> config);
+
+        /// <summary>
+        /// Define the media writer when there are no negotiation headers.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        void NoNegotiationWriter(Action<IWebBodyWritableConfigurator> config);
     }
 }

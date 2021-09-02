@@ -47,9 +47,9 @@ namespace Periturf.Web.Tests.BodyWriters
             A.CallTo(() => response.BodyStream).Returns(bodyStream);
             var dummyBody = new BodyType();
 
-            await sut.WriteAsync<BodyType>(@event, response, dummyBody, CancellationToken.None);
+            await sut.WriteAsync(@event, response, dummyBody, dummyBody.GetType(), CancellationToken.None);
 
-            A.CallTo(() => serializer.Serialize<BodyType>(dummyBody, bodyStream, A<CancellationToken>._)).MustHaveHappened();
+            A.CallTo(() => serializer.Serialize(dummyBody, dummyBody.GetType(), bodyStream, A<CancellationToken>._)).MustHaveHappened();
             A.CallToSet(() => response.ContentType).To(contentType).MustHaveHappened();
         }
     }

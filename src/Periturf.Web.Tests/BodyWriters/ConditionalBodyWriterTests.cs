@@ -15,6 +15,7 @@
 //  
 //
 
+using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -75,10 +76,10 @@ namespace Periturf.Web.Tests.BodyWriters
 
             A.CallTo(() => @event.Request.Method).Returns("GET");
 
-            await _sut.WriteAsync<BodyType>(@event, response, dummyBody, CancellationToken.None);
+            await _sut.WriteAsync(@event, response, dummyBody, dummyBody.GetType(), CancellationToken.None);
 
-            A.CallTo(() => _writer1.WriteAsync<BodyType>(@event, response, dummyBody, A<CancellationToken>._)).MustHaveHappened();
-            A.CallTo(() => _writer2.WriteAsync<BodyType>(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => _writer1.WriteAsync(@event, response, dummyBody, dummyBody.GetType(), A<CancellationToken>._)).MustHaveHappened();
+            A.CallTo(() => _writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
         }
 
         [Test]
@@ -90,10 +91,10 @@ namespace Periturf.Web.Tests.BodyWriters
 
             A.CallTo(() => @event.Request.Method).Returns("POST");
 
-            await _sut.WriteAsync<BodyType>(@event, response, dummyBody, CancellationToken.None);
+            await _sut.WriteAsync(@event, response, dummyBody, dummyBody.GetType(), CancellationToken.None);
 
-            A.CallTo(() => _writer2.WriteAsync<BodyType>(@event, response, dummyBody, A<CancellationToken>._)).MustHaveHappened();
-            A.CallTo(() => _writer1.WriteAsync<BodyType>(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => _writer2.WriteAsync(@event, response, dummyBody, dummyBody.GetType(), A<CancellationToken>._)).MustHaveHappened();
+            A.CallTo(() => _writer1.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
         }
 
         [Test]
@@ -105,10 +106,10 @@ namespace Periturf.Web.Tests.BodyWriters
 
             A.CallTo(() => @event.Request.Method).Returns("PUT");
 
-            await _sut.WriteAsync<BodyType>(@event, response, dummyBody, CancellationToken.None);
+            await _sut.WriteAsync(@event, response, dummyBody, dummyBody.GetType(), CancellationToken.None);
             
-            A.CallTo(() => _writer1.WriteAsync<BodyType>(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
-            A.CallTo(() => _writer2.WriteAsync<BodyType>(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => _writer1.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => _writer2.WriteAsync(A<IWebRequestEvent>._, A<IWebResponse>._, A<BodyType>._, A<Type>._, A<CancellationToken>._)).MustNotHaveHappened();
             A.CallToSet(() => response.StatusCode).To(HttpStatusCode.NotAcceptable).MustHaveHappened();
         }
     }

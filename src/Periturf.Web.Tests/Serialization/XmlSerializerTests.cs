@@ -28,6 +28,7 @@ namespace Periturf.Web.Tests.Serialization
     class XmlSerializerTests
     {
         const string xml = "<?xml version=\"1.0\"?>\r\n<BodyType xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <Test>6</Test>\r\n</BodyType>";
+        const string emptyXml = "<?xml version=\"1.0\"?>\r\n<BodyType xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xsi:nil=\"true\" />";
         private ISerializer _sut;
 
         [OneTimeSetUp]
@@ -52,7 +53,7 @@ namespace Periturf.Web.Tests.Serialization
         }
 
         [Test]
-        public async Task Given_Object_When_Serialize_Then_SerializeOutput()
+        public async Task Given_Object_When_SerializeT_Then_SerializeOutput()
         {
             using var stream = new MemoryStream();
 
@@ -62,6 +63,42 @@ namespace Periturf.Web.Tests.Serialization
 
             var result = Encoding.UTF8.GetString(stream.ToArray());
             Assert.That(result, Is.EqualTo(xml.Replace("\r\n", System.Environment.NewLine)));
+        }
+
+        [Test]
+        public async Task Given_Object_When_Serialize_Then_SerializeOutput()
+        {
+            using var stream = new MemoryStream();
+
+            await _sut.Serialize(new BodyType { Test = 6 }, typeof(BodyType), stream, CancellationToken.None);
+            stream.Flush();
+            stream.Position = 0;
+
+            var result = Encoding.UTF8.GetString(stream.ToArray());
+            Assert.That(result, Is.EqualTo(xml.Replace("\r\n", System.Environment.NewLine)));
+        }
+
+        [Test]
+        public async Task Given_NullObject_When_Serialize_Then_SerializeOutput()
+        {
+            using var stream = new MemoryStream();
+
+            await _sut.Serialize(null, typeof(BodyType), stream, CancellationToken.None);
+            stream.Flush();
+            stream.Position = 0;
+
+            var result = Encoding.UTF8.GetString(stream.ToArray());
+            Assert.That(result, Is.EqualTo(emptyXml.Replace("\r\n", System.Environment.NewLine)));
+        }
+
+        [Test]
+        public async Task Given_NullType_When_Serialize_Then_StreamUntouched()
+        {
+            using var stream = new MemoryStream();
+
+            await _sut.Serialize(null, null, stream, CancellationToken.None);
+            stream.Flush();
+            Assert.That(stream.Position, Is.EqualTo(0));
         }
     }
 }
