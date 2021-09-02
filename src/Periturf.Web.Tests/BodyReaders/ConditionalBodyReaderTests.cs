@@ -31,7 +31,7 @@ namespace Periturf.Web.Tests.BodyReaders
         private IBodyReader _reader2;
         private IBodyReader _sut;
 
-        [OneTimeSetUp]
+        [SetUp]
         public void SetUp()
         {
             _reader1 = A.Fake<IBodyReader>();
@@ -55,15 +55,6 @@ namespace Periturf.Web.Tests.BodyReaders
             });
 
             _sut = spec.Build();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Fake.ClearConfiguration(_reader1);
-            Fake.ClearRecordedCalls(_reader1);
-            Fake.ClearConfiguration(_reader2);
-            Fake.ClearRecordedCalls(_reader2);
         }
 
         [Test]

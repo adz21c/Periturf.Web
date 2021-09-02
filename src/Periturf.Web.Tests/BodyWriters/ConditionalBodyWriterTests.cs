@@ -32,7 +32,7 @@ namespace Periturf.Web.Tests.BodyWriters
         private IBodyWriter _writer2;
         private IBodyWriter _sut;
 
-        [OneTimeSetUp]
+        [SetUp]
         public void SetUp()
         {
             _writer1 = A.Fake<IBodyWriter>();
@@ -56,15 +56,6 @@ namespace Periturf.Web.Tests.BodyWriters
             });
 
             _sut = spec.Build();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Fake.ClearConfiguration(_writer1);
-            Fake.ClearRecordedCalls(_writer1);
-            Fake.ClearConfiguration(_writer2);
-            Fake.ClearRecordedCalls(_writer2);
         }
 
         [Test]

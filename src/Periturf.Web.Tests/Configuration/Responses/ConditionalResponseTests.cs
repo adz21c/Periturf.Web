@@ -36,7 +36,7 @@ namespace Periturf.Web.Tests.Configuration.Responses
         private IWebResponseSpecification<IWebRequestEvent> _writer2Spec;
         private Func<IWebRequestEvent, IWebResponse, CancellationToken, ValueTask> _sut;
 
-        [OneTimeSetUp]
+        [SetUp]
         public void SetUp()
         {
             _defBodyWriterSpec = A.Fake<IWebBodyWriterSpecification>();
@@ -62,15 +62,6 @@ namespace Periturf.Web.Tests.Configuration.Responses
             });
 
             _sut = spec.BuildResponseWriter(_defBodyWriterSpec);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Fake.ClearConfiguration(_writer1);
-            Fake.ClearRecordedCalls(_writer1);
-            Fake.ClearConfiguration(_writer2);
-            Fake.ClearRecordedCalls(_writer2);
         }
 
         [Test]

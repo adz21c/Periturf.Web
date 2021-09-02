@@ -63,15 +63,6 @@ namespace Periturf.Web.Tests.BodyWriters.ServerNegotiationContentWriter
             return writer;
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            Fake.ClearConfiguration(_event);
-            Fake.ClearRecordedCalls(_event);
-            Fake.ClearConfiguration(_response);
-            Fake.ClearRecordedCalls(_response);
-        }
-
         [TestCase("application", "json")]
         [TestCase("application", "xml")]
         public async Task Given_MultipleMediaType_When_WriteWithOneMatch_Then_MatchingWriterChosen(string type, string subType)

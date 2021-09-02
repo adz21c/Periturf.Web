@@ -22,7 +22,6 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using NUnit.Framework;
 using Periturf.Web.BodyWriters;
-using Periturf.Web.Configuration.Responses;
 using Periturf.Web.Configuration.Responses.Body;
 using Periturf.Web.Configuration.Responses.Body.Conditional;
 
@@ -37,7 +36,7 @@ namespace Periturf.Web.Tests.Configuration.Responses.Body
         private Func<IWebRequestEvent, IWebResponse, CancellationToken, ValueTask> _sut;
         private IWebBodyWriterSpecification _defBodyWriterSpec;
 
-        [OneTimeSetUp]
+        [SetUp]
         public void SetUp()
         {
             _defBodyWriterSpec = A.Fake<IWebBodyWriterSpecification>();
@@ -63,15 +62,6 @@ namespace Periturf.Web.Tests.Configuration.Responses.Body
             });
 
             _sut = spec.BuildResponseBodyWriter(_defBodyWriterSpec);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Fake.ClearConfiguration(_writer1);
-            Fake.ClearRecordedCalls(_writer1);
-            Fake.ClearConfiguration(_writer2);
-            Fake.ClearRecordedCalls(_writer2);
         }
 
         [Test]
