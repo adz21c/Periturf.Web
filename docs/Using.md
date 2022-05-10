@@ -142,6 +142,26 @@ The default BodyWriter is the *ServerContentNogetiationWriter*, which implements
   - application/xml
   - */*+xml
 
+The default *BodyReader* and *BodyWriter* can be configured when setting up the web application, as below.
+
+```csharp
+var env = Environment.Setup(e =>
+{
+    e.GenericHost(h =>
+    {
+        h.Web(wh =>
+        {
+            wh.WebApp("MyApp", "/MyApp", w =>
+            {
+                w.DefaultBodyReader(br => br.JsonBodyReader());
+                w.DefaultBodyWriter(bw => bw.JsonBodyWriter());
+            });
+            wh.BindToUrl(WebHostUrl);
+        });
+    });
+});
+```
+
 ## Conditional
 
 Various points within request definition you can specify alternative configuration based on the request data. The below example shows a request that varies its response based on the HTTP Method.
