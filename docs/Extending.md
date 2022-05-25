@@ -7,7 +7,7 @@ This document assumes you have read the *Extending Periturf* document and theref
 
 ## Serializer
 
-Periturf.Web provides a *Json* and *Xml* serializer out of the box, but there is a good chance you will want to extend to include other serialization formats. Extend *ISerializerSpecification* to build an instance of *ISerializer*, which provides methods providing streams and objects for serialization and deserialization. 
+Periturf.Web provides a *Json* and *Xml* serializer out of the box, but there is a good chance you will want to extend to include other serialization formats. Extend *ISerializerSpecification* to build an instance of *ISerializer*, which provides methods accepting streams and objects for serialization and deserialization. 
 
 ## BodyWriters
 
@@ -33,19 +33,19 @@ Both *IWebResponseSpecification* and *IWebResponseBodySpecification* are intende
 
 Implement *IWebResponseSpecification* to return a function that will accept a request and write a response.
 
-## Web Request
-
-TODO
-
 ## Web Request Criteria
 
-TODO
+The *IWebRequestCriteriaSpecification* specifies and creates a *Func* that accepts a web request and evalutes if it matches a criteria or not. This interface accepts a generic TWebRequestEvent parameter that implements *IWebRequestEvent*. *IWebRequestEvent* holds the basic information about the web request, such as the request itself and the trace identifier, but making it generic allows us to extend the type to include deserialized body data while also being strongly typed (especially during configuration).. 
+
+## Web Request
+
+The base upon which much of Periturf.Web's functionality is built comes from *IWebRequestEventSpecification*, which creates instances of *IWebConfiguration* that evaluate whether a web request matches criteria and produces a responses.
 
 ## Web Component
 
-At the base of Periturf.Web are web components. These are *Periturf Components* that are configured on top of a .NET Generic Host. The *IWebComponentSetupSpecification* exposes the creation of these components, enabling the creation of more complex web-based components that don't confirm to the standard Periturf.Web request handling (see Periturf.IdentityServer).
+At the core of Periturf.Web are web components. These are *Periturf Components* that are configured on top of a .NET Generic Host. The *IWebComponentSetupSpecification* exposes the creation of these components, enabling the creation of more complex web-based components that don't confirm to the standard Periturf.Web request handling (see Periturf.IdentityServer).
 
-Implement *IWebComponentSetupSpecification* as a specification and factory for an instance of *ConfigureWebAppDto*. *ConfigureWebAppDto* returns methods that will configured the ASP.NET web application as you require and returns the Periturf Component (implementing *Periturf.Components.IComponent* as per Periturf requirements). The *Name* property conforms to Periturf's component naming, but the *Path* property will be the component base path on the ASP.NET host.
+Implement *IWebComponentSetupSpecification* as a specification and factory for an instance of *ConfigureWebAppDto*. *ConfigureWebAppDto* returns methods that will configure the ASP.NET web application as you require and returns the Periturf Component (implementing *Periturf.Components.IComponent* as per Periturf requirements). The *Name* property conforms to Periturf's component naming, but the *Path* property will be the component base path on the ASP.NET host.
 
 By convention create an *Entry Point* for your component with the *Name* and *Path* as parameters, with an optional configurator parameter as your component requires.
 
