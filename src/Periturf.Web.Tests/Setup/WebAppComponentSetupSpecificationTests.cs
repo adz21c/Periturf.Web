@@ -29,7 +29,7 @@ using Periturf.Web.Setup;
 namespace Periturf.Web.Tests.Setup
 {
     [TestFixture]
-    class WebComponentSetupSpecificationTests
+    class WebAppComponentSetupSpecificationTests
     {
         [Test]
         public void Given_BuilderAction_When_Apply_Then_IsExecuted()
@@ -37,7 +37,7 @@ namespace Periturf.Web.Tests.Setup
             const string name = "Name";
             PathString path = "/Path";
 
-            var sut = new WebComponentSetupSpecification(name, path);
+            var sut = new WebAppComponentSetupSpecification(name, path);
 
             var config = sut.Configure();
 
@@ -56,7 +56,7 @@ namespace Periturf.Web.Tests.Setup
             var bodyWriterSpec = A.Dummy<IWebBodyWriterSpecification>();
             var bodyReaderSpec = A.Dummy<IWebBodyReaderSpecification>();
 
-            var sut = new WebComponentSetupSpecification(name, path);
+            var sut = new WebAppComponentSetupSpecification(name, path);
             sut.DefaultBodyReader(c => c.AddWebBodyReaderSpecification(bodyReaderSpec));
             sut.DefaultBodyWriter(c => c.AddWebBodyWriterSpecification(bodyWriterSpec));
 

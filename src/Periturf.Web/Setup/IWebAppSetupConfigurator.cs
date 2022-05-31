@@ -15,31 +15,27 @@
 //  
 //
 
-using System.Diagnostics.CodeAnalysis;
+using System;
 using Periturf.Web.BodyReaders;
 using Periturf.Web.BodyWriters;
 
 namespace Periturf.Web.Setup
 {
-    [ExcludeFromCodeCoverage]
-    class WebComponentBodyReaderConfigurator : IWebBodyReaderConfigurator
+    /// <summary>
+    /// 
+    /// </summary>
+    public interface IWebAppSetupConfigurator
     {
-        public IWebBodyReaderSpecification? Spec { get; private set; }
+        /// <summary>
+        /// Configures a body reader used by all request handlers unless otherwise specified.
+        /// </summary>
+        /// <param name="config"></param>
+        void DefaultBodyReader(Action<IWebBodyReaderConfigurator> config);
 
-        public void AddWebBodyReaderSpecification(IWebBodyReaderSpecification spec)
-        {
-            Spec = spec;
-        }
-    }
-
-    [ExcludeFromCodeCoverage]
-    class WebComponentBodyWriterConfigurator : IWebBodyWritableConfigurator
-    {
-        public IWebBodyWriterSpecification? Spec { get; private set; }
-
-        public void AddWebBodyWriterSpecification(IWebBodyWriterSpecification spec)
-        {
-            Spec = spec;
-        }
+        /// <summary>
+        /// Configures a body writer used by all request handlers unless otherwise specified.
+        /// </summary>
+        /// <param name="config"></param>
+        void DefaultBodyWriter(Action<IWebBodyWritableConfigurator> config);
     }
 }
