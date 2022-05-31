@@ -15,6 +15,7 @@
 //  
 //
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Http;
 using Periturf.Web.Setup;
@@ -33,7 +34,7 @@ namespace Periturf
         /// <param name="configurator">The configurator.</param>
         public static void WebApp(this IWebSetupConfigurator configurator)
         {
-            configurator.AddWebComponentSpecification(new WebComponentSetupSpecification("WebApp", "/WebApp"));
+            configurator.AddWebComponentSpecification(new WebAppComponentSetupSpecification("WebApp", "/WebApp"));
         }
 
         /// <summary>
@@ -44,7 +45,21 @@ namespace Periturf
         /// <param name="path">The web application base path.</param>
         public static void WebApp(this IWebSetupConfigurator configurator, string name, PathString path)
         {
-            configurator.AddWebComponentSpecification(new WebComponentSetupSpecification(name, path));
+            configurator.AddWebComponentSpecification(new WebAppComponentSetupSpecification(name, path));
+        }
+
+        /// <summary>
+        /// Create a web application component.
+        /// </summary>
+        /// <param name="configurator">The configurator.</param>
+        /// <param name="name">The component name.</param>
+        /// <param name="path">The web application base path.</param>
+        /// <param name="config">Configure web app defaults.</param>
+        public static void WebApp(this IWebSetupConfigurator configurator, string name, PathString path, Action<IWebAppSetupConfigurator> config)
+        {
+            var spec = new WebAppComponentSetupSpecification(name, path);
+            config(spec);
+            configurator.AddWebComponentSpecification(spec);
         }
     }
 }

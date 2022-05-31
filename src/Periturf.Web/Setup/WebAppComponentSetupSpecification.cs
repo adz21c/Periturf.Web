@@ -26,12 +26,12 @@ using Periturf.Web.BodyWriters.ContentNegotiation;
 
 namespace Periturf.Web.Setup
 {
-    class WebComponentSetupSpecification : IWebComponentSetupSpecification
+    class WebAppComponentSetupSpecification : IWebComponentSetupSpecification, IWebAppSetupConfigurator
     {
         private IWebBodyReaderSpecification _defaultBodyReaderSpec;
         private IWebBodyWriterSpecification _defaultBodyWriterSpec;
 
-        public WebComponentSetupSpecification(string name, PathString path)
+        public WebAppComponentSetupSpecification(string name, PathString path)
         {
             Name = name;
             Path = path;
@@ -71,7 +71,7 @@ namespace Periturf.Web.Setup
 
         public void DefaultBodyReader(Action<IWebBodyReaderConfigurator> config)
         {
-            var spec = new WebComponentBodyReaderConfigurator();
+            var spec = new WebAppComponentBodyReaderConfigurator();
             config(spec);
 
             if (spec.Spec != null)
@@ -100,6 +100,5 @@ namespace Periturf.Web.Setup
                 }),
                 (IServiceCollection s) => { });
         }
-
     }
 }

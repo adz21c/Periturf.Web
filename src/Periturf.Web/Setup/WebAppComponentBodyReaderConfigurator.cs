@@ -15,37 +15,31 @@
 //  
 //
 
-using System;
-using Microsoft.AspNetCore.Http;
+using System.Diagnostics.CodeAnalysis;
 using Periturf.Web.BodyReaders;
+using Periturf.Web.BodyWriters;
 
 namespace Periturf.Web.Setup
 {
-    /// <summary>
-    /// Web component specification.
-    /// </summary>
-    public interface IWebComponentSetupSpecification
+    [ExcludeFromCodeCoverage]
+    class WebAppComponentBodyReaderConfigurator : IWebBodyReaderConfigurator
     {
-        /// <summary>
-        /// Component name.
-        /// </summary>
-        /// <value>
-        /// The name.
-        /// </value>
-        string Name { get; }
+        public IWebBodyReaderSpecification? Spec { get; private set; }
 
-        /// <summary>
-        /// Component sub-path.
-        /// </summary>
-        /// <value>
-        /// The path.
-        /// </value>
-        PathString Path { get; }
+        public void AddWebBodyReaderSpecification(IWebBodyReaderSpecification spec)
+        {
+            Spec = spec;
+        }
+    }
 
-        /// <summary>
-        /// Web component factory method.
-        /// </summary>
-        /// <returns></returns>
-        ConfigureWebAppDto Configure();
+    [ExcludeFromCodeCoverage]
+    class WebComponentBodyWriterConfigurator : IWebBodyWritableConfigurator
+    {
+        public IWebBodyWriterSpecification? Spec { get; private set; }
+
+        public void AddWebBodyWriterSpecification(IWebBodyWriterSpecification spec)
+        {
+            Spec = spec;
+        }
     }
 }

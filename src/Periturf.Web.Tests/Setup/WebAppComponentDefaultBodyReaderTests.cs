@@ -30,7 +30,7 @@ using Periturf.Web.Setup;
 namespace Periturf.Web.Tests.Setup
 {
     [TestFixture]
-    class WebComponentDefaultBodyReaderTests
+    class WebAppComponentDefaultBodyReaderTests
     {
         private IBodyReader _bodyReader;
 
@@ -40,7 +40,7 @@ namespace Periturf.Web.Tests.Setup
             const string name = "Name";
             const string path = "/Path";
 
-            var sut = new WebComponentSetupSpecification(name, path);
+            var sut = new WebAppComponentSetupSpecification(name, path);
             var component = sut.Configure();
             
             var reqBodySpec = A.Fake<IWebRequestEventSpecification>();
