@@ -27,10 +27,10 @@ namespace Periturf.Web.Serialization.Xml
     {
         private readonly XmlSerializerFactory _factory = new XmlSerializerFactory();
 
-        public ValueTask<T> Deserialize<T>(Stream body, CancellationToken ct)
+        public ValueTask<T?> Deserialize<T>(Stream body, CancellationToken ct)
         {
             var serializer = _factory.CreateSerializer(typeof(T));
-            return new ValueTask<T>((T)serializer.Deserialize(body));
+            return new ValueTask<T?>((T?)serializer.Deserialize(body));
         }
 
         public ValueTask Serialize<T>(T @object, Stream stream, CancellationToken ct) where T : class

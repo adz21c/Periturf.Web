@@ -24,21 +24,21 @@ namespace Periturf.Web.Serialization.Json
 {
     class JsonSerializer : ISerializer
     {
-        public ValueTask<T> Deserialize<T>(Stream body, CancellationToken ct)
+        public ValueTask<T?> Deserialize<T>(Stream body, CancellationToken ct)
         {
-            return System.Text.Json.JsonSerializer.DeserializeAsync<T>(body, null, ct);
+            return System.Text.Json.JsonSerializer.DeserializeAsync<T>(body, options: null, cancellationToken: ct);
         }
 
         public async ValueTask Serialize<T>(T @object, Stream stream, CancellationToken ct) where T : class
         {
-            await System.Text.Json.JsonSerializer.SerializeAsync<T>(stream, @object, null, ct);
+            await System.Text.Json.JsonSerializer.SerializeAsync<T>(stream, @object, options: null, cancellationToken: ct);
         }
 
         public async ValueTask Serialize(object? @object, Type? type, Stream stream, CancellationToken ct)
         {
             if (type == null)
                 return;
-            await System.Text.Json.JsonSerializer.SerializeAsync(stream, @object, type, null, ct);
+            await System.Text.Json.JsonSerializer.SerializeAsync(stream, @object, type, options: null, cancellationToken: ct);
         }
     }
 }

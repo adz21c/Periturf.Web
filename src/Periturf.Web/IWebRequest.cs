@@ -112,7 +112,7 @@ namespace Periturf.Web
         /// <value>
         /// The request content type.
         /// </value>
-        string ContentType { get; }
+        string? ContentType { get; }
 
         /// <summary>
         /// The request content length in bytes.
