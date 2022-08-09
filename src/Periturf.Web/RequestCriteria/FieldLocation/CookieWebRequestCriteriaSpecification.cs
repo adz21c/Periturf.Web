@@ -20,10 +20,10 @@ using System.Diagnostics;
 
 namespace Periturf.Web.RequestCriteria.FieldLocation
 {
-    class CookieWebRequestCriteriaSpecification<TWebRequestEvent> : IWebRequestCriteriaSpecification<TWebRequestEvent>, IValueConditionBuilder<string>
+    class CookieWebRequestCriteriaSpecification<TWebRequestEvent> : IWebRequestCriteriaSpecification<TWebRequestEvent>, IValueConditionBuilder<string?>
         where TWebRequestEvent : IWebRequestEvent
     {
-        private IValueEvaluatorSpecification<string>? _valueEvaluatorSpec;
+        private IValueEvaluatorSpecification<string?>? _valueEvaluatorSpec;
         private readonly string _cookieName;
 
         public CookieWebRequestCriteriaSpecification(string cookieName)
@@ -31,7 +31,7 @@ namespace Periturf.Web.RequestCriteria.FieldLocation
             _cookieName = cookieName;
         }
 
-        public void AddNextValueEvaluatorSpecification(IValueEvaluatorSpecification<string> spec)
+        public void AddNextValueEvaluatorSpecification(IValueEvaluatorSpecification<string?> spec)
         {
             _valueEvaluatorSpec = spec;
         }

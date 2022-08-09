@@ -97,7 +97,7 @@ namespace Periturf.Web.BodyWriters.ContentNegotiation
                 .Select(x => x.MediaType);
         }
 
-        private IBodyWriter GetMediaTypeWriter(MediaType target)
+        private IBodyWriter? GetMediaTypeWriter(MediaType target)
         {
             var query = _writers.AsQueryable();
 

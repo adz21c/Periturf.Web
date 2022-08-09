@@ -34,7 +34,7 @@ namespace Periturf.Web.Serialization
         /// <param name="body">The body stream.</param>
         /// <param name="ct">The ct.</param>
         /// <returns></returns>
-        ValueTask<T> Deserialize<T>(Stream body, CancellationToken ct);
+        ValueTask<T?> Deserialize<T>(Stream body, CancellationToken ct);
 
         /// <summary>
         /// Serializes the provided object into the provided stream.

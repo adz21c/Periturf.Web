@@ -1,3 +1,7 @@
+---
+sidebar: auto
+---
+
 # Using Periturf.Web
 
 ## Add as dependency

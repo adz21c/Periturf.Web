@@ -66,7 +66,7 @@ namespace Periturf.Web
 
         public string Method { get; }
 
-        public string ContentType { get; }
+        public string? ContentType { get; }
 
         public long? ContentLength { get; }
 
