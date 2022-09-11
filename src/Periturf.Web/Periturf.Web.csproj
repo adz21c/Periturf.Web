@@ -11,8 +11,8 @@
   
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Periturf" Version="0.6.0-develop0013" />
-    <PackageReference Include="Periturf.Hosting" Version="0.6.0-develop0013" />
+    <PackageReference Include="Periturf" Version="0.6.0-develop.49" />
+    <PackageReference Include="Periturf.Hosting" Version="0.6.0-develop.49" />
   </ItemGroup>
 
 </Project>
