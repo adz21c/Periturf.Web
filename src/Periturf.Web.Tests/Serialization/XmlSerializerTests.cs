@@ -28,8 +28,8 @@ namespace Periturf.Web.Tests.Serialization
 {
     class XmlSerializerTests
     {
-        const string xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><BodyType xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><Test>6</Test></BodyType>";
-        const string emptyXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><BodyType xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xsi:nil=\"true\" />";
+        const string xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<BodyType xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <Test>6</Test>\r\n</BodyType>";
+        const string emptyXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<BodyType xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xsi:nil=\"true\" />";
         private ISerializer _sut;
 
         [OneTimeSetUp]
@@ -63,7 +63,7 @@ namespace Periturf.Web.Tests.Serialization
             stream.Position = 0;
 
             var result = Encoding.UTF8.GetString(stream.ToArray());
-            Assert.That(result, Is.EqualTo(GetEncodedXmlString(xml)));
+            Assert.That(result, Is.EqualTo(xml));
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace Periturf.Web.Tests.Serialization
             stream.Position = 0;
 
             var result = Encoding.UTF8.GetString(stream.ToArray());
-            Assert.That(result, Is.EqualTo(GetEncodedXmlString(xml)));
+            Assert.That(result, Is.EqualTo(xml));
         }
 
         [Test]
@@ -89,7 +89,7 @@ namespace Periturf.Web.Tests.Serialization
             stream.Position = 0;
 
             var result = Encoding.UTF8.GetString(stream.ToArray());
-            Assert.That(result, Is.EqualTo(GetEncodedXmlString(emptyXml)));
+            Assert.That(result, Is.EqualTo(emptyXml));
         }
 
         [Test]
@@ -100,15 +100,6 @@ namespace Periturf.Web.Tests.Serialization
             await _sut.Serialize(null, null, stream, CancellationToken.None);
             stream.Flush();
             Assert.That(stream.Position, Is.EqualTo(0));
-        }
-
-        private static string GetEncodedXmlString(string xml)
-        {
-            var encoder = new UTF8Encoding(true);
-            return encoder.GetString(
-                encoder.GetPreamble()
-                .Concat(encoder.GetBytes(xml))
-                .ToArray());
         }
     }
 }
